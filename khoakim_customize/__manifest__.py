@@ -13,6 +13,9 @@
     'data': [
         'views/inherit_views.xml',
     ],
+    "depends": [
+        "sale",
+    ],
     'demo': [
     ],
     'installable': True,
