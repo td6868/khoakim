@@ -15,6 +15,8 @@
     ],
     "depends": [
         "sale",
+        "base",
+        "product",
     ],
     'demo': [
     ],
