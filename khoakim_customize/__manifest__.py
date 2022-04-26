@@ -13,6 +13,11 @@
     'data': [
         'views/inherit_views.xml',
     ],
+    "depends": [
+        "sale",
+        "base",
+        "product",
+    ],
     'demo': [
     ],
     'installable': True,
