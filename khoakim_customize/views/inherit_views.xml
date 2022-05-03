@@ -10,13 +10,22 @@
                 <field name="prod_image" widget="image"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
-                <field name="prod_image" widget="image" height="50"/>
+                <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="100"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_qty']" position="after">
                 <field name="qty_available"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="after">
                 <field name="qty_available"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="replace">
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="replace">
+                <button name="customize_sale_confirm" id="customize_sale_confirm" string="Xác nhận" class="btn-primary"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+            </xpath>
+            <xpath expr="//page[@name='other_information']/group//group[@name='sale_info']//field[@name='fiscal_position_id']" position="before">
+                <field name="total_due"/>
             </xpath>
         </field>
     </record>
