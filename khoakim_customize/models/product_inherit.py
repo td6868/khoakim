@@ -73,7 +73,7 @@ class ProductProductCustomize(models.Model):
                     },
                 ]
             }
-            post = wcapi.post("products", data).json()
+            wcapi.post("products", data).json()
 
 
 class ResPartnerCustomize(models.Model):
@@ -174,11 +174,11 @@ class ResCompanyCustomize(models.Model):
     woo_ck = fields.Char(string='Keys Woocommerce')
     woo_cs = fields.Char(string='Secret Woocommerce')
 
-class WPSetting(models.TransientModel):
-    _inherit = 'res.config.settings'
-
-    wp_url = fields.Char(string='URL website')
-    wp_user = fields.Char(string='Tài khoản WP')
-    wp_pass = fields.Char(string='Mật khẩu WP')
-    woo_ck = fields.Char(string='Keys Woocommerce')
-    woo_cs = fields.Char(string='Secret Woocommerce')
+# class WPSetting(models.TransientModel):
+#     _inherit = 'res.config.settings'
+#
+#     wp_url = fields.Char(string='URL website')
+#     wp_user = fields.Char(string='Tài khoản WP')
+#     wp_pass = fields.Char(string='Mật khẩu WP')
+#     woo_ck = fields.Char(string='Keys Woocommerce')
+#     woo_cs = fields.Char(string='Secret Woocommerce')
