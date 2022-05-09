@@ -41,39 +41,39 @@ class ProductProductCustomize(models.Model):
                 "image_1920": img_b64,
             })
 
-    def sync_woo_product(self):
-        com_id = self.env.company_id
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3"
-        )
-
-        product = self.env['product.product'].search([])
-
-        for p in product:
-            data = {
-                "name": p.name,
-                "type": "simple",
-                "regular_price": p.list_price,
-                "description": p.description,
-                "short_description": p.description,
-                "manage_stock": 1,
-                "stock_quantity": p.qty_available,
-                "sku": p.default_code,
-                "images": [
-                    {
-                        "src": self.url_img
-
-                    },
-                ]
-            }
-            wcapi.post("products", data).json()
+    # def sync_woo_product(self):
+    #     com_id = self.env.company_id
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3"
+    #     )
+    #
+    #     product = self.env['product.product'].search([()])
+    #
+    #     for p in product:
+    #         data = {
+    #             "name": p.name,
+    #             "type": "simple",
+    #             "regular_price": p.list_price,
+    #             "description": p.description,
+    #             "short_description": p.description,
+    #             "manage_stock": 1,
+    #             "stock_quantity": p.qty_available,
+    #             "sku": p.default_code,
+    #             "images": [
+    #                 {
+    #                     "src": self.url_img
+    #
+    #                 },
+    #             ]
+    #         }
+    #         wcapi.post("products", data).json()
 
 
 class ResPartnerCustomize(models.Model):
