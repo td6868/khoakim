@@ -80,11 +80,11 @@ class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
 
     phone = fields.Char(string="Số điện thoại", required=True)
-    roles = fields.Selection([
-        ('daily1', 'Đại lý cấp 1'),
-        ('daily2', 'Đại lý cấp 2'),
-        ('daily3', 'Đại lý cấp 3')
-        ], string='Cấp đại lý', required=True)
+    # roles = fields.Selection([
+    #     ('daily1', 'Đại lý cấp 1'),
+    #     ('daily2', 'Đại lý cấp 2'),
+    #     ('daily3', 'Đại lý cấp 3')
+    #     ], string='Cấp đại lý', required=True)
 
     @api.onchange('phone')
     def action_duplicate_customer(self):
@@ -115,32 +115,32 @@ class ResPartnerCustomize(models.Model):
             else:
                 email = self.phone + '@khoakim.com.vn'
 
-            if (self.phone and self.roles):
-                password = str(self.phone) + '@abc'
-                print(password)
-                data = {
-                    "username": str(self.phone),
-                    "password": password,
-                    "name": self.name,
-                    "email": email,
-                    "roles": self.roles,
-                }
-                r = requests.post(wp_url, auth=(wp_user, wp_pass), json=data)
-                print(r.text)
-                if (r.status_code == '201'):
-                    return {
-                        'warning': {
-                            'title': ('Tạo tài khoản thành công'),
-                            'message': (("Tài khoản của khách hàng đã được tạo thành công! Với tên tài khoản là %s và mật khẩu là %s") % (self.phone, self.phone))
-                        },
-                    }
-                else:
-                    return {
-                        'warning': {
-                            'title': ('Đã có lỗi'),
-                            'message': (("Đã có lỗi %s . Liên hệ với admin để giải đáp!") % (r.status_code)),
-                        },
-                    }
+            # if (self.phone and self.roles):
+            #     password = str(self.phone) + '@abc'
+            #     print(password)
+            #     data = {
+            #         "username": str(self.phone),
+            #         "password": password,
+            #         "name": self.name,
+            #         "email": email,
+            #         "roles": self.roles,
+            #     }
+            #     r = requests.post(wp_url, auth=(wp_user, wp_pass), json=data)
+            #     print(r.text)
+            #     if (r.status_code == '201'):
+            #         return {
+            #             'warning': {
+            #                 'title': ('Tạo tài khoản thành công'),
+            #                 'message': (("Tài khoản của khách hàng đã được tạo thành công! Với tên tài khoản là %s và mật khẩu là %s") % (self.phone, self.phone))
+            #             },
+            #         }
+            #     else:
+            #         return {
+            #             'warning': {
+            #                 'title': ('Đã có lỗi'),
+            #                 'message': (("Đã có lỗi %s . Liên hệ với admin để giải đáp!") % (r.status_code)),
+            #             },
+            #         }
         return UserError('Lỗi chưa có thông tin về website Đại lý. Hãy vào công ty để khai báo!')
 
 
