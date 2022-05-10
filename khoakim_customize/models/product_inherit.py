@@ -30,6 +30,11 @@ class ProductProduct(models.Model):
             vals["sku_wp"] = sku
         return super(ProductProduct, self).create(vals)
 
+    def write(self, values):
+        wr = super(ProductProduct, self).write(values)
+        self.update_product_wp(values)
+        return wr
+
     @api.onchange('default_code')
     def action_duplicate_code(self):
         if self.default_code:
@@ -79,7 +84,7 @@ class ProductProduct(models.Model):
                 "description": vals['description'] or "Chưa được cập nhật",
                 "short_description": vals['description'] or "Chưa được cập nhật",
                 "manage_stock": 1,
-                "stock_quantity": "0",
+                "stock_quantity": "10",
                 "sku": vals['default_code'],
                 "images": [
                     {
@@ -99,6 +104,50 @@ class ProductProduct(models.Model):
             return js["id"]
         else:
             return False
+
+    def update_product_wp(self, values):
+        com_id = self.env.company
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
+
+        if (wp_url == False or woo_ck == False or woo_cs == False):
+            return True
+
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+
+        data = {
+            # "name": values['name'],
+            "name": self.name,
+            "type": "simple",
+            "regular_price": str(self.list_price),
+            "description": self.description or "Chưa được cập nhật",
+            "short_description": self.description or "Chưa được cập nhật",
+            "manage_stock": 1,
+            "stock_quantity": self.qty_available or "10",
+            "sku": self.default_code,
+            "images": [
+                {
+                    "src": self.url_img
+                },
+            ]
+        }
+
+        if self.sku_wp:
+            update = wcapi.put("products/" + str(self.sku_wp), data)
+        else:
+            update = wcapi.post("products", data)
+
+        status = update.status_code
+        js = update.json()
+        print(js)
+        print(status)
 
     def sync_product_wp(self):
         for p in self:
@@ -121,7 +170,7 @@ class ProductProduct(models.Model):
                     "description": p.description,
                     "short_description": p.description,
                     "manage_stock": 1,
-                    "stock_quantity": p.qty_available,
+                    "stock_quantity": p.qty_available or "10",
                     "sku": p.default_code,
                     "images": [
                         {
@@ -129,10 +178,17 @@ class ProductProduct(models.Model):
                         },
                     ]
                 }
-                pe = wcapi.post("products", data).json()
-                self.write({
-                    'sku_wp': pe["id"],
-                })
+
+                if p.sku_wp:
+                    update = wcapi.put("products" + str(p.sku_wp), data)
+                else:
+                    update = wcapi.post("products", data)
+                    status = update.status_code
+                    js = update.json()
+                    if status == 201:
+                        p.write({
+                            'sku_wp': js["id"],
+                        })
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
