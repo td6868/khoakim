@@ -5,7 +5,7 @@ import time
 
 from woocommerce import API
 from odoo import api, fields, models
-from odoo.exceptions import UserError, Warning
+from odoo.exceptions import Warning, UserError
 import requests
 import base64
 import urllib.request
@@ -22,32 +22,34 @@ class ProductProduct(models.Model):
     url_img = fields.Char(string="URL Ảnh", required=True)
     sku_wp = fields.Char(string="ID")
     default_code = fields.Char(string="Mã nội bộ", required=True)
+    wp_ok = fields.Boolean(string="Khả dụng ở website")
 
     @api.model
     def create(self, vals):
-        if 'name' in vals:
-            sku = self.create_woo_product(vals)
-            vals["sku_wp"] = sku
+        if vals["wp_ok"] != True:
+            vals["sku_wp"] = self.create_woo_product(vals)
         return super(ProductProduct, self).create(vals)
 
     def write(self, values):
         wr = super(ProductProduct, self).write(values)
-        self.update_product_wp(values)
+        if self.wp_ok == True:
+            self.update_product_wp(values)
         return wr
 
     @api.onchange('default_code')
     def action_duplicate_code(self):
-        if self.default_code:
-            dup_code = self.env['product.product'].search([('default_code', '=', self.default_code)])
-            if dup_code:
-                code = self.default_code
-                self.default_code = False
-                return {
-                    'warning': {
-                                    'title': ('Trùng sản phẩm'),
-                                    'message': (("Mã %s đã bị trùng với sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code))
-                                },
-                }
+        if self.type == 'product':
+            if self.default_code:
+                dup_code = self.env['product.product'].search([('default_code', '=', self.default_code)])
+                if dup_code:
+                    code = self.default_code
+                    self.default_code = False
+                    return {
+                        'warning': {
+                                        'title': ('Trùng sản phẩm'),
+                                        'message': (("Mã %s đã bị trùng với sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code))
+                                    },
+                    }
 
     @api.onchange('url_img')
     def onchange_image(self):
@@ -105,7 +107,7 @@ class ProductProduct(models.Model):
         else:
             return False
 
-    def update_product_wp(self, values):
+    def update_product_wp(self):
         com_id = self.env.company
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
