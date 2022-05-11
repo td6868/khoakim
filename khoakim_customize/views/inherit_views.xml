@@ -9,33 +9,54 @@
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
             </xpath>
+
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
+
             <xpath expr="//field[@name='order_line']/kanban//field[@name='name']" position="before">
                 <field name="prod_image" widget="image"/>
             </xpath>
+
             <xpath expr="//field[@name='order_line']/kanban/templates//t[@t-name='kanban-box']//div[1]//t[1]" position="before">
 <!--                <field name="prod_image" widget="image"/>-->
                 <div class="o_kanban_image">
                     <img t-att-src="kanban_image('product.template', 'image_128', record.prod_image.raw_value)" alt="Sản phẩm" class="o_image_64_contain"/>
                 </div>
             </xpath>
+
             <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_qty']" position="after">
                 <field name="qty_available"/>
             </xpath>
+
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="after">
                 <field name="qty_available"/>
             </xpath>
+
             <xpath expr="//button[@name='action_confirm']" position="replace">
             </xpath>
+
             <xpath expr="//button[@name='action_confirm']" position="replace">
-                <button name="customize_sale_confirm" id="customize_sale_confirm" string="Xác nhận" class="btn-primary"
+                <button name="action_quotation_approval" id="customize_sale_approval" string="Xác nhận" class="btn-primary"
                         type="object" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+                <button name="action_accept_approval" id="action_accept_approval" string="Xác nhận" class="btn-primary"
+                        groups="khoakim_customize.group_approval_sale_order"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
+                <button name="action_cancel_approval" id="action_cancel_approval" string="Hủy"
+                        groups="khoakim_customize.group_approval_sale_order"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
+                <button name="action_cancel" id="action_cancel" string="Hủy"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
             </xpath>
+
+<!--            <xpath expr="//button[@name='action_quotation_sent']" position="replace">-->
+<!--                -->
+<!--            </xpath>-->
+
             <xpath expr="//page[@name='other_information']/group//group[@name='sale_info']//field[@name='fiscal_position_id']" position="before">
                 <field name="total_due"/>
             </xpath>
+
         </field>
     </record>
 
@@ -83,6 +104,9 @@
                     <field name="sku_wp" invisible="1"/>
                 </div>
             </xpath>
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="wp_ok"/>
+            </xpath>
         </field>
     </record>
 
@@ -96,6 +120,9 @@
                     <field name="url_img" label="URL"/>
                     <field name="sku_wp" invisible="1"/>
                 </div>
+            </xpath>
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="wp_ok"/>
             </xpath>
         </field>
     </record>

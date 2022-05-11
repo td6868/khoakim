@@ -11,7 +11,10 @@
     'category': 'Customize',
     'website': 'https://www.odoo.com/page/billing',
     'data': [
+        'security/security.xml',
         'views/inherit_views.xml',
+        'data/data.xml',
+        'data/mail_data.xml',
     ],
     "depends": [
         "sale",

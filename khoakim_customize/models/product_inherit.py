@@ -26,14 +26,14 @@ class ProductProduct(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals["wp_ok"] != True:
+        if vals["wp_ok"] == False:
             vals["sku_wp"] = self.create_woo_product(vals)
         return super(ProductProduct, self).create(vals)
 
     def write(self, values):
         wr = super(ProductProduct, self).write(values)
         if self.wp_ok == True:
-            self.update_product_wp(values)
+            self.update_product_wp()
         return wr
 
     @api.onchange('default_code')
@@ -145,52 +145,80 @@ class ProductProduct(models.Model):
             update = wcapi.put("products/" + str(self.sku_wp), data)
         else:
             update = wcapi.post("products", data)
+            js = update.json()
+            self.write({
+                'sku_wp': js['id']
+            })
 
         status = update.status_code
         js = update.json()
-        print(js)
+
+        print(js['id'])
         print(status)
 
+    @api.model
     def sync_product_wp(self):
-        for p in self:
-            if p.sku_wp == False:
-                wp_url = ''
-                woo_ck = ''
-                woo_cs = ''
+        com_id = self.env['res.company'].search([('id', '=', 1)])
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
 
-                wcapi = API(
-                    url=wp_url,
-                    consumer_key=woo_ck,
-                    consumer_secret=woo_cs,
-                    version="wc/v3"
-                )
+        if (wp_url == False or woo_ck == False or woo_cs == False):
+            return True
 
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+
+        if self.wp_ok:
+            if self.sku_wp:
                 data = {
-                    "name": p.name,
-                    "type": "simple",
-                    "regular_price": p.list_price,
-                    "description": p.description,
-                    "short_description": p.description,
-                    "manage_stock": 1,
-                    "stock_quantity": p.qty_available or "10",
-                    "sku": p.default_code,
-                    "images": [
-                        {
-                            "src": p.url_img
-                        },
-                    ]
+                    "stock_quantity": self.qty_available,
                 }
+                update = wcapi.put("products/" + str(self.sku_wp), data)
+                status = update.status_code
+                js = update.json()
+                print(js['id'])
+                print(status)
+            else:
+                self.update_product_wp()
 
-                if p.sku_wp:
-                    update = wcapi.put("products" + str(p.sku_wp), data)
-                else:
-                    update = wcapi.post("products", data)
-                    status = update.status_code
-                    js = update.json()
-                    if status == 201:
-                        p.write({
-                            'sku_wp': js["id"],
-                        })
+    @api.model
+    def _cron_product_wp(self):
+        com_id = self.env['res.company'].search([('id','=',1)])
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
+        
+        if (wp_url == False or woo_ck == False or woo_cs == False):
+            return True
+
+        prod_vals = self.env['product.product'].search([('wp_ok', '=', True)])
+        print(prod_vals)
+
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+        for p in prod_vals:
+            if p.sku_wp:
+                data = {
+                    "stock_quantity": p.qty_available,
+                }
+                update = wcapi.put("products/" + str(p.sku_wp), data)
+                status = update.status_code
+                js = update.json()
+                print(js['id'])
+                print(status)
+            else:
+                p.update_product_wp()
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
@@ -232,8 +260,7 @@ class ResPartnerCustomize(models.Model):
                 email = self.phone + '@khoakim.com.vn'
 
             if (self.phone and self.roles):
-                password = str(self.phone) + '@abc'
-                print(password)
+                password = str(self.phone) + '@'
                 data = {
                     "username": str(self.phone),
                     "password": password,
@@ -242,7 +269,6 @@ class ResPartnerCustomize(models.Model):
                     "roles": self.roles,
                 }
                 r = requests.post(wp_url, auth=(wp_user, wp_pass), json=data)
-                print(r.text)
                 if (r.status_code == '201'):
                     return {
                         'warning': {
@@ -264,6 +290,54 @@ class SaleOrderCustomize(models.Model):
     _inherit = 'sale.order'
 
     total_due = fields.Monetary(string="Công nợ hiện tại", related="partner_id.total_due")
+    state = fields.Selection(selection=[
+        ('draft', 'Báo giá'),
+        ('waiting', 'Chờ duyệt báo giá'),
+        ('sent', 'Báo giá đã gửi'),
+        ('sale', 'Đơn hàng'),
+        ('done', 'Đã khóa'),
+        ('cancel', 'Đã hủy'),
+    ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
+
+    def action_quotation_approval(self):
+        sum = 0
+        for l in self.order_line:
+            sum += l.discount
+        if sum:
+            self.write({'state': 'waiting'})
+            self.notify_manager()
+        else:
+            self.customize_sale_confirm()
+
+    def action_accept_approval(self):
+        self.customize_sale_confirm()
+        self.notify_manager()
+
+    def action_cancel_approval(self):
+        self.action_draft()
+
+    def notify_manager(self):
+        if self.state == 'waiting':
+            manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1).parent_id
+            print('run notify')
+            if manager:
+                for sale_approval in self.filtered(lambda hol: hol.state == 'waiting'):
+                    print(sale_approval)
+                    self.activity_schedule(
+                        'khoakim_customize.mail_act_sale_approval_kk',
+                        user_id=manager.user_id.id or self.env.uid)
+            else:
+                return {
+                        'warning': {
+                            'title': ('Đã có lỗi'),
+                            'message': (("Chưa tìm được người duyệt, vui lòng liên hệ admin!")),
+                        },
+                    }
+
+        self.filtered(lambda hol: hol.state in ['sale', 'done']).activity_feedback(
+            ['khoakim_customize.mail_act_sale_approval_kk'])
+        self.filtered(lambda hol: hol.state == 'cancel').activity_unlink(
+            ['khoakim_customize.mail_act_sale_approval_kk'])
 
     def customize_sale_confirm(self):
         self.action_confirm()
