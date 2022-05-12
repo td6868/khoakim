@@ -21,8 +21,9 @@ class ProductProduct(models.Model):
 
     url_img = fields.Char(string="URL Ảnh", required=True)
     sku_wp = fields.Char(string="ID")
-    default_code = fields.Char(string="Mã nội bộ", required=True)
+    default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code')
     wp_ok = fields.Boolean(string="Khả dụng ở website")
+    prod_code = fields.Char(string="Mã SP/NSX", required=True)
 
     @api.model
     def create(self, vals):
@@ -36,20 +37,28 @@ class ProductProduct(models.Model):
             self.update_product_wp()
         return wr
 
-    @api.onchange('default_code')
+    @api.onchange('prod_code')
     def action_duplicate_code(self):
         if self.type == 'product':
-            if self.default_code:
-                dup_code = self.env['product.product'].search([('default_code', '=', self.default_code)])
+            if self.prod_code:
+                dup_code = self.env['product.product'].search([('prod_code', '=', self.prod_code)])
                 if dup_code:
-                    code = self.default_code
-                    self.default_code = False
+                    code = self.prod_code
+                    self.prod_code = False
                     return {
                         'warning': {
                                         'title': ('Trùng sản phẩm'),
-                                        'message': (("Mã %s đã bị trùng với sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code))
+                                        'message': (("Mã %s đã bị trùng với sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code.name))
                                     },
                     }
+
+    @api.depends('categ_id', 'prod_code')
+    def _gen_product_code(self):
+        for prod in self:
+            if prod.categ_id:
+                prod.default_code = '%s%s' % (prod.categ_id.cate_code, prod.prod_code or '')
+            else:
+                prod.default_code = prod.prod_code
 
     @api.onchange('url_img')
     def onchange_image(self):
@@ -193,7 +202,7 @@ class ProductProduct(models.Model):
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
         woo_cs = com_id.woo_cs
-        
+
         if (wp_url == False or woo_ck == False or woo_cs == False):
             return True
 
@@ -211,6 +220,7 @@ class ProductProduct(models.Model):
             if p.sku_wp:
                 data = {
                     "stock_quantity": p.qty_available,
+                    "regular_price": str(p.list_price),
                 }
                 update = wcapi.put("products/" + str(p.sku_wp), data)
                 status = update.status_code
@@ -219,6 +229,34 @@ class ProductProduct(models.Model):
                 print(status)
             else:
                 p.update_product_wp()
+
+class ProductCategory(models.Model):
+    _inherit = 'product.category'
+
+    ccode = fields.Char(string="Mã nhóm sản phẩm", required=True)
+    cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate')
+
+    @api.depends('ccode', 'parent_id')
+    def _gene_code_cate(self):
+        for cate in self:
+            if cate.parent_id:
+                cate.cate_code = '%s%s' % (cate.parent_id.cate_code, cate.ccode or '')
+            else:
+                cate.cate_code = cate.ccode
+
+    @api.onchange('ccode')
+    def action_duplicate_categ_code(self):
+        if self.ccode:
+            dup_code = self.env['product.category'].search([('ccode', '=', self.ccode)])
+            if dup_code:
+                code = self.ccode
+                self.ccode = False
+                return {
+                        'warning': {
+                            'title': ('Trùng nhóm sản phẩm'),
+                            'message': (("Mã %s đã bị trùng với nhóm sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code.name))
+                        },
+                    }
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
