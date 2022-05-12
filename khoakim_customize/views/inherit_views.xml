@@ -10,12 +10,24 @@
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
+                <field name="price_unit" readonly="1" force_save="1"/>
+            </xpath>
+
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="replace">
+                <field name="price_unit" readonly="1" force_save="1"/>
+            </xpath>
+
             <xpath expr="//field[@name='order_line']/kanban//field[@name='name']" position="before">
                 <field name="prod_image" widget="image"/>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="replace">
+                <field name="price_unit" readonly="1" force_save="1"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban/templates//t[@t-name='kanban-box']//div[1]//t[1]" position="before">
@@ -104,6 +116,10 @@
                     <field name="sku_wp" invisible="1"/>
                 </div>
             </xpath>
+            <xpath expr="//field[@name='default_code']" position="replace">
+                <field name="prod_code"/>
+                <field name="default_code" force_save="1" readonly="1"/>
+            </xpath>
             <xpath expr="//field[@name='barcode']" position="after">
                 <field name="wp_ok"/>
             </xpath>
@@ -121,9 +137,43 @@
                     <field name="sku_wp" invisible="1"/>
                 </div>
             </xpath>
-            <xpath expr="//field[@name='categ_id']" position="after">
+            <xpath expr="//field[@name='default_code']" position="replace">
+                <field name="prod_code"/>
+                <field name="default_code" force_save="1" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='barcode']" position="after">
                 <field name="wp_ok"/>
             </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_product_category_form_inherit" model="ir.ui.view">
+        <field name="name">product.category.inherit</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="ccode"/>
+                <field name="cate_code"/>
+            </xpath>
+<!--            <xpath expr="//field[@name='categ_id']" position="after">-->
+<!--                <field name="wp_ok"/>-->
+<!--            </xpath>-->
+        </field>
+    </record>
+
+    <record id="view_product_category_tree_inherit" model="ir.ui.view">
+        <field name="name">product.category.inherit</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_list_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="after">
+                <field name="ccode"/>
+            </xpath>
+<!--            <xpath expr="//field[@name='categ_id']" position="after">-->
+<!--                <field name="wp_ok"/>-->
+<!--            </xpath>-->
         </field>
     </record>
 
