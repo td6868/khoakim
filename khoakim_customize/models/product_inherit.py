@@ -16,7 +16,7 @@ class SaleOrderLinesCustomize(models.Model):
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
     qty_available = fields.Float(string="Tồn kho", related="product_id.qty_available")
 
-class ProductProduct(models.Model):
+class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     url_img = fields.Char(string="URL Ảnh", required=True)
@@ -29,19 +29,18 @@ class ProductProduct(models.Model):
     def create(self, vals):
         if vals["wp_ok"] == False:
             vals["sku_wp"] = self.create_woo_product(vals)
-        return super(ProductProduct, self).create(vals)
+        return super(ProductTemplate, self).write(vals)
 
-    def write(self, values):
-        wr = super(ProductProduct, self).write(values)
+    def write(self, vals):
+        super(ProductTemplate, self).write(vals)
         if self.wp_ok == True:
             self.update_product_wp()
-        return wr
 
     @api.onchange('prod_code')
     def action_duplicate_code(self):
         if self.type == 'product':
             if self.prod_code:
-                dup_code = self.env['product.product'].search([('prod_code', '=', self.prod_code)])
+                dup_code = self.env['product.template'].search([('prod_code', '=', self.prod_code)])
                 if dup_code:
                     code = self.prod_code
                     self.prod_code = False
@@ -230,6 +229,11 @@ class ProductProduct(models.Model):
             else:
                 p.update_product_wp()
 
+class ProductAttributeValues(models.Model):
+    _inherit = 'product.attribute.value'
+
+    acode = fields.Char(string='Mã biến thể', required=True)
+
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
@@ -257,6 +261,30 @@ class ProductCategory(models.Model):
                             'message': (("Mã %s đã bị trùng với nhóm sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code.name))
                         },
                     }
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
+    default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code')
+
+    def _get_temp_prod(self):
+        for p in self:
+            if p.product_tmpl_id:
+                p.prod_code = p.product_tmpl_id.prod_code or ''
+
+    @api.depends('product_template_attribute_value_ids', 'prod_code', 'product_tmpl_id.default_code')
+    def _gen_product_attrs_code(self):
+        for prod in self:
+            code = prod.product_tmpl_id.default_code or ''
+            attrs = prod.product_template_attribute_value_ids
+            b = []
+            for s in attrs:
+                b.append([s.attribute_id.sequence, s.product_attribute_value_id.acode])
+
+            for c in b:
+                code += c[1] or ''
+            prod.default_code = code
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
@@ -338,14 +366,20 @@ class SaleOrderCustomize(models.Model):
     ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
 
     def action_quotation_approval(self):
-        sum = 0
-        for l in self.order_line:
-            sum += l.discount
-        if sum:
-            self.write({'state': 'waiting'})
-            self.notify_manager()
+        group_pass = 'khoakim_customize.group_pass_approval_sale_order'
+        user = self.env.user
+        if user.has_group(group_pass):
+            print(user.has_group(group_pass))
+            return True
         else:
-            self.customize_sale_confirm()
+            sum = 0
+            for l in self.order_line:
+                sum += l.discount
+            if sum:
+                self.write({'state': 'waiting'})
+                self.notify_manager()
+            else:
+                self.customize_sale_confirm()
 
     def action_accept_approval(self):
         self.customize_sale_confirm()

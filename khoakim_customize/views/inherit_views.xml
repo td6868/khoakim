@@ -10,24 +10,27 @@
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
-                <field name="price_unit" readonly="1" force_save="1"/>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">1</attribute>
+                <attribute name="force_save">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="replace">
-                <field name="price_unit" readonly="1" force_save="1"/>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">1</attribute>
+                <attribute name="force_save">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban//field[@name='name']" position="before">
                 <field name="prod_image" widget="image"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="replace">
-                <field name="price_unit" readonly="1" force_save="1"/>
+            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">1</attribute>
+                <attribute name="force_save">1</attribute>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban/templates//t[@t-name='kanban-box']//div[1]//t[1]" position="before">
@@ -72,6 +75,20 @@
         </field>
     </record>
 
+    <record id="view_product_attribute_form_inherit" model="ir.ui.view">
+        <field name="name">product.attribute.form.inherit</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="sequence"/>
+            </xpath>
+            <xpath expr="//field[@name='value_ids']/tree//field[@name='name']" position="after">
+                <field name="acode"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="view_res_partner_form_inherit" model="ir.ui.view">
         <field name="name">res.partner.inherit</field>
         <field name="model">res.partner</field>
@@ -110,6 +127,9 @@
         <field name="model">product.product</field>
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
+<!--            <xpath expr="//button[@name='action_update_quantity_on_hand']" position="before">-->
+<!--                <button name="test_attrs" type="object" string="Test A"/>-->
+<!--            </xpath>-->
             <xpath expr="//div[@name='options']" position="after">
                 <div>
                     <field name="url_img" label="URL"/>
