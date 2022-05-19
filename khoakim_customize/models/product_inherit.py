@@ -10,26 +10,164 @@ import requests
 import base64
 import urllib.request
 
-class SaleOrderLinesCustomize(models.Model):
+class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
     qty_available = fields.Float(string="Tồn kho", related="product_id.qty_available")
+    cus_discount = fields.Float(string='CK ($)')
+
+    @api.onchange("cus_discount")
+    def _onchange_discount_percent(self):
+        if self.cus_discount:
+            self.write({
+                'discount': 0.0,
+            })
+
+    @api.onchange("discount")
+    def _onchange_discount_fix(self):
+        if self.discount:
+            self.write({
+                'cus_discount': 0.0,
+            })
+
+    @api.depends("product_uom_qty", "discount", "price_unit", "tax_id", "cus_discount")
+    def _compute_amount(self):
+        vals = {}
+        for line in self.filtered(
+                lambda l: l.cus_discount and l.order_id.state not in ["done", "cancel"]
+        ):
+            real_price = line.price_unit * (1 - (line.discount or 0.0) / 100.0) - (
+                    line.cus_discount or 0.0
+            )
+            twicked_price = real_price / (1 - (line.discount or 0.0) / 100.0)
+            vals[line] = {
+                "price_unit": line.price_unit,
+            }
+            line.update({"price_unit": twicked_price})
+        res = super(SaleOrderLine, self)._compute_amount()
+        for line in vals.keys():
+            line.update(vals[line])
+        return res
+
+class AccountMove(models.Model):
+    _inherit = "account.move"
+
+    def _recompute_tax_lines(self, recompute_tax_base_amount=False):
+        vals = {}
+        for line in self.invoice_line_ids.filtered("cus_discount"):
+            vals[line] = {"price_unit": line.price_unit}
+            price_unit = line.price_unit - line.cus_discount
+            line.update({"price_unit": price_unit})
+        res = super(AccountMove, self)._recompute_tax_lines(
+            recompute_tax_base_amount=recompute_tax_base_amount
+        )
+        for line in vals.keys():
+            line.update(vals[line])
+        return res
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    cus_discount = fields.Float(string='CK ($)')
+
+    @api.onchange("cus_discount")
+    def _onchange_discount_percent(self):
+        if self.cus_discount:
+            self.write({
+                'discount': 0.0,
+            })
+
+    @api.onchange("discount")
+    def _onchange_discount_fix(self):
+        if self.discount:
+            self.write({
+                'cus_discount': 0.0,
+            })
+
+    @api.onchange("quantity", "discount", "price_unit", "tax_ids", "cus_discount")
+    def _onchange_price_subtotal(self):
+        return super(AccountMoveLine, self)._onchange_price_subtotal()
+
+    @api.model
+    def _get_price_total_and_subtotal_model(
+        self,
+        price_unit,
+        quantity,
+        discount,
+        currency,
+        product,
+        partner,
+        taxes,
+        move_type,
+    ):
+        if self.cus_discount != 0:
+            discount = ((self.cus_discount) / price_unit) * 100 or 0.00
+        return super(AccountMoveLine, self)._get_price_total_and_subtotal_model(
+            price_unit, quantity, discount, currency, product, partner, taxes, move_type
+        )
+
+    @api.model
+    def _get_fields_onchange_balance_model(
+        self,
+        quantity,
+        discount,
+        balance,
+        move_type,
+        currency,
+        taxes,
+        price_subtotal,
+        force_computation=False,
+    ):
+        if self.cus_discount != 0:
+            discount = ((self.cus_discount) / self.price_unit) * 100 or 0.00
+        return super(AccountMoveLine, self)._get_fields_onchange_balance_model(
+            quantity,
+            discount,
+            balance,
+            move_type,
+            currency,
+            taxes,
+            price_subtotal,
+            force_computation=force_computation,
+        )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        prev_discount = []
+        for vals in vals_list:
+            if vals.get("cus_discount"):
+                prev_discount.append(
+                    {"cus_discount": vals.get("cus_discount"), "discount": 0.00}
+                )
+                fixed_discount = (
+                    vals.get("cus_discount") / vals.get("price_unit")
+                ) * 100
+                vals.update({"discount": fixed_discount, "cus_discount": 0.00})
+            elif vals.get("discount"):
+                prev_discount.append({"discount": vals.get("discount")})
+        res = super(AccountMoveLine, self).create(vals_list)
+        i = 0
+        for rec in res:
+            if rec.discount and prev_discount:
+                rec.write(prev_discount[i])
+                i += 1
+        return res
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     url_img = fields.Char(string="URL Ảnh")
     sku_wp = fields.Char(string="ID")
-    default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code')
+    default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code', store=True)
     wp_ok = fields.Boolean(string="Khả dụng ở website")
     prod_code = fields.Char(string="Mã SP/NSX", required=True)
 
     @api.model
     def create(self, vals):
-        if vals["wp_ok"] == False:
-            vals["sku_wp"] = self.create_woo_product(vals)
-        return super(ProductTemplate, self).create(vals)
+        super(ProductTemplate, self).create(vals)
+        if self.wp_ok == True:
+            self.update_product_wp()
 
     def write(self, vals):
         super(ProductTemplate, self).write(vals)
@@ -68,52 +206,53 @@ class ProductTemplate(models.Model):
                 "image_1920": img_b64,
             })
 
-    def create_woo_product(self, vals):
-        com_id = self.env.company
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-        sku_wp = ''
-
-        if (wp_url == False or woo_ck == False or woo_cs == False):
-            return sku_wp
-        else:
-            wcapi = API(
-                url=wp_url,
-                consumer_key=woo_ck,
-                consumer_secret=woo_cs,
-                version="wc/v3",
-                timeout=30
-            )
-
-            # print(vals['name'])
-
-            data = {
-                    "name": vals['name'],
-                    "type": "simple",
-                    "regular_price": str(vals['list_price']),
-                    "description": vals['description'] or "Chưa được cập nhật",
-                    "short_description": vals['description'] or "Chưa được cập nhật",
-                    "manage_stock": 1,
-                    "stock_quantity": "10",
-                    "sku": vals['default_code'],
-                    "images": [
-                        {
-                            "src": vals['url_img'] or ''
-                        },
-                    ]
-                }
-
-            # if self.sku_wp:
-            #     wcapi.put("products" + str(self.id), data).json()
-            # else:
-            post = wcapi.post("products", data)
-            status = post.status_code
-            js = post.json()
-            print(status)
-            if status == 201:
-                sku_wp = str(js["id"])
-            return sku_wp
+    # def create_woo_product(self, vals):
+    #     com_id = self.env.company
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #
+    #     if (wp_url == False or woo_ck == False or woo_cs == False):
+    #         return True
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3",
+    #         timeout=30
+    #     )
+    #
+    #     # print(vals['name'])
+    #
+    #     data = {
+    #             "name": vals['name'],
+    #             "type": "simple",
+    #             "regular_price": str(vals['list_price']),
+    #             "description": vals['description'] or "Chưa được cập nhật",
+    #             "short_description": vals['description'] or "Chưa được cập nhật",
+    #             "manage_stock": 1,
+    #             "stock_quantity": "10",
+    #             "sku": vals['default_code'],
+    #             "images": [
+    #                 {
+    #                     "src": vals['url_img']
+    #                 },
+    #             ]
+    #         }
+    #
+    #     # if self.sku_wp:
+    #     #     wcapi.put("products" + str(self.id), data).json()
+    #     # else:
+    #     post = wcapi.post("products", data)
+    #     status = post.status_code
+    #     js = post.json()
+    #     print(status)
+    #     if status == 201:
+    #         return js["id"]
+    #     else:
+    #         id = ''
+    #         return id
 
     def update_product_wp(self):
         com_id = self.env.company
@@ -154,13 +293,15 @@ class ProductTemplate(models.Model):
             update = wcapi.put("products/" + str(self.sku_wp), data)
         else:
             update = wcapi.post("products", data)
+
+        status = update.status_code
+        js = update.json()
+
+        if status == 201:
             js = update.json()
             self.write({
                 'sku_wp': js['id']
             })
-
-        status = update.status_code
-        js = update.json()
 
         print(js['id'])
         print(status)
@@ -236,12 +377,56 @@ class ProductAttributeValues(models.Model):
     _inherit = 'product.attribute.value'
 
     acode = fields.Char(string='Mã biến thể', required=True)
+    attr_term_wp = fields.Char(string='ID')
+
+
+class ProductAttribute(models.Model):
+    _inherit = 'product.attribute'
+
+    attr_wp = fields.Char(string='ID')
+
+    def update_attrs_wp(self):
+        com_id = self.env.company
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
+
+        if (wp_url == False or woo_ck == False or woo_cs == False):
+            return True
+
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+
+        data = {
+            "name": self.name,
+            "type": "select",
+            "order_by": "menu_order",
+            "has_archives": True
+        }
+
+        if self.cate_id:
+            update = wcapi.put("products/attributes/" + str(self.cate_id), data)
+            status = update.status_code
+        else:
+            update = wcapi.post("products/attributes", data)
+            status = update.status_code
+            if status == 201:
+                js = update.json()
+                self.cate_id = js['id']
+        print(status)
 
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
     ccode = fields.Char(string="Mã nhóm sản phẩm", required=True)
-    cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate')
+    cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
+    cate_id = fields.Char(string="ID")
+    wp_ok = fields.Char(string="Khả dụng trên website")
 
     @api.depends('ccode', 'parent_id')
     def _gene_code_cate(self):
@@ -265,11 +450,45 @@ class ProductCategory(models.Model):
                         },
                     }
 
+    def update_categ_wp(self):
+        com_id = self.env.company
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
+
+        if (wp_url == False or woo_ck == False or woo_cs == False or self.wp_ok == False):
+            return True
+
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+
+        data = {
+            "name": self.name,
+            "parent": self.parent_id.cate_id or 0,
+            "description": "",
+        }
+
+        if self.cate_id:
+            update = wcapi.put("products/categories/" + str(self.cate_id), data)
+            status = update.status_code
+        else:
+            update = wcapi.post("products/categories", data)
+            status = update.status_code
+            if status == 201:
+                js = update.json()
+                self.cate_id = js['id']
+        print(status)
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
-    default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code')
+    default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code', store=True)
 
     def _get_temp_prod(self):
         for p in self:
@@ -288,6 +507,15 @@ class ProductProduct(models.Model):
             for c in b:
                 code += c[1] or ''
             prod.default_code = code
+
+    @api.onchange('url_img')
+    def onchange_image(self):
+        if self.url_img:
+            get_img = urllib.request.urlopen(self.url_img).read()
+            img_b64 = base64.encodestring(get_img)
+            self.write({
+                "image_1920": img_b64,
+            })
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
@@ -329,9 +557,10 @@ class ResPartnerCustomize(models.Model):
                 email = self.phone + '@khoakim.com.vn'
 
             if (self.phone and self.roles):
-                password = str(self.phone) + '@'
+                username = str(self.phone)[0:6]
+                password = str(self.phone)
                 data = {
-                    "username": str(self.phone),
+                    "username": str(self.phone)[0:7],
                     "password": password,
                     "name": self.name,
                     "email": email,
@@ -342,7 +571,7 @@ class ResPartnerCustomize(models.Model):
                     return {
                         'warning': {
                             'title': ('Tạo tài khoản thành công'),
-                            'message': (("Tài khoản của khách hàng đã được tạo thành công! Với tên tài khoản là %s và mật khẩu là %s") % (self.phone, self.phone))
+                            'message': (("Tài khoản của khách hàng đã được tạo thành công! Với tên tài khoản là %s và mật khẩu là %s") % (username, password))
                         },
                     }
                 else:
@@ -372,8 +601,7 @@ class SaleOrderCustomize(models.Model):
         group_pass = 'khoakim_customize.group_pass_approval_sale_order'
         user = self.env.user
         if user.has_group(group_pass):
-            print(user.has_group(group_pass))
-            return True
+            self.customize_sale_confirm()
         else:
             sum = 0
             for l in self.order_line:
@@ -387,9 +615,6 @@ class SaleOrderCustomize(models.Model):
     def action_accept_approval(self):
         self.customize_sale_confirm()
         self.notify_manager()
-
-    def action_cancel_approval(self):
-        self.action_draft()
 
     def notify_manager(self):
         if self.state == 'waiting':
