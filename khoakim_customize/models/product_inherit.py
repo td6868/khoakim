@@ -19,7 +19,7 @@ class SaleOrderLinesCustomize(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    url_img = fields.Char(string="URL Ảnh", required=True)
+    url_img = fields.Char(string="URL Ảnh")
     sku_wp = fields.Char(string="ID")
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code')
     wp_ok = fields.Boolean(string="Khả dụng ở website")
@@ -98,7 +98,7 @@ class ProductTemplate(models.Model):
                 "sku": vals['default_code'],
                 "images": [
                     {
-                        "src": vals['url_img']
+                        "src": vals['url_img'] or ''
                     },
                 ]
             }
@@ -110,10 +110,10 @@ class ProductTemplate(models.Model):
         status = post.status_code
         js = post.json()
         print(status)
+        sku_wp = ''
         if status == 201:
-            return js["id"]
-        else:
-            return False
+            sku_wp = str(js["id"])
+        return sku_wp
 
     def update_product_wp(self):
         com_id = self.env.company
@@ -144,7 +144,7 @@ class ProductTemplate(models.Model):
             "sku": self.default_code,
             "images": [
                 {
-                    "src": self.url_img
+                    "src": self.url_img or ''
                 },
             ]
         }
