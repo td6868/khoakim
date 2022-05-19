@@ -73,9 +73,10 @@ class ProductTemplate(models.Model):
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
         woo_cs = com_id.woo_cs
+        sku_wp = ''
 
         if (wp_url == False or woo_ck == False or woo_cs == False):
-            return True
+            return sku_wp
 
         wcapi = API(
             url=wp_url,
@@ -110,7 +111,6 @@ class ProductTemplate(models.Model):
         status = post.status_code
         js = post.json()
         print(status)
-        sku_wp = ''
         if status == 201:
             sku_wp = str(js["id"])
         return sku_wp
@@ -120,9 +120,10 @@ class ProductTemplate(models.Model):
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
         woo_cs = com_id.woo_cs
+        sku_wp = ''
 
         if (wp_url == False or woo_ck == False or woo_cs == False):
-            return True
+            return sku_wp
 
         wcapi = API(
             url=wp_url,
@@ -170,9 +171,10 @@ class ProductTemplate(models.Model):
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
         woo_cs = com_id.woo_cs
+        sku_wp = ''
 
         if (wp_url == False or woo_ck == False or woo_cs == False):
-            return True
+            return sku_wp
 
         wcapi = API(
             url=wp_url,
@@ -201,9 +203,10 @@ class ProductTemplate(models.Model):
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
         woo_cs = com_id.woo_cs
+        sku_wp = ''
 
         if (wp_url == False or woo_ck == False or woo_cs == False):
-            return True
+            return sku_wp
 
         prod_vals = self.env['product.product'].search([('wp_ok', '=', True)])
         print(prod_vals)
