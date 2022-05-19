@@ -76,6 +76,7 @@ class ProductTemplate(models.Model):
         sku_wp = ''
 
         if (wp_url == False or woo_ck == False or woo_cs == False):
+            print(com_id, wp_url)
             return sku_wp
 
         wcapi = API(
