@@ -76,45 +76,44 @@ class ProductTemplate(models.Model):
         sku_wp = ''
 
         if (wp_url == False or woo_ck == False or woo_cs == False):
-            print(com_id, wp_url)
             return sku_wp
+        else:
+            wcapi = API(
+                url=wp_url,
+                consumer_key=woo_ck,
+                consumer_secret=woo_cs,
+                version="wc/v3",
+                timeout=30
+            )
 
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3",
-            timeout=30
-        )
+            # print(vals['name'])
 
-        # print(vals['name'])
+            data = {
+                    "name": vals['name'],
+                    "type": "simple",
+                    "regular_price": str(vals['list_price']),
+                    "description": vals['description'] or "Chưa được cập nhật",
+                    "short_description": vals['description'] or "Chưa được cập nhật",
+                    "manage_stock": 1,
+                    "stock_quantity": "10",
+                    "sku": vals['default_code'],
+                    "images": [
+                        {
+                            "src": vals['url_img'] or ''
+                        },
+                    ]
+                }
 
-        data = {
-                "name": vals['name'],
-                "type": "simple",
-                "regular_price": str(vals['list_price']),
-                "description": vals['description'] or "Chưa được cập nhật",
-                "short_description": vals['description'] or "Chưa được cập nhật",
-                "manage_stock": 1,
-                "stock_quantity": "10",
-                "sku": vals['default_code'],
-                "images": [
-                    {
-                        "src": vals['url_img'] or ''
-                    },
-                ]
-            }
-
-        # if self.sku_wp:
-        #     wcapi.put("products" + str(self.id), data).json()
-        # else:
-        post = wcapi.post("products", data)
-        status = post.status_code
-        js = post.json()
-        print(status)
-        if status == 201:
-            sku_wp = str(js["id"])
-        return sku_wp
+            # if self.sku_wp:
+            #     wcapi.put("products" + str(self.id), data).json()
+            # else:
+            post = wcapi.post("products", data)
+            status = post.status_code
+            js = post.json()
+            print(status)
+            if status == 201:
+                sku_wp = str(js["id"])
+            return sku_wp
 
     def update_product_wp(self):
         com_id = self.env.company
