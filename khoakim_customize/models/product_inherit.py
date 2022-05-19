@@ -25,11 +25,11 @@ class ProductTemplate(models.Model):
     wp_ok = fields.Boolean(string="Khả dụng ở website")
     prod_code = fields.Char(string="Mã SP/NSX", required=True)
 
-#     @api.model
-#     def create(self, vals):
+    @api.model
+    def create(self, vals):
 #         if vals["wp_ok"] == False:
 #             vals["sku_wp"] = self.create_woo_product(vals)
-#         return super(ProductTemplate, self).write(vals)
+        return super(ProductTemplate, self).write(vals)
 
     def write(self, vals):
         super(ProductTemplate, self).write(vals)
