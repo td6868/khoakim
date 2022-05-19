@@ -178,6 +178,20 @@
         </field>
     </record>
 
+    <record id="view_product_product_kanban_inherit" model="ir.ui.view">
+        <field name="name">product.product.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='tags']" position="before">
+                <ul>
+                    <li><strong>Thực tế: <field name="qty_available"/> sản phẩm</strong></li>
+                </ul>
+            </xpath>
+
+        </field>
+    </record>
+
     <record id="view_product_category_form_inherit" model="ir.ui.view">
         <field name="name">product.category.inherit</field>
         <field name="model">product.category</field>
