@@ -27,9 +27,9 @@ class ProductTemplate(models.Model):
 
     @api.model
     def create(self, vals):
-#         if vals["wp_ok"] == False:
-#             vals["sku_wp"] = self.create_woo_product(vals)
-        return super(ProductTemplate, self).write(vals)
+        if vals["wp_ok"] == False:
+            vals["sku_wp"] = self.create_woo_product(vals)
+        return super(ProductTemplate, self).create(vals)
 
     def write(self, vals):
         super(ProductTemplate, self).write(vals)
