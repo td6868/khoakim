@@ -19,21 +19,31 @@ class Pricelist(models.Model):
         ('non_policy', 'Không theo chính sách')
     ], string="Loại bảng giá", default='main', required=True)
     def_pl_id = fields.Many2one('product.pricelist',string="Bảng giá NY", domain=[('type_pl', '=', 'main')])
-    discount = fields.Float(string='Chiết khấu theo bảng giá (%)',tracking=True)
+    discount = fields.Float(string='Chiết khấu theo bảng giá (%)', tracking=True)
+    type_dics = fields.Selection([
+        ('perc', 'Phần trăm'),
+        ('fix', 'Tiền cố định')
+    ], string='Loại chiết khấu')
     catg_id = fields.Many2one('product.category',string='Danh mục SP', tracking=True, onchange=True)
-    catg_disc = fields.Float(string='Tỷ lệ CK (%)', tracking=True)
+    catg_disc = fields.Float(string='Chiết khấu', tracking=True)
 
     # def write(self, vals):
     #     super(Pricelist, self).write(vals)
 
     def action_price_categ(self):
-        if self.catg_id and self.catg_disc:
+        if self.catg_id and self.catg_disc and self.type_dics:
             for l in self.item_ids:
-                if l.product_tmpl_id.categ_id.id == self.catg_id.id:
-                    cur_price = l.fixed_price
-                    l.fixed_price = ((100.00 - self.catg_disc) / 100.00) * cur_price
+                categ_ids = self.env['product.category'].search([('id', 'child_of', [self.catg_id.id])])
+                for cid in categ_ids:
+                    if l.product_tmpl_id.categ_id.id == cid.id:
+                        cur_price = l.fixed_price
+                        if self.type_dics == 'perc':
+                            l.fixed_price = ((100.00 - self.catg_disc) / 100.00) * cur_price
+                        elif self.type_dics == 'fix':
+                            l.fixed_price = cur_price - self.catg_disc
             self.write({
                 'catg_id': False,
+                'type_dics': False,
                 'catg_disc': False
             })
 

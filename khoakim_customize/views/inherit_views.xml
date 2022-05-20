@@ -241,6 +241,7 @@
                 </group>
                 <group name="catg_id">
                     <field name="catg_id"/>
+                    <field name="type_dics"/>
                 </group>
                 <group name="catg_disc">
                     <field name="catg_disc"/>
