@@ -222,4 +222,32 @@
         </field>
     </record>
 
+    <record id="view_product_pricelist_tree_inherit" model="ir.ui.view">
+        <field name="name">product.pricelist.inherit</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_update_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'policy')]}"/>
+                    <button name="action_update_main_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'main')]}"/>
+                </header>
+            </xpath>
+            <xpath expr="//group[@name='pricelist_settings']" position="after">
+                <group name="pricelist_st">
+                    <field name="type_pl"/>
+                    <field name="def_pl_id" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>
+                    <field name="discount" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>
+                </group>
+                <group name="catg_id">
+                    <field name="catg_id"/>
+                </group>
+                <group name="catg_disc">
+                    <field name="catg_disc"/>
+                    <button name="action_price_categ" string="Cập nhật giá" type="object" class="btn-warning"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

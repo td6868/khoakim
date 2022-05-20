@@ -10,6 +10,89 @@ import requests
 import base64
 import urllib.request
 
+class Pricelist(models.Model):
+    _inherit = 'product.pricelist'
+
+    type_pl = fields.Selection([
+        ('main', 'Bảng giá niêm yết'),
+        ('policy', 'Theo chính sách'),
+        ('non_policy', 'Không theo chính sách')
+    ], string="Loại bảng giá", default='main', required=True)
+    def_pl_id = fields.Many2one('product.pricelist',string="Bảng giá NY", domain=[('type_pl', '=', 'main')])
+    discount = fields.Float(string='Chiết khấu theo bảng giá (%)',tracking=True)
+    catg_id = fields.Many2one('product.category',string='Danh mục SP', tracking=True, onchange=True)
+    catg_disc = fields.Float(string='Tỷ lệ CK (%)', tracking=True)
+
+    # def write(self, vals):
+    #     super(Pricelist, self).write(vals)
+
+    def action_price_categ(self):
+        if self.catg_id and self.catg_disc:
+            for l in self.item_ids:
+                if l.product_tmpl_id.categ_id.id == self.catg_id.id:
+                    cur_price = l.fixed_price
+                    l.fixed_price = ((100.00 - self.catg_disc) / 100.00) * cur_price
+            self.write({
+                'catg_id': False,
+                'catg_disc': False
+            })
+
+    def _update_price_policy(self):
+        if self.discount:
+            for l in self.item_ids:
+                cur_price = l.fixed_price
+                l.fixed_price = ((100.00 - self.discount) / 100.00) * cur_price
+
+    def action_update_main_price(self):
+        pl = self.env['product.pricelist']
+        pl_ids = pl.search([('def_pl_id', '=', self.id)])
+        pl_item_ids = []
+        pl_update = ''
+        for item in self.item_ids:
+            pl_item_ids.append((0, item.id,
+                                {
+                                    'product_tmpl_id': item.product_tmpl_id.id,
+                                    'product_id': item.product_id.id,
+                                    'min_quantity': item.min_quantity,
+                                    'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price,
+                                    'date_start': item.date_start,
+                                    'date_end': item.date_end
+                                }))
+        for pl_id in pl_ids:
+            if pl_id.item_ids:
+                for i in pl_id.item_ids:
+                    i.unlink()
+            pl_id.write({
+                'item_ids': pl_item_ids,
+                })
+            pl_id._update_price_policy()
+            pl_update += str(pl_id.name) + ', '
+        return {
+                        'warning': {
+                            'title': ('Đã hoàn thành'),
+                            'message': (("Đã cập nhật các bảng giá sau %s") % (pl_update))
+                        },
+                    }
+
+    def action_update_price(self):
+            pl_item_ids = []
+            for item in self.def_pl_id.item_ids:
+                pl_item_ids.append((0, item.id,
+                {
+                    'product_tmpl_id': item.product_tmpl_id.id,
+                    'product_id': item.product_id.id,
+                    'min_quantity': item.min_quantity,
+                    'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price ,
+                    'date_start': item.date_start,
+                    'date_end': item.date_end
+                }))
+            if self.item_ids:
+                for i in self.item_ids:
+                    i.unlink()
+            self.write({
+                'item_ids': pl_item_ids,
+            })
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -165,9 +248,10 @@ class ProductTemplate(models.Model):
 
     @api.model
     def create(self, vals):
-        super(ProductTemplate, self).create(vals)
+        rec = super(ProductTemplate, self).create(vals)
         if self.wp_ok == True:
             self.update_product_wp()
+        return rec
 
     def write(self, vals):
         super(ProductTemplate, self).write(vals)
