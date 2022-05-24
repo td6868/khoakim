@@ -610,7 +610,7 @@ class ProductProduct(models.Model):
             for c in d:
                 code += c[1] or ''
             prod.default_code = code
-            print(code)
+#             print(code)
 
     @api.onchange('url_img')
     def onchange_image(self):
