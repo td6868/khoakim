@@ -589,6 +589,10 @@ class ProductProduct(models.Model):
     prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code', store=True)
 
+    def write(self, vals):
+        super(ProductProduct, self).write(vals)
+        self._gen_product_attrs_code()
+
     def _get_temp_prod(self):
         for p in self:
             if p.product_tmpl_id:
