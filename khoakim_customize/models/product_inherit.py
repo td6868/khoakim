@@ -262,17 +262,17 @@ class ProductTemplate(models.Model):
     wp_ok = fields.Boolean(string="Khả dụng ở website")
     prod_code = fields.Char(string="Mã SP/NSX", required=True)
 
-    @api.model
-    def create(self, vals):
-        rec = super(ProductTemplate, self).create(vals)
-        if self.wp_ok == True:
-            self.update_product_wp()
-        return rec
+    # @api.model
+    # def create(self, vals):
+    #     rec = super(ProductTemplate, self).create(vals)
+    #     if self.wp_ok == True:
+    #         self.update_product_wp()
+    #     return rec
 
-    def write(self, vals):
-        super(ProductTemplate, self).write(vals)
-        if self.wp_ok == True:
-            self.update_product_wp()
+    # def write(self, vals):
+    #     super(ProductTemplate, self).write(vals)
+    #     if self.wp_ok == True:
+    #         self.update_product_wp()
 
     @api.onchange('prod_code')
     def action_duplicate_code(self):
@@ -601,11 +601,12 @@ class ProductProduct(models.Model):
             attrs = prod.product_template_attribute_value_ids
             b = []
             for s in attrs:
-                b.append([s.attribute_id.sequence, s.product_attribute_value_id.acode])
+                b.append((s.attribute_id.sequence, s.product_attribute_value_id.acode))
             d = sorted(b)
             for c in d:
                 code += c[1] or ''
             prod.default_code = code
+            print(code)
 
     @api.onchange('url_img')
     def onchange_image(self):
