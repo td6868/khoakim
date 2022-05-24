@@ -233,6 +233,9 @@
                     <button name="action_update_main_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'main')]}"/>
                 </header>
             </xpath>
+            <xpath expr="//group[@name='pricelist_settings']" position="inside">
+                <field name="roles" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>
+            </xpath>
             <xpath expr="//group[@name='pricelist_settings']" position="after">
                 <group name="pricelist_st">
                     <field name="type_pl"/>

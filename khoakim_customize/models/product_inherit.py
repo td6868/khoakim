@@ -26,6 +26,12 @@ class Pricelist(models.Model):
     ], string='Loại chiết khấu')
     catg_id = fields.Many2one('product.category',string='Danh mục SP', tracking=True, onchange=True)
     catg_disc = fields.Float(string='Chiết khấu', tracking=True)
+    roles = fields.Selection([
+        ('daily1', 'Đại lý cấp 1'),
+        ('daily2', 'Đại lý cấp 2'),
+        ('daily3', 'Đại lý cấp 3'),
+        ('customer', 'Khách hàng lẻ')
+    ], string='Cấp đại lý', default='customer', required=True)
 
     # def write(self, vals):
     #     super(Pricelist, self).write(vals)
@@ -251,7 +257,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     url_img = fields.Char(string="URL Ảnh")
-    sku_wp = fields.Char(string="ID")
+    sku_wp = fields.Char(string="ID WP")
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code', store=True)
     wp_ok = fields.Boolean(string="Khả dụng ở website")
     prod_code = fields.Char(string="Mã SP/NSX", required=True)
@@ -287,9 +293,9 @@ class ProductTemplate(models.Model):
     def _gen_product_code(self):
         for prod in self:
             if prod.categ_id:
-                prod.default_code = '%s%s' % (prod.categ_id.cate_code, prod.prod_code or '')
+                prod.default_code = '%s%s' % (prod.categ_id.cate_code or '', prod.prod_code or '')
             else:
-                prod.default_code = prod.prod_code
+                prod.default_code = prod.prod_code or ''
 
     @api.onchange('url_img')
     def onchange_image(self):
@@ -473,7 +479,6 @@ class ProductAttributeValues(models.Model):
     acode = fields.Char(string='Mã biến thể', required=True)
     attr_term_wp = fields.Char(string='ID')
 
-
 class ProductAttribute(models.Model):
     _inherit = 'product.attribute'
 
@@ -526,9 +531,9 @@ class ProductCategory(models.Model):
     def _gene_code_cate(self):
         for cate in self:
             if cate.parent_id:
-                cate.cate_code = '%s%s' % (cate.parent_id.cate_code, cate.ccode or '')
+                cate.cate_code = '%s%s' % (cate.parent_id.cate_code or '', cate.ccode or '')
             else:
-                cate.cate_code = cate.ccode
+                cate.cate_code = cate.ccode or ''
 
     @api.onchange('ccode')
     def action_duplicate_categ_code(self):
@@ -597,8 +602,8 @@ class ProductProduct(models.Model):
             b = []
             for s in attrs:
                 b.append([s.attribute_id.sequence, s.product_attribute_value_id.acode])
-
-            for c in b:
+            d = sorted(b)
+            for c in d:
                 code += c[1] or ''
             prod.default_code = code
 
@@ -618,8 +623,9 @@ class ResPartnerCustomize(models.Model):
     roles = fields.Selection([
         ('daily1', 'Đại lý cấp 1'),
         ('daily2', 'Đại lý cấp 2'),
-        ('daily3', 'Đại lý cấp 3')
-        ], string='Cấp đại lý', required=True)
+        ('daily3', 'Đại lý cấp 3'),
+        ('customer', 'Khách hàng lẻ')
+    ], string='Cấp đại lý', default='customer', required=True)
 
     @api.onchange('phone')
     def action_duplicate_customer(self):
@@ -636,6 +642,16 @@ class ResPartnerCustomize(models.Model):
                                     'message': (("Số %s đã bị trùng với khách %s, vui lòng kiểm tra lại khách hàng") % (phone, partner)),
                                  },
                 }
+
+    @api.onchange('name', 'roles')
+    def action_def_pricelist(self):
+        if self.name:
+            pl = self.env['product.pricelist']
+            if self.roles:
+                def_pl = pl.search([('roles', '=', self.roles)], limit=1)
+            else:
+                def_pl = pl.search([('type_pl', '=', 'main')])
+            self.propety_product_pricelist = def_pl.id
 
     def create_acc_distributor(self):
         com_id = self.env.company
