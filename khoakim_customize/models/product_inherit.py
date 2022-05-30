@@ -699,7 +699,7 @@ class ResPartnerCustomize(models.Model):
         return UserError('Lỗi chưa có thông tin về website Đại lý. Hãy vào công ty để khai báo!')
 
 
-class SaleOrderCustomize(models.Model):
+class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     total_due = fields.Monetary(string="Công nợ hiện tại", related="partner_id.total_due")
@@ -713,6 +713,12 @@ class SaleOrderCustomize(models.Model):
     ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
 
     def action_quotation_approval(self):
+
+        if self.order_line:
+            for line in self.order_line:
+                if line.price_unit == 0:
+                    raise UserError(("Vui lòng kiểm tra lại sản phẩm %s chưa có giá tiền") % (line.name))
+
         group_pass = 'khoakim_customize.group_pass_approval_sale_order'
         user = self.env.user
         if user.has_group(group_pass):
