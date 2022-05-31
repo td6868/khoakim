@@ -65,7 +65,10 @@
                 <button name="action_accept_approval" string="Xác nhận" class="btn-success"
                         groups="khoakim_customize.group_approval_sale_order"
                         type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
-                <button name="action_draft" string="Từ chối"
+<!--                <button name="customize_sale_confirm" string="Xác nhận" class="btn-success"-->
+<!--                        groups="khoakim_customize.group_approval_sale_order"-->
+<!--                        type="object" attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>-->
+                <button name="action_deny_approval" string="Từ chối"
                         groups="khoakim_customize.group_approval_sale_order" class="btn-warning"
                         type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
                 <button name="action_cancel" id="action_cancel" string="Hủy"
@@ -250,6 +253,18 @@
                     <field name="catg_disc"/>
                     <button name="action_price_categ" string="Cập nhật giá" type="object" class="btn-warning"/>
                 </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_picking_form_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm']" position="replace">
+                <button name="action_check_out_wh" attrs="{'invisible': [('show_mark_as_todo', '=', False)]}" string="Xác nhận phiếu"
+                        type="object" class="oe_highlight" groups="base.group_user"/>
             </xpath>
         </field>
     </record>

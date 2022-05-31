@@ -712,8 +712,16 @@ class SaleOrder(models.Model):
         ('cancel', 'Đã hủy'),
     ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
 
-    def action_quotation_approval(self):
+    def customize_sale_confirm(self):
+        self.action_confirm()
+        iv = self._create_invoices(final=True)
+        if iv:
+            iv.action_post()
+            return iv
+        else:
+            return False
 
+    def action_quotation_approval(self):
         if self.order_line:
             for line in self.order_line:
                 if line.price_unit == 0:
@@ -721,8 +729,9 @@ class SaleOrder(models.Model):
 
         group_pass = 'khoakim_customize.group_pass_approval_sale_order'
         user = self.env.user
+        iv = False
         if user.has_group(group_pass):
-            self.customize_sale_confirm()
+            iv = self.customize_sale_confirm()
         else:
             sum = 0
             for l in self.order_line:
@@ -731,11 +740,38 @@ class SaleOrder(models.Model):
                 self.write({'state': 'waiting'})
                 self.notify_manager()
             else:
-                self.customize_sale_confirm()
+                iv = self.customize_sale_confirm()
+
+        if iv:
+            return self.env['account.payment'] \
+                .with_context(active_ids=iv.ids, active_model='account.move', active_id=iv.id) \
+                .action_register_payment()
+        else:
+            return {
+                'warning': {
+                                'title': ('Kiểm tra lại cấu hình sản phẩm'),
+                                'message': ("Không thể tạo hóa đơn theo đơn hàng"),
+                            },
+            }
 
     def action_accept_approval(self):
-        self.customize_sale_confirm()
+        iv = self.customize_sale_confirm()
+        if iv:
+            return self.env['account.payment'] \
+                .with_context(active_ids=iv.ids, active_model='account.move', active_id=iv.id) \
+                .action_register_payment()
+        else:
+            return {
+                'warning': {
+                                'title': ('Kiểm tra lại cấu hình sản phẩm'),
+                                'message': ("Không thể tạo hóa đơn theo đơn hàng"),
+                            },
+            }
+
         self.notify_manager()
+
+    def action_deny_approval(self):
+        self.write({'state': 'draft'})
 
     def notify_manager(self):
         if self.state == 'waiting':
@@ -760,22 +796,6 @@ class SaleOrder(models.Model):
         self.filtered(lambda hol: hol.state == 'cancel').activity_unlink(
             ['khoakim_customize.mail_act_sale_approval_kk'])
 
-    def customize_sale_confirm(self):
-        self.action_confirm()
-        iv = self._create_invoices(final=True)
-        if iv:
-            iv.action_post()
-            return self.env['account.payment'] \
-                .with_context(active_ids=iv.ids, active_model='account.move', active_id=iv.id) \
-                .action_register_payment()
-        else:
-            return {
-                'warning': {
-                                'title': ('Kiểm tra lại cấu hình sản phẩm'),
-                                'message': ("Không thể tạo hóa đơn theo đơn hàng"),
-                            },
-            }
-
 class ResCompanyCustomize(models.Model):
     _inherit = 'res.company'
 
@@ -784,6 +804,18 @@ class ResCompanyCustomize(models.Model):
     wp_pass = fields.Char(string='Mật khẩu WP')
     woo_ck = fields.Char(string='Keys Woocommerce')
     woo_cs = fields.Char(string='Secret Woocommerce')
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    def action_check_out_wh(self):
+        if self.picking_type_code == 'outgoing':
+            if self.move_ids_without_package:
+                for line in self.move_ids_without_package:
+                    prod = line.product_id
+                    if (prod.weight == False or prod.volumn == False ):
+                        raise UserError(("Vui lòng kiểm tra lại sản phẩm %s chưa có khối lượng hoặc thể tích") % (prod.name))
+        self.action_confirm()
 
 # class WPSetting(models.TransientModel):
 #     _inherit = 'res.config.settings'
