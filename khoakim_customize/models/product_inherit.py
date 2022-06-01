@@ -589,9 +589,16 @@ class ProductProduct(models.Model):
     prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code', store=True)
 
+    @api.model
+    def create(self, vals):
+        res = super(ProductProduct, self).create(vals)
+        # self._gen_product_attrs_code()
+        return res
+
     def write(self, vals):
-        super(ProductProduct, self).write(vals)
-        self._gen_product_attrs_code()
+        res = super(ProductProduct, self).write(vals)
+        # self._gen_product_attrs_code()
+        return res
 
     def _get_temp_prod(self):
         for p in self:
@@ -603,14 +610,14 @@ class ProductProduct(models.Model):
         for prod in self:
             code = prod.product_tmpl_id.default_code or ''
             attrs = prod.product_template_attribute_value_ids
-            b = []
-            for s in attrs:
-                b.append((s.attribute_id.sequence, s.product_attribute_value_id.acode))
-            d = sorted(b)
-            for c in d:
-                code += c[1] or ''
-            prod.default_code = code
-#             print(code)
+            if attrs:
+                b = []
+                for s in attrs:
+                    b.append((s.attribute_id.sequence, s.product_attribute_value_id.acode))
+                d = sorted(b)
+                for c in d:
+                    code += c[1] or ''
+                prod.default_code = code
 
     @api.onchange('url_img')
     def onchange_image(self):
@@ -698,6 +705,26 @@ class ResPartnerCustomize(models.Model):
                     }
         return UserError('Lỗi chưa có thông tin về website Đại lý. Hãy vào công ty để khai báo!')
 
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
+    declare_ok = fields.Boolean(string="KBHQ")
+    attrs_prod = fields.Char(string="Thuộc tính")
+
+    # @api.onchange('product_id')
+    # def onchange_attrs_prod(self):
+    #     if self.product_id:
+    #         attrs = self.product_id.product_template_attribute_value_ids
+    #         if attrs:
+    #             b = []
+    #             for a in attrs:
+    #                 b.append((a.attribute_id.sequence, a.attribute_id.name + '(' + a.attribute_id.ot_name + ')'))
+    #             d = sorted(b)
+    #             attrs_prod = ''
+    #             for c in d:
+    #                 attrs_prod += c[1] + '\n'
+    #             self.attrs_prod = attrs_prod
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'

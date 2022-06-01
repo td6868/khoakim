@@ -88,6 +88,24 @@
         </field>
     </record>
 
+    <record id="view_order_image_purchase_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.image</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="before">
+                <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
+                <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
+            </xpath>
+<!--            <div class="o_kanban_image">-->
+<!--                <img t-att-src="kanban_image('product.template', 'image_1920', record.prod_image.raw_value)" alt="Sản phẩm" class="o_image_64_contain"/>-->
+<!--            </div>-->
+        </field>
+    </record>
+
+
     <record id="view_product_attribute_form_inherit" model="ir.ui.view">
         <field name="name">product.attribute.form.inherit</field>
         <field name="model">product.attribute</field>
@@ -112,7 +130,8 @@
                     <button name="create_acc_distributor" type="object" string="Tạo tài khoản"/>
                 </header>
             </xpath>
-            <xpath expr="//field[@name='mobile']" position="replace">
+            <xpath expr="//field[@name='mobile']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='vat']" position="before">
                 <field name="roles"/>
