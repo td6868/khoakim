@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import json
 import time
+import ssl
 
 from woocommerce import API
 from odoo import api, fields, models
@@ -300,8 +301,9 @@ class ProductTemplate(models.Model):
     @api.onchange('url_img')
     def onchange_image(self):
         if self.url_img:
-            get_img = urllib.request.urlopen(self.url_img).read()
-            img_b64 = base64.encodestring(get_img)
+            context = ssl._create_unverified_context()
+            get_img = urllib.request.urlopen(self.url_img, context=context).read()
+            img_b64 = base64.b64encode(get_img)
             self.write({
                 "image_1920": img_b64,
             })
@@ -623,7 +625,7 @@ class ProductProduct(models.Model):
     def onchange_image(self):
         if self.url_img:
             get_img = urllib.request.urlopen(self.url_img).read()
-            img_b64 = base64.encodestring(get_img)
+            img_b64 = base64.b64encode(get_img)
             self.write({
                 "image_1920": img_b64,
             })
