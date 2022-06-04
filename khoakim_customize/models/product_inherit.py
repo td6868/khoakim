@@ -115,7 +115,7 @@ class SaleOrderLine(models.Model):
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
     qty_available = fields.Float(string="Tồn kho", related="product_id.qty_available")
-    cus_discount = fields.Float(string='CK ($)')
+    cus_discount = fields.Float(string='C.Khấu ($)')
 
     @api.onchange("cus_discount")
     def _onchange_discount_percent(self):
@@ -134,20 +134,31 @@ class SaleOrderLine(models.Model):
     @api.depends("product_uom_qty", "discount", "price_unit", "tax_id", "cus_discount")
     def _compute_amount(self):
         vals = {}
+        res = {
+            'warning': {
+                'title': ('Số tiền chiết khấu không phù hợp'),
+                'message': (("Số tiền chiết khấu không thể nhỏ hơn 0.0"))
+            },
+        }
         for line in self.filtered(
                 lambda l: l.cus_discount and l.order_id.state not in ["done", "cancel"]
         ):
             real_price = line.price_unit * (1 - (line.discount or 0.0) / 100.0) - (
                     line.cus_discount or 0.0
             )
-            twicked_price = real_price / (1 - (line.discount or 0.0) / 100.0)
-            vals[line] = {
-                "price_unit": line.price_unit,
-            }
-            line.update({"price_unit": twicked_price})
-        res = super(SaleOrderLine, self)._compute_amount()
-        for line in vals.keys():
-            line.update(vals[line])
+            if real_price >= 0.0:
+                twicked_price = real_price / (1 - (line.discount or 0.0) / 100.0)
+                vals[line] = {
+                    "price_unit": line.price_unit,
+                }
+                line.update({"price_unit": twicked_price})
+                res = super(SaleOrderLine, self)._compute_amount()
+            else:
+                vals[line] = {
+                    "cus_discount": 0.0,
+                }
+            for line in vals.keys():
+                line.update(vals[line])
         return res
 
 class AccountMove(models.Model):
@@ -169,7 +180,7 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
-    cus_discount = fields.Float(string='CK ($)')
+    cus_discount = fields.Float(string='C.Khấu ($)')
 
     @api.onchange("cus_discount")
     def _onchange_discount_percent(self):
@@ -207,30 +218,30 @@ class AccountMoveLine(models.Model):
             price_unit, quantity, discount, currency, product, partner, taxes, move_type
         )
 
-    @api.model
-    def _get_fields_onchange_balance_model(
-        self,
-        quantity,
-        discount,
-        balance,
-        move_type,
-        currency,
-        taxes,
-        price_subtotal,
-        force_computation=False,
-    ):
-        if self.cus_discount != 0:
-            discount = ((self.cus_discount) / self.price_unit) * 100 or 0.00
-        return super(AccountMoveLine, self)._get_fields_onchange_balance_model(
-            quantity,
-            discount,
-            balance,
-            move_type,
-            currency,
-            taxes,
-            price_subtotal,
-            force_computation=force_computation,
-        )
+    # @api.model
+    # def _get_fields_onchange_balance_model(
+    #     self,
+    #     quantity,
+    #     discount,
+    #     balance,
+    #     move_type,
+    #     currency,
+    #     taxes,
+    #     price_subtotal,
+    #     force_computation=False,
+    # ):
+    #     if self.cus_discount:
+    #         discount = ((self.cus_discount) / self.price_unit) * 100 or 0.00
+    #     return super(AccountMoveLine, self)._get_fields_onchange_balance_model(
+    #         quantity,
+    #         discount,
+    #         balance,
+    #         move_type,
+    #         currency,
+    #         taxes,
+    #         price_subtotal,
+    #         force_computation=force_computation,
+    #     )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -772,9 +783,7 @@ class SaleOrder(models.Model):
                 iv = self.customize_sale_confirm()
 
         if iv:
-            return self.env['account.payment'] \
-                .with_context(active_ids=iv.ids, active_model='account.move', active_id=iv.id) \
-                .action_register_payment()
+            return iv.action_register_payment()
         else:
             return {
                 'warning': {
@@ -786,9 +795,7 @@ class SaleOrder(models.Model):
     def action_accept_approval(self):
         iv = self.customize_sale_confirm()
         if iv:
-            return self.env['account.payment'] \
-                .with_context(active_ids=iv.ids, active_model='account.move', active_id=iv.id) \
-                .action_register_payment()
+            return iv.action_register_payment()
         else:
             return {
                 'warning': {
@@ -796,7 +803,6 @@ class SaleOrder(models.Model):
                                 'message': ("Không thể tạo hóa đơn theo đơn hàng"),
                             },
             }
-
         self.notify_manager()
 
     def action_deny_approval(self):
