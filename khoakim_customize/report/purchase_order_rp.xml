@@ -24,26 +24,26 @@
                     <p>订货单 #<span t-field="o.name"/></p>
                 </h2>
 
-                <div class="row col-auto mt32 mb32">
-                    <div t-if="o.date_order" class="col-auto mt32 mb32 text-center" name="date_order">
+                <div class="row col-12 mt32 mb32">
+                    <div t-if="o.date_order" class="col-12 mt32 mb32 text-center" name="date_order">
                         <strong>Ngày cần hàng/ 收货日期: </strong><span t-field="o.date_order"/>
                     </div>
                 </div>
 
                 <div class="row mt64 mb32" id="customer_info">
-                    <p class="col-auto mw-100 mb-2">
+                    <p class="col-12 mw-100 mb-2">
                         <t t-if="o.partner_id.name">
                             <strong>Kính gửi 发送至: </strong>
                             <span t-field="o.partner_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </p>
-                    <p class="col-auto mw-100 mb-2">
+                    <p class="col-12 mw-100 mb-2">
                         <t t-if="o.company_id">
                             <strong>Nhận hàng 接收者: </strong>
                             <span t-field="o.company_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </p>
-                    <p class="col-auto mw-100 mb-2">
+                    <p class="col-12 mw-100 mb-2">
                         <t t-if="o.company_id">
                             <strong>Địa chỉ 交货地址:</strong>
                             <span t-if="o.company_id.street" t-field="o.company_id.street" t-options='{"widget": "text"}'/>
@@ -58,7 +58,7 @@
                         </t>
                     </p>
 
-                    <p class="col-auto mw-100 mb-2">
+                    <p class="col-12 mw-100 mb-2">
                         <t t-if="o.company_id.mobile or o.company_id.phone">
                             <strong>Số điện thoại 电话号码:  </strong>
                             <span t-field="o.company_id.mobile or o.company_id.phone" t-options='{"widget": "text"}'/>
