@@ -28,7 +28,7 @@
             <div class="page">
                 <div class="oe_structure"/>
 
-                <h2 class="mt16 text-center" style="font-size: 25px;">
+                <h2 class="mt16 text-center" style="font-size: 28px;">
                     <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
                         <span t-if="doc.state not in ['draft','sent']">Đơn hàng # </span>
                         <span t-if="doc.state in ['draft','sent']">Báo giá # </span>
@@ -46,14 +46,16 @@
                     </t>
                 </div>
 
-                <div class="mt64 mb32" id="customer_info" style="font-size: 14px">
-                    <div class="row col-12 mw-100 mb-2">
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 14px">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id.name">
                             <strong>Khách hàng: </strong>
                             <span t-field="doc.partner_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="row col-12 mw-100 mb-2">
+                </div>
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 14px">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id">
                             <strong>Địa chỉ: </strong>
                             <span t-if="doc.partner_id.street" t-field="doc.partner_id.street" t-options='{"widget": "text"}'/>
@@ -67,7 +69,9 @@
                             <span t-if="doc.partner_id.country_id.name" t-field="doc.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="row col-12 mw-100 mb-2">
+                </div>
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 14px">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id.mobile or doc.partner_id.phone">
                             <strong>Số điện thoại: </strong>
                             <span t-field="doc.partner_id.mobile or doc.partner_id.phone" t-options='{"widget": "text"}'/>
@@ -75,14 +79,16 @@
                     </div>
                 </div>
 
-                <div class="mt32 mb32" id="sale_person_info" style="font-size: 14px">
-                    <div class="row col-12 mw-100 mb-2">
+                <div class="row mt32 mb32" id="sale_person_info" style="font-size: 14px">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.user_id.name">
                             <strong>Nhân viên kinh doanh: </strong>
                             <span t-field="doc.user_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="row col-12 mw-100 mb-2">
+                </div>
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 14px">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.user_id.mobile">
                             <strong>Số điện thoại: </strong>
                             <span t-field="doc.user_id.phone" t-options='{"widget": "text"}'/>
@@ -149,7 +155,7 @@
 
                             <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
-                                    <td name="td_prod_image"><img t-att-src="image_data_uri(line.prod_image)" style="max-width: 100px;"/></td>
+                                    <td name="td_prod_image"><img t-att-src="image_data_uri(line.prod_image)" style="max-width: 150px;"/></td>
                                     <td name="td_name"><span t-field="line.name"/></td>
                                     <td name="td_quantity">
                                         <span t-field="line.product_uom_qty"/>
@@ -226,8 +232,9 @@
                 <div class="mt32 ml64 mr4 text-center" name="sale_person">
                     <div class="offset-8">
                         <strong class="mt64 mb64">Người báo giá</strong>
+                        <div class="mt64 mb64" t-field="doc.user_id.name"/>
                     </div>
-                    <div class="mt64 mb64" t-field="doc.user_id.name"/>
+
                 </div>
 
 <!--                <div t-if="doc.signature" class="mt32 ml64 mr4" name="signature">-->
