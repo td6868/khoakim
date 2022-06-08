@@ -378,15 +378,15 @@
         </field>
     </record>
 
-    <record id="view_res_users_signa_form_inherit" model="ir.ui.view">
-        <field name="name">res.users.signa.inherit</field>
-        <field name="model">res.users</field>
-        <field name="inherit_id" ref="hr.res_users_view_form_profile"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='signature']" position="after">
-                <field name="digit_sign" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
-            </xpath>
-        </field>
-    </record>
+<!--    <record id="view_res_users_signa_form_inherit" model="ir.ui.view">-->
+<!--        <field name="name">res.users.signa.inherit</field>-->
+<!--        <field name="model">res.users</field>-->
+<!--        <field name="inherit_id" ref="hr.res_users_view_form_profile"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='signature']" position="after">-->
+<!--                <field name="digit_sign" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
 </odoo>
