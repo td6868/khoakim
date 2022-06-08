@@ -927,11 +927,6 @@ class StockMove(models.Model):
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
 
-class ResUsers(models.Model):
-    _inherit = 'res.users'
-
-    digit_sign = fields.Binary(string="Ảnh chữ ký")
-
 # class WPSetting(models.TransientModel):
 #     _inherit = 'res.config.settings'
 #
