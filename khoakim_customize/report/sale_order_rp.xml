@@ -47,13 +47,13 @@
                 </div>
 
                 <div class="row mt32 mb32" id="customer_info">
-                    <div class="col-auto mw-100 mb-2">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id.name">
                             <strong>Khách hàng: </strong>
                             <span t-field="doc.partner_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="col-auto mw-100 mb-2">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id">
                             <strong>Địa chỉ: </strong>
                             <span t-if="doc.partner_id.street" t-field="doc.partner_id.street" t-options='{"widget": "text"}'/>
@@ -67,7 +67,7 @@
                             <span t-if="doc.partner_id.country_id.name" t-field="doc.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="col-auto mw-100 mb-2">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id.mobile or doc.partner_id.phone">
                             <strong>Số điện thoại: </strong>
                             <span t-field="doc.partner_id.mobile or doc.partner_id.phone" t-options='{"widget": "text"}'/>
@@ -76,13 +76,13 @@
                 </div>
 
                 <div class="row mt32 mb32" id="sale_person_info">
-                    <div class="col-auto mw-100 mb-2">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.user_id.name">
                             <strong>Nhân viên kinh doanh: </strong>
                             <span t-field="doc.user_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="col-auto mw-100 mb-2">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="doc.user_id.mobile">
                             <strong>Số điện thoại: </strong>
                             <span t-field="doc.user_id.phone" t-options='{"widget": "text"}'/>
@@ -91,23 +91,23 @@
                 </div>
 
 <!--                <div class="row mt32 mb32" id="informations">-->
-<!--                    <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2">-->
+<!--                    <div t-if="doc.client_order_ref" class="col-12 col-3 mw-100 mb-2">-->
 <!--                        <strong>Your Reference:</strong>-->
 <!--                        <p class="m-0" t-field="doc.client_order_ref"/>-->
 <!--                    </div>-->
-<!--                    <div t-if="doc.date_order and doc.state not in ['draft','sent']" class="col-auto col-3 mw-100 mb-2">-->
+<!--                    <div t-if="doc.date_order and doc.state not in ['draft','sent']" class="col-12 col-3 mw-100 mb-2">-->
 <!--                        <strong>Order Date:</strong>-->
 <!--                        <p class="m-0" t-field="doc.date_order"/>-->
 <!--                    </div>-->
-<!--                    <div t-if="doc.date_order and doc.state in ['draft','sent']" class="col-auto col-3 mw-100 mb-2">-->
+<!--                    <div t-if="doc.date_order and doc.state in ['draft','sent']" class="col-12 col-3 mw-100 mb-2">-->
 <!--                        <strong>Quotation Date:</strong>-->
 <!--                        <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>-->
 <!--                    </div>-->
-<!--                    <div t-if="doc.validity_date and doc.state in ['draft', 'sent']" class="col-auto col-3 mw-100 mb-2" name="expiration_date">-->
+<!--                    <div t-if="doc.validity_date and doc.state in ['draft', 'sent']" class="col-12 col-3 mw-100 mb-2" name="expiration_date">-->
 <!--                        <strong>Expiration:</strong>-->
 <!--                        <p class="m-0" t-field="doc.validity_date"/>-->
 <!--                    </div>-->
-<!--                    <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">-->
+<!--                    <div t-if="doc.user_id.name" class="col-12 col-3 mw-100 mb-2">-->
 <!--                        <strong>Salesperson:</strong>-->
 <!--                        <p class="m-0" t-field="doc.user_id"/>-->
 <!--                    </div>-->

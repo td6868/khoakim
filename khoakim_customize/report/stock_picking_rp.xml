@@ -9,12 +9,12 @@
                                 <span t-if="o.state == 'cancel'">PHIẾU XUẤT KHO (Huỷ)</span>
                             </h2>
                             <div class="row mt32 mb32">
-                                <div t-if="o.origin" class="col-auto mt32 mb32 text-center" name="div_origin">
+                                <div t-if="o.origin" class="col-12 mt32 mb32 text-center" name="div_origin">
                                     <strong>Đơn hàng: </strong><span t-field="o.origin"/>
                                 </div>
                             </div>
                             <div class="row mt64 mb32">
-                                <div t-if="o.partner_id" class="col-auto col-6 mw-100 mb-2" name="partner_id">
+                                <div t-if="o.partner_id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
                                     <strong>Địa chỉ khách hàng: </strong>
                                     <p t-if="o.partner_id">
                                         <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
@@ -28,7 +28,7 @@
                                         <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                     </p>
                                 </div>
-                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id" class="col-auto col-6 mw-100 mb-2" name="partner_shipping_id">
+                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id" class="col-12 col-6 mw-100 mb-2" name="partner_shipping_id">
                                     <strong>Địa chỉ bàn giao: </strong>
                                     <p t-if="o.move_ids_without_package[0].partner_id">
                                         <span t-if="o.move_ids_without_package[0].partner_id.street"
@@ -47,7 +47,7 @@
                                               t-field="o.move_ids_without_package[0].partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                     </p>
                                 </div>
-                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id" class="col-auto col-6 mw-100 mb-2" name="partner_id">
+                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
                                     <strong>Địa chỉ bàn giao: </strong>
                                     <p t-if="o.partner_id">
                                         <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
@@ -98,15 +98,15 @@
 
 <!--                            <h1 t-field="o.name" class="mt0 float-left"/>-->
 <!--                            <div class="row mt48 mb32">-->
-<!--                                <div t-if="o.origin" class="col-auto" name="div_origin">-->
+<!--                                <div t-if="o.origin" class="col-12" name="div_origin">-->
 <!--                                    <strong>Order:</strong>-->
 <!--                                    <p t-field="o.origin"/>-->
 <!--                                </div>-->
-<!--                                <div class="col-auto" name="div_state">-->
+<!--                                <div class="col-12" name="div_state">-->
 <!--                                    <strong>Status:</strong>-->
 <!--                                    <p t-field="o.state"/>-->
 <!--                                </div>-->
-<!--                                <div class="col-auto" name="div_sched_date">-->
+<!--                                <div class="col-12" name="div_sched_date">-->
 <!--                                    <strong>Scheduled Date:</strong>-->
 <!--                                    <p t-field="o.scheduled_date"/>-->
 <!--                                </div>-->
@@ -213,21 +213,21 @@
                             </p>
                             <p t-field="o.note"/>
                             <div class="row mt64 mb128 text-center" id="informations">
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-12 col-3 mw-100 mb-2">
                                     <strong>Khách hàng</strong>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-12 col-3 mw-100 mb-2">
                                     <strong>Giao vận</strong>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-12 col-3 mw-100 mb-2">
                                     <strong>Thủ kho</strong>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-12 col-3 mw-100 mb-2">
                                     <strong>Kế toán</strong>
                                 </div>
                             </div>
                             <p style="page-break-before:always;"></p>
-                                <div class="col-auto">
+                                <div class="col-12">
                                     <table class="table table-condensed" style="border: 3px solid black important!">
                                         <tr>
                                             <td width="100%" class="mt64 mt128 ml32 mr32">

@@ -15,24 +15,24 @@
                         </h2>
 
                         <div id="informations" class="row mt32 mb32">
-                            <div class="col-auto col-6 mw-100 mb-2 text-center" t-if="o.invoice_date" name="invoice_date">
+                            <div class="col-12 col-6 mw-100 mb-2 text-center" t-if="o.invoice_date" name="invoice_date">
                                 <strong>Ngày hoá đơn:</strong>
                                 <p class="m-0" t-field="o.invoice_date"/>
                             </div>
-                            <div class="col-auto col-6 mw-100 mb-2 text-center" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
+                            <div class="col-12 col-6 mw-100 mb-2 text-center" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
                                 <strong>Ngày thanh toán:</strong>
                                 <p class="m-0" t-field="o.invoice_date_due"/>
                             </div>
                         </div>
 
                         <div class="row mt32 mb32" id="customer_info">
-                            <div class="col-auto mw-100 mb-2">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id.name">
                                     <strong>Khách hàng: </strong>
                                     <span t-field="o.partner_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="col-auto mw-100 mb-2">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id">
                                     <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
                                     <span t-if="o.partner_id.street"> , </span>
@@ -45,13 +45,13 @@
                                     <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="col-auto mw-100 mb-2">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id.vat">
                                     <strong>Mã số thuế: </strong>
                                     <span t-field="o.partner_id.vat" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="col-auto mw-100 mb-2">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id">
                                     <strong>Địa chỉ hoá đơn: </strong>
                                     <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
@@ -65,7 +65,7 @@
                                     <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="col-auto mw-100 mb-2">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_shipping_id">
                                     <strong>Địa chỉ giao hàng: </strong>
                                     <span t-if="o.partner_shipping_id.street" t-field="o.partner_shipping_id.street" t-options='{"widget": "text"}'/>
@@ -79,7 +79,7 @@
                                     <span t-if="o.partner_shipping_id.country_id.name" t-field="o.partner_shipping_id.country_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="col-auto mw-100 mb-2">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id.mobile or o.partner_id.phone">
                                     <strong>Số điện thoại: </strong>
                                     <span t-field="o.partner_id.mobile or o.partner_id.phone" t-options='{"widget": "text"}'/>
@@ -88,30 +88,30 @@
                         </div>
 
                         <div id="source" class="row mt32 mb32">
-                            <div class="col-auto mw-100 mb-2 text-right" t-if="o.invoice_date" name="invoice_date">
+                            <div class="col-12 mw-100 mb-2 text-right" t-if="o.invoice_date" name="invoice_date">
                                 <strong>Hồ sơ gốc</strong>
                                 <p class="m-0" t-field="o.invoice_origin"/>
                             </div>
                         </div>
 
 <!--                        <div id="informations" class="row mt32 mb32">-->
-<!--                            <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_date" name="invoice_date">-->
+<!--                            <div class="col-12 col-3 mw-100 mb-2" t-if="o.invoice_date" name="invoice_date">-->
 <!--                                <strong>Invoice Date:</strong>-->
 <!--                                <p class="m-0" t-field="o.invoice_date"/>-->
 <!--                            </div>-->
-<!--                            <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">-->
+<!--                            <div class="col-12 col-3 mw-100 mb-2" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">-->
 <!--                                <strong>Due Date:</strong>-->
 <!--                                <p class="m-0" t-field="o.invoice_date_due"/>-->
 <!--                            </div>-->
-<!--                            <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_origin" name="origin">-->
+<!--                            <div class="col-12 col-3 mw-100 mb-2" t-if="o.invoice_origin" name="origin">-->
 <!--                                <strong>Source:</strong>-->
 <!--                                <p class="m-0" t-field="o.invoice_origin"/>-->
 <!--                            </div>-->
-<!--                            <div class="col-auto col-3 mw-100 mb-2" t-if="o.partner_id.ref" name="customer_code">-->
+<!--                            <div class="col-12 col-3 mw-100 mb-2" t-if="o.partner_id.ref" name="customer_code">-->
 <!--                                <strong>Customer Code:</strong>-->
 <!--                                <p class="m-0" t-field="o.partner_id.ref"/>-->
 <!--                            </div>-->
-<!--                            <div class="col-auto col-3 mw-100 mb-2" t-if="o.ref" name="reference">-->
+<!--                            <div class="col-12 col-3 mw-100 mb-2" t-if="o.ref" name="reference">-->
 <!--                                <strong>Reference:</strong>-->
 <!--                                <p class="m-0" t-field="o.ref"/>-->
 <!--                            </div>-->
@@ -260,16 +260,16 @@
                         </div>
 
                         <div class="row mt64 mb128 text-center" id="informations">
-                            <div class="col-auto col-3 mw-100 mb-2">
+                            <div class="col-12 col-3 mw-100 mb-2">
                                 <strong>Khách hàng</strong>
                             </div>
-                            <div class="col-auto col-3 mw-100 mb-2">
+                            <div class="col-12 col-3 mw-100 mb-2">
                                 <strong>Giao vận</strong>
                             </div>
-                            <div class="col-auto col-3 mw-100 mb-2">
+                            <div class="col-12 col-3 mw-100 mb-2">
                                 <strong>Thủ kho</strong>
                             </div>
-                            <div class="col-auto col-3 mw-100 mb-2">
+                            <div class="col-12 col-3 mw-100 mb-2">
                                 <strong>Kế toán</strong>
                             </div>
                         </div>
