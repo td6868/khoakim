@@ -3,17 +3,17 @@
     <template id="report_picking_customize_doc">
                     <t t-call="web.external_layout">
                         <div class="page">
-                            <h2 class="mt16 text-center">
+                            <h2 class="mt16 text-center" style="font-size: 25px">
                                 <span t-if="o.state in ['assigned','done']">PHIẾU XUẤT KHO </span>
                                 <span t-if="o.state == 'draft'">PHIẾU XUẤT KHO (Nháp)</span>
                                 <span t-if="o.state == 'cancel'">PHIẾU XUẤT KHO (Huỷ)</span>
                             </h2>
-                            <div class="row mt32 mb32">
+                            <div class="row mt32 mb32" style="font-size: 14px">
                                 <div t-if="o.origin" class="col-12 mt32 mb32 text-center" name="div_origin">
                                     <strong>Đơn hàng: </strong><span t-field="o.origin"/>
                                 </div>
                             </div>
-                            <div class="row mt64 mb32">
+                            <div class="row mt64 mb32" style="font-size: 14px">
                                 <div t-if="o.partner_id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
                                     <strong>Địa chỉ khách hàng: </strong>
                                     <p t-if="o.partner_id">
@@ -28,7 +28,7 @@
                                         <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                     </p>
                                 </div>
-                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id" class="col-12 col-6 mw-100 mb-2" name="partner_shipping_id">
+                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id" class="col-12 col-6 mw-100 mb-2" name="partner_shipping_id" style="font-size: 14px">
                                     <strong>Địa chỉ bàn giao: </strong>
                                     <p t-if="o.move_ids_without_package[0].partner_id">
                                         <span t-if="o.move_ids_without_package[0].partner_id.street"
@@ -47,7 +47,7 @@
                                               t-field="o.move_ids_without_package[0].partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                     </p>
                                 </div>
-                                <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
+                                <div style="font-size: 14px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
                                     <strong>Địa chỉ bàn giao: </strong>
                                     <p t-if="o.partner_id">
                                         <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
@@ -111,7 +111,7 @@
 <!--                                    <p t-field="o.scheduled_date"/>-->
 <!--                                </div>-->
 <!--                            </div>-->
-                            <table class="table table-sm" t-if="o.move_line_ids and o.move_ids_without_package">
+                            <table class="table table-sm text-center" t-if="o.move_line_ids and o.move_ids_without_package" style="font-size: 14px">
                                 <t t-set="has_barcode" t-value="any(move_line.product_id and move_line.product_id.sudo().barcode or move_line.package_id for move_line in o.move_line_ids)"/>
                                 <t t-set="has_serial_number" t-value="any(move_line.lot_id or move_line.lot_name for move_line in o.move_line_ids)" groups="stock.group_production_lot"/>
                                 <thead>
@@ -184,7 +184,7 @@
                                     </t>
                                   </tbody>
                             </table>
-                            <table class="table table-sm" t-if="o.package_level_ids and o.picking_type_entire_packs and o.state in ['assigned', 'done']">
+                            <table style="font-size: 14px" class="table table-sm" t-if="o.package_level_ids and o.picking_type_entire_packs and o.state in ['assigned', 'done']">
                                 <thead>
                                     <tr>
                                         <th name="th_package">Đóng gói</th>
@@ -208,50 +208,46 @@
                                 </tbody>
                             </table>
                             <t t-set="no_reserved_product" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty != x.reserved_availability and x.move_line_ids and x.state!='done')"/>
-                            <p t-if="o.state in ['draft', 'waiting', 'confirmed'] or no_reserved_product"><i class="fa fa-exclamation-triangle"/>
+                            <p style="font-size: 14px" t-if="o.state in ['draft', 'waiting', 'confirmed'] or no_reserved_product"><i class="fa fa-exclamation-triangle"/>
                                 Không có sản phẩm nào hợp lệ. Xin vui lòng kiểm tra lại sản phẩm và tồn kho!
                             </p>
-                            <p t-field="o.note"/>
+                            <p t-field="o.note" style="font-size: 14px"/>
                             <div class="row mt64 mb128 text-center" id="informations">
-                                <div class="col-12 col-3 mw-100 mb-2">
+                                <div class="col-auto col-3 mw-100 mb-2">
                                     <strong>Khách hàng</strong>
                                 </div>
-                                <div class="col-12 col-3 mw-100 mb-2">
+                                <div class="col-auto col-3 mw-100 mb-2">
                                     <strong>Giao vận</strong>
                                 </div>
-                                <div class="col-12 col-3 mw-100 mb-2">
+                                <div class="col-auto col-3 mw-100 mb-2">
                                     <strong>Thủ kho</strong>
                                 </div>
-                                <div class="col-12 col-3 mw-100 mb-2">
+                                <div class="col-auto col-3 mw-100 mb-2">
                                     <strong>Kế toán</strong>
                                 </div>
                             </div>
                             <p style="page-break-before:always;"></p>
                                 <div class="col-12">
-                                    <table class="table table-condensed" style="border: 3px solid black important!">
-                                        <tr>
-                                            <td width="100%" class="mt64 mt128 ml32 mr32">
-                                                <h2 class="text-center" style="font-size: 36px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
-                                                <div style="font-size: 25px">
-                                                    <strong>Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
-                                                    <p>Người nhận: <span t-field="o.partner_id.name"/></p>
-                                                        <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
-                                                    </strong>
-                                                    <p t-if="o.partner_id">
-                                                        <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
-                                                        <span t-if="o.partner_id.street"> , </span>
-                                                        <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
-                                                        <span t-if="o.partner_id.street2"> , </span>
-                                                        <span t-if="o.partner_id.city" t-field="o.partner_id.city" t-options='{"widget": "text"}'/>
-                                                        <span t-if="o.partner_id.city"> , </span>
-                                                        <span t-if="o.partner_id.state_id.name" t-field="o.partner_id.state_id.name" t-options='{"widget": "text"}'/>
-                                                        <span t-if="o.partner_id.state_id.name"> , </span>
-                                                        <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                    <div width="100%" class="mt64 mt128 ml32 mr32" style="border: 3px solid black important!">
+                                        <h2 class="text-center" style="font-size: 36px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
+                                        <div style="font-size: 25px">
+                                            <strong>Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
+                                                <p>Người nhận: <span t-field="o.partner_id.name"/></p>
+                                                <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
+                                            </strong>
+                                                <p t-if="o.partner_id">
+                                                <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
+                                                    <span t-if="o.partner_id.street"> , </span>
+                                                    <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
+                                                    <span t-if="o.partner_id.street2"> , </span>
+                                                    <span t-if="o.partner_id.city" t-field="o.partner_id.city" t-options='{"widget": "text"}'/>
+                                                    <span t-if="o.partner_id.city"> , </span>
+                                                    <span t-if="o.partner_id.state_id.name" t-field="o.partner_id.state_id.name" t-options='{"widget": "text"}'/>
+                                                    <span t-if="o.partner_id.state_id.name"> , </span>
+                                                    <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
+                                                </p>
+                                        </div>
+                                    </div>
                                 </div>
                         </div>
                     </t>
