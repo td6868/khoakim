@@ -85,6 +85,10 @@
                 <field name="total_due"/>
             </xpath>
 
+            <xpath expr="//field[@name='note']" position="before">
+                <field name="pst_by_word"/>
+            </xpath>
+
         </field>
     </record>
 
@@ -102,6 +106,30 @@
 <!--            <div class="o_kanban_image">-->
 <!--                <img t-att-src="kanban_image('product.template', 'image_1920', record.prod_image.raw_value)" alt="Sản phẩm" class="o_image_64_contain"/>-->
 <!--            </div>-->
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_qty']" position="before">
+                <field name="declare_ok"/>
+                <field name="brand"/>
+                <field name="color"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
+                <field name="declare_ok"/>
+                <field name="brand" invisible="1"/>
+                <field name="color" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/kanban//field[@name='product_qty']" position="before">
+                <field name="declare_ok"/>
+                <field name="brand" invisible="1"/>
+                <field name="color" invisible="1"/>
+            </xpath>
+<!--            <xpath expr="//field[@name='order_line']/form//field[@name='price_subtotal']" position="after">-->
+<!--                <field name="note"/>-->
+<!--            </xpath>-->
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_subtotal']" position="after">
+                <field name="note"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_subtotal']" position="after">
+                <field name="note"/>
+            </xpath>
         </field>
     </record>
 
@@ -144,12 +172,38 @@
         <field name="model">res.company</field>
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='website']" position="replace">
-                <field name="wp_url"/>
-                <field name="wp_user"/>
-                <field name="wp_pass"/>
-                <field name="woo_ck"/>
-                <field name="woo_cs"/>
+            <xpath expr="//page[@name='general_info']/group/group[1]" position="after">
+                <group string="Quản lý Đồng bộ Woocommerce">
+                    <field name="wp_url"/>
+                    <field name="wp_user"/>
+                    <field name="wp_pass"/>
+                    <field name="woo_ck"/>
+                    <field name="woo_cs"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='general_info']" position="after">
+                <page string="Tài khoản ngân hàng" name="banks_information">
+                    <group string="Thông tin tài khoản ngân hàng">
+                        <field name="account_lines" nolabel="1" widget="section_and_note_one2many" mode="tree">
+                            <tree string="Thông tin tài khoản" editable="bottom">
+                                <field name="company_id" invisible="1"/>
+                                <field name="name" invisible="1"/>
+                                <field name="qr_code" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
+                                <field name="bank_id"/>
+                                <field name="acc_holder"/>
+                                <field name="acc_number"/>
+                            </tree>
+                            <form>
+                                <field name="company_id" invisible="1"/>
+                                <field name="name" invisible="1"/>
+                                <field name="qr_code" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
+                                <field name="bank_id"/>
+                                <field name="acc_holder"/>
+                                <field name="acc_number"/>
+                            </form>
+                        </field>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
@@ -285,6 +339,23 @@
                 <button name="action_check_out_wh" attrs="{'invisible': [('show_mark_as_todo', '=', False)]}" string="Xác nhận phiếu"
                         type="object" class="oe_highlight" groups="base.group_user"/>
             </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_id']" position="before">
+                <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/form//field[@name='product_id']" position="before">
+                <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_move_line_form_inherit" model="ir.ui.view">
+        <field name="name">stock.move.line.inherit</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="before">
+                <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
+            </xpath>
         </field>
     </record>
 
@@ -293,12 +364,16 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='price_unit']" position="after">
-                <field name="cus_discount"/>
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="after">
+                <field name="cus_discount" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='discount']" position="after">
+                <field name="cus_discount" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='narration']" position="before">
+                <field name="pst_by_word"/>
             </xpath>
         </field>
     </record>
-
-
 
 </odoo>

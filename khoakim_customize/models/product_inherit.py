@@ -3,6 +3,7 @@
 import json
 import time
 import ssl
+from vietnam_number import n2w
 
 from woocommerce import API
 from odoo import api, fields, models
@@ -85,11 +86,11 @@ class Pricelist(models.Model):
             pl_id._update_price_policy()
             pl_update += str(pl_id.name) + ', '
         return {
-                        'warning': {
-                            'title': ('Đã hoàn thành'),
-                            'message': (("Đã cập nhật các bảng giá sau %s") % (pl_update))
-                        },
-                    }
+                    'warning': {
+                        'title': ('Đã hoàn thành'),
+                        'message': (("Đã cập nhật các bảng giá sau %s") % (pl_update))
+                    },
+                }
 
     def action_update_price(self):
             pl_item_ids = []
@@ -134,17 +135,10 @@ class SaleOrderLine(models.Model):
     @api.depends("product_uom_qty", "discount", "price_unit", "tax_id", "cus_discount")
     def _compute_amount(self):
         vals = {}
-        res = {
-            'warning': {
-                'title': ('Số tiền chiết khấu không phù hợp'),
-                'message': (("Số tiền chiết khấu không thể nhỏ hơn 0.0"))
-            },
-        }
-        for line in self.filtered(
-                lambda l: l.cus_discount and l.order_id.state not in ["done", "cancel"]
-        ):
+        res = {}
+        for line in self:
             real_price = line.price_unit * (1 - (line.discount or 0.0) / 100.0) - (
-                    line.cus_discount or 0.0
+                    line.cus_discount/line.product_uom_qty or 0.0
             )
             if real_price >= 0.0:
                 twicked_price = real_price / (1 - (line.discount or 0.0) / 100.0)
@@ -156,13 +150,30 @@ class SaleOrderLine(models.Model):
             else:
                 vals[line] = {
                     "cus_discount": 0.0,
+                    "discount": 0.0,
                 }
+                res = {
+                            'warning': {
+                                'title': ('Số tiền chiết khấu không phù hợp'),
+                                'message': (("Số tiền chiết khấu không thể nhỏ hơn 0.0"))
+                            },
+                        }
             for line in vals.keys():
                 line.update(vals[line])
         return res
 
 class AccountMove(models.Model):
     _inherit = "account.move"
+
+    pst_by_word = fields.Char(string="Số tiền bằng chữ", compute='_compute_subtotal_word')
+
+    @api.depends('amount_total')
+    def _compute_subtotal_word(self):
+        if self.amount_total:
+            pst_word = n2w(str(self.amount_total))
+            self.pst_by_word = pst_word.capitalize() + ' đồng'
+        else:
+            self.pst_by_word = ''
 
     def _recompute_tax_lines(self, recompute_tax_base_amount=False):
         vals = {}
@@ -317,6 +328,10 @@ class ProductTemplate(models.Model):
             img_b64 = base64.b64encode(get_img)
             self.write({
                 "image_1920": img_b64,
+                "image_1024": img_b64,
+                "image_128": img_b64,
+                "image_256": img_b64,
+                "image_512": img_b64,
             })
 
     # def create_woo_product(self, vals):
@@ -639,6 +654,15 @@ class ProductProduct(models.Model):
             img_b64 = base64.b64encode(get_img)
             self.write({
                 "image_1920": img_b64,
+                "image_1024": img_b64,
+                "image_128": img_b64,
+                "image_256": img_b64,
+                "image_512": img_b64,
+                "image_variant_1920": img_b64,
+                "image_variant_1024": img_b64,
+                "image_variant_512": img_b64,
+                "image_variant_256": img_b64,
+                "image_variant_128": img_b64,
             })
 
 class ResPartnerCustomize(models.Model):
@@ -722,22 +746,25 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
-    declare_ok = fields.Boolean(string="KBHQ")
-    attrs_prod = fields.Char(string="Thuộc tính")
+    declare_ok = fields.Selection([
+        ('no', 'Không'),
+        ('yes', 'Có'),
+    ],
+        string="KBHQ", default='no')
+    brand = fields.Char(string="Hãng")
+    color = fields.Char(string="Màu")
+    note = fields.Text(string="Ghi chú")
 
-    # @api.onchange('product_id')
-    # def onchange_attrs_prod(self):
-    #     if self.product_id:
-    #         attrs = self.product_id.product_template_attribute_value_ids
-    #         if attrs:
-    #             b = []
-    #             for a in attrs:
-    #                 b.append((a.attribute_id.sequence, a.attribute_id.name + '(' + a.attribute_id.ot_name + ')'))
-    #             d = sorted(b)
-    #             attrs_prod = ''
-    #             for c in d:
-    #                 attrs_prod += c[1] + '\n'
-    #             self.attrs_prod = attrs_prod
+    @api.onchange('product_id')
+    def onchange_attrs_prod(self):
+        if self.product_id:
+            attrs = self.product_id.product_template_attribute_value_ids
+            if attrs:
+                for a in attrs:
+                    if a.attribute_id.sequence == 0:
+                        self.brand = a.attribute_id.name
+                    if a.attribute_id.sequence == 1:
+                        self.color = a.attribute_id.name
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -751,6 +778,16 @@ class SaleOrder(models.Model):
         ('done', 'Đã khóa'),
         ('cancel', 'Đã hủy'),
     ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
+
+    pst_by_word = fields.Char(string="Số tiền bằng chữ", compute='_compute_subtotal_word')
+
+    @api.depends('amount_total')
+    def _compute_subtotal_word(self):
+        if self.amount_total:
+            pst_word = n2w(str(self.amount_total))
+            self.pst_by_word = pst_word.capitalize() + ' đồng'
+        else:
+            self.pst_by_word = ''
 
     def customize_sale_confirm(self):
         self.action_confirm()
@@ -831,6 +868,26 @@ class SaleOrder(models.Model):
         self.filtered(lambda hol: hol.state == 'cancel').activity_unlink(
             ['khoakim_customize.mail_act_sale_approval_kk'])
 
+class ResCompanyAccountLine(models.Model):
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _name = 'res.company.account.lines'
+    _rec_name = 'name'
+    _description = 'Thông tin tài khoản'
+
+    company_id = fields.Many2one('res.company', string='Công ty')
+    name = fields.Char(string='Tài khoản', compute='_compute_name')
+    acc_holder = fields.Char(string='Tên tài khoản', require=True)
+    acc_number = fields.Char(string='Số tài khoản', require=True)
+    bank_id = fields.Many2one('res.bank', string="Ngân hàng", require=True)
+    qr_code = fields.Binary(string='Mã QR code')
+
+    @api.depends('acc_number', 'bank_id.name')
+    def _compute_name(self):
+        if self.bank_id.name and self.acc_number:
+            self.name = self.acc_number + ' - ' + self.bank_id.name
+        else:
+            self.name = ''
+
 class ResCompanyCustomize(models.Model):
     _inherit = 'res.company'
 
@@ -839,6 +896,9 @@ class ResCompanyCustomize(models.Model):
     wp_pass = fields.Char(string='Mật khẩu WP')
     woo_ck = fields.Char(string='Keys Woocommerce')
     woo_cs = fields.Char(string='Secret Woocommerce')
+    sign_company = fields.Binary(string='Dấu công ty')
+    account_lines = fields.One2many('res.company.account.lines', 'company_id',
+                                    string='Tài khoản ngân hàng')
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -851,6 +911,16 @@ class StockPicking(models.Model):
                     if (prod.weight == False or prod.volumn == False ):
                         raise UserError(("Vui lòng kiểm tra lại sản phẩm %s chưa có khối lượng hoặc thể tích") % (prod.name))
         self.action_confirm()
+
+class StockMoveLine(models.Model):
+    _inherit = 'stock.move.line'
+
+    prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
 
 # class WPSetting(models.TransientModel):
 #     _inherit = 'res.config.settings'
