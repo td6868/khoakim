@@ -115,22 +115,26 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
-    qty_available = fields.Float(string="Tồn kho", related="product_id.qty_available")
+    qty_available = fields.Float(string="TK khả dụng", related="product_id.qty_available")
     cus_discount = fields.Float(string='C.Khấu ($)')
+    new_price_unit = fields.Float(string='Giá sau CK')
+    note = fields.Char(string='Ghi chú')
 
-    @api.onchange("cus_discount")
-    def _onchange_discount_percent(self):
+    # def _compute_qty_available_all(self):
+    #     prod = self.env['product.product']
+    #     qty_prod = prod.search()
+    #     qty_available = self.product_id.qty_available
+
+    @api.onchange("cus_discount", "discount")
+    def _onchange_discount(self):
         if self.cus_discount:
-            self.write({
-                'discount': 0.0,
-            })
-
-    @api.onchange("discount")
-    def _onchange_discount_fix(self):
+                self.write({
+                    'discount': 0.0,
+                })
         if self.discount:
             self.write({
-                'cus_discount': 0.0,
-            })
+                    'cus_discount': 0.0,
+                })
 
     @api.depends("product_uom_qty", "discount", "price_unit", "tax_id", "cus_discount")
     def _compute_amount(self):
@@ -138,12 +142,13 @@ class SaleOrderLine(models.Model):
         res = {}
         for line in self:
             real_price = line.price_unit * (1 - (line.discount or 0.0) / 100.0) - (
-                    line.cus_discount/line.product_uom_qty or 0.0
+                    line.cus_discount or 0.0
             )
             if real_price >= 0.0:
                 twicked_price = real_price / (1 - (line.discount or 0.0) / 100.0)
                 vals[line] = {
                     "price_unit": line.price_unit,
+                    "new_price_unit": real_price,
                 }
                 line.update({"price_unit": twicked_price})
                 res = super(SaleOrderLine, self)._compute_amount()
@@ -921,6 +926,11 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    digit_sign = fields.Binary(string="Ảnh chữ ký")
 
 # class WPSetting(models.TransientModel):
 #     _inherit = 'res.config.settings'

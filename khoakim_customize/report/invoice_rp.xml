@@ -4,7 +4,7 @@
                 <t t-call="web.external_layout">
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <div class="page">
-                        <h2 class="mt16 text-center" style="font-size: 25px;">
+                        <h2 class="mt16 text-center" style="font-size: 34px;">
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Hoá đơn bán hàng </span>
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Hoá đơn bán hàng (Nháp)</span>
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Hoá đơn đã huỷ (Nháp)</span>
@@ -14,25 +14,27 @@
                             <span t-if="o.name != '/'" t-field="o.name"/>
                         </h2>
 
-                        <div id="informations" class="row mt32 mb32" style="font-size: 14px">
-                            <div class="col-auto col-6 mw-100 mb-2 text-center" t-if="o.invoice_date" name="invoice_date">
+                        <div id="informations" class="row mt32 mb32" style="font-size: 17px">
+                            <div class="col-6 mw-100 mb-2 text-center" t-if="o.invoice_date" name="invoice_date">
                                 <strong>Ngày hoá đơn:</strong>
                                 <p class="m-0" t-field="o.invoice_date"/>
                             </div>
-                            <div class="col-auto col-6 mw-100 mb-2 text-center" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
+                            <div class="col-6 mw-100 mb-2 text-center" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
                                 <strong>Ngày thanh toán:</strong>
                                 <p class="m-0" t-field="o.invoice_date_due"/>
                             </div>
                         </div>
 
-                        <div class="mt32 mb32" id="customer_info" style="font-size: 14px">
-                            <div class="row mw-100 mb-2">
+                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id.name">
                                     <strong>Khách hàng: </strong>
                                     <span t-field="o.partner_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="row mw-100 mb-2">
+                        </div>
+                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id">
                                     <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
                                     <span t-if="o.partner_id.street"> , </span>
@@ -45,13 +47,17 @@
                                     <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="row mw-100 mb-2">
+                        </div>
+                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id.vat">
                                     <strong>Mã số thuế: </strong>
                                     <span t-field="o.partner_id.vat" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="row mw-100 mb-2">
+                        </div>
+                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id">
                                     <strong>Địa chỉ hoá đơn: </strong>
                                     <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
@@ -65,7 +71,9 @@
                                     <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="row mw-100 mb-2">
+                        </div>
+                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_shipping_id">
                                     <strong>Địa chỉ giao hàng: </strong>
                                     <span t-if="o.partner_shipping_id.street" t-field="o.partner_shipping_id.street" t-options='{"widget": "text"}'/>
@@ -79,7 +87,9 @@
                                     <span t-if="o.partner_shipping_id.country_id.name" t-field="o.partner_shipping_id.country_id.name" t-options='{"widget": "text"}'/>
                                 </t>
                             </div>
-                            <div class="row mw-100 mb-2">
+                        </div>
+                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                            <div class="col-12 mw-100 mb-2">
                                 <t t-if="o.partner_id.mobile or o.partner_id.phone">
                                     <strong>Số điện thoại: </strong>
                                     <span t-field="o.partner_id.mobile or o.partner_id.phone" t-options='{"widget": "text"}'/>
@@ -87,7 +97,7 @@
                             </div>
                         </div>
 
-                        <div id="source" class="row mt64 mb32" style="font-size: 14px">
+                        <div id="source" class="row mt64 mb48" style="font-size: 17px">
                             <div class="col-12 mw-100 mb-2 text-right" t-if="o.invoice_origin" name="invoice_origin">
                                 <strong>Hồ sơ gốc</strong>
                                 <p class="m-0" t-field="o.invoice_origin"/>
@@ -120,7 +130,7 @@
                         <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
                         <t t-set="display_cus_discount" t-value="any(l.cus_discount for l in o.invoice_line_ids)"/>
 
-                        <table class="table table-sm o_main_table" name="invoice_line_table" style="font-size: 14px">
+                        <table class="table table-sm o_main_table" name="invoice_line_table" style="font-size: 17px">
                             <thead>
                                 <tr>
                                     <th name="th_description" class="text-left"><span>Mô tả</span></th>
@@ -197,7 +207,7 @@
                             </tbody>
                         </table>
 
-                        <div class="clearfix" style="font-size: 14px">
+                        <div class="clearfix" style="font-size: 17px">
                             <div id="total" class="row">
                                 <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
                                     <table class="table table-sm" style="page-break-inside: avoid;">
@@ -234,10 +244,10 @@
                                 </div>
                             </div>
                         </div>
-                        <p t-if="o.pst_by_word" name="pst_by_word" style="font-size: 14px">
+                        <p t-if="o.pst_by_word" name="pst_by_word" style="font-size: 17px">
                             <strong>Số tiền bằng chữ: <span t-field="o.pst_by_word"/></strong>
                         </p>
-                        <p t-if="o.move_type in ('out_invoice', 'in_refund') and o.payment_reference" name="payment_communication" style="font-size: 14px">
+                        <p t-if="o.move_type in ('out_invoice', 'in_refund') and o.payment_reference" name="payment_communication" style="font-size: 17px">
                             Vui lòng làm theo mô tả sau khi bạn thực hiện thanh toán : <b><span t-field="o.payment_reference"/></b>
                         </p>
                         <p t-if="o.invoice_payment_term_id" name="payment_term">
@@ -259,7 +269,7 @@
 <!--                            </p>-->
 <!--                        </div>-->
 
-                        <div class="row mt64 mb128 text-center" id="signature" style="font-size: 14px">
+                        <div class="row mt64 mb128 text-center" id="signature" style="font-size: 17px">
                             <div class="col-auto col-3 mw-100 mb-2">
                                 <strong>Khách hàng</strong>
                             </div>

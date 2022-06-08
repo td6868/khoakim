@@ -28,12 +28,14 @@
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="before">
+            <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
+                <field name="new_price_unit"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="before">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
+                <field name="new_price_unit"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="attributes">
@@ -372,6 +374,17 @@
             </xpath>
             <xpath expr="//field[@name='narration']" position="before">
                 <field name="pst_by_word"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_users_signa_form_inherit" model="ir.ui.view">
+        <field name="name">res.users.signa.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="hr.res_users_view_form_profile"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='signature']" position="after">
+                <field name="digit_sign" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
         </field>
     </record>
