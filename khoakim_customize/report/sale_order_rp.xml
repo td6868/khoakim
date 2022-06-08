@@ -47,13 +47,13 @@
                 </div>
 
                 <div class="mt64 mb32" id="customer_info" style="font-size: 14px">
-                    <div class="row mw-100 mb-2">
+                    <div class="row col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id.name">
                             <strong>Khách hàng: </strong>
                             <span t-field="doc.partner_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="row mw-100 mb-2">
+                    <div class="row col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id">
                             <strong>Địa chỉ: </strong>
                             <span t-if="doc.partner_id.street" t-field="doc.partner_id.street" t-options='{"widget": "text"}'/>
@@ -67,7 +67,7 @@
                             <span t-if="doc.partner_id.country_id.name" t-field="doc.partner_id.country_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="row mw-100 mb-2">
+                    <div class="row col-12 mw-100 mb-2">
                         <t t-if="doc.partner_id.mobile or doc.partner_id.phone">
                             <strong>Số điện thoại: </strong>
                             <span t-field="doc.partner_id.mobile or doc.partner_id.phone" t-options='{"widget": "text"}'/>
@@ -76,13 +76,13 @@
                 </div>
 
                 <div class="mt32 mb32" id="sale_person_info" style="font-size: 14px">
-                    <div class="row mw-100 mb-2">
+                    <div class="row col-12 mw-100 mb-2">
                         <t t-if="doc.user_id.name">
                             <strong>Nhân viên kinh doanh: </strong>
                             <span t-field="doc.user_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
-                    <div class="row mw-100 mb-2">
+                    <div class="row col-12 mw-100 mb-2">
                         <t t-if="doc.user_id.mobile">
                             <strong>Số điện thoại: </strong>
                             <span t-field="doc.user_id.phone" t-options='{"widget": "text"}'/>
