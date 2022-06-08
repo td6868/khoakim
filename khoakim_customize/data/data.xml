@@ -31,6 +31,24 @@
             <field name="doall" eval="False"/>
         </record>
 
+        <record id="procure_calculation_wh_orderpoint_automation" model="ir.cron">
+            <field name="name">Tự động chạy kế hoạch đặt hàng</field>
+            <field name="model_id" ref="stock.model_stock_warehouse_orderpoint"/>
+            <field name="state">code</field>
+            <field name="code">model.with_context(
+                search_default_trigger='manual',
+                search_default_filter_to_reorder=True,
+                search_default_filter_not_snoozed=True,
+                default_trigger='manual'
+            ).action_open_orderpoints()</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">12</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+
     </data>
 
 </odoo>

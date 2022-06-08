@@ -1,0 +1,121 @@
+<odoo>
+
+    <data>
+        <report
+            id="action_report_saleorder_customize"
+            string="Báo giá/ Đơn hàng"
+            model="sale.order"
+            report_type="qweb-html"
+            file="khoakim_customize.report_saleorder_khoakim"
+            name="khoakim_customize.report_saleorder_khoakim"
+            print_report_name="(object.state in ('draft', 'sent') and 'Báo giá - %s' % (object.name)) or 'Đơn hàng - %s' % (object.name)"
+            menu="True"
+        />
+    </data>
+
+    <data>
+        <report
+            id="action_report_account_move_customize"
+            string="Hoá đơn/ Công nợ"
+            model="account.move"
+            report_type="qweb-html"
+            file="khoakim_customize.report_account_move_khoakim"
+            name="khoakim_customize.report_account_move_khoakim"
+            print_report_name="(object._get_report_base_filename())"
+            menu="True"
+        />
+    </data>
+
+    <data>
+        <report
+            id="action_report_stock_pick_customize"
+            string="Phiếu giao hàng"
+            model="stock.picking"
+            report_type="qweb-html"
+            file="khoakim_customize.report_stock_picking_khoakim"
+            name="khoakim_customize.report_stock_picking_khoakim"
+            print_report_name="'Phiếu giao hàng - %s - %s' % (object.partner_id.name or '', object.name)"
+            menu="True"
+        />
+    </data>
+
+    <data>
+        <report
+            id="action_report_purchase_order_customize"
+            string="Phiếu đặt hàng"
+            model="purchase.order"
+            report_type="qweb-html"
+            file="khoakim_customize.report_purchase_order_khoakim"
+            name="khoakim_customize.report_purchase_order_khoakim"
+            print_report_name="'Phiếu mua hàng - %s - %s' % (object.name or '', object.partner_id.name)"
+            menu="True"
+        />
+    </data>
+
+<!--    delete old rec-->
+    <data>
+        <report
+            id="sale.action_report_saleorder"
+            string="Báo giá/ Đơn hàng"
+            model="sale.order"
+            report_type="qweb-pdf"
+            file="sale.report_saleorder"
+            name="sale.report_saleorder"
+            print_report_name="(object.state in ('draft', 'sent') and 'Báo giá - %s' % (object.name)) or 'Đơn hàng - %s' % (object.name)"
+            menu="False"
+        />
+    </data>
+
+    <data>
+        <report
+            id="sale.action_report_pro_forma_invoice"
+            string="Hóa đơn chiếu lệ"
+            model="sale.order"
+            report_type="qweb-pdf"
+            file="sale.report_saleorder"
+            name="sale.report_saleorder"
+            print_report_name="'CHIẾU LỆ - %s' % (object.name)"
+            menu="False"
+        />
+    </data>
+
+<!--    <data>-->
+<!--        <report-->
+<!--            id="stock.action_report_delivery"-->
+<!--            string="Phiếu giao hàng"-->
+<!--            model="stock.picking"-->
+<!--            report_type="qweb-pdf"-->
+<!--            file="stock.report_deliveryslip"-->
+<!--            name="stock.report_deliveryslip"-->
+<!--            print_report_name="'Phiếu giao hàng - %s - %s' % (object.partner_id.name or '', object.name)"-->
+<!--            menu="Fasle"-->
+<!--        />-->
+<!--    </data>-->
+
+<!--    <data>-->
+<!--        <report-->
+<!--            id="purchase.action_report_purchase_order"-->
+<!--            string="Đơn mua hàng"-->
+<!--            model="purchase.order"-->
+<!--            report_type="qweb-pdf"-->
+<!--            file="purchase.report_purchaseorder"-->
+<!--            name="purchase.report_purchaseorder"-->
+<!--            print_report_name="object.state in ('draft', 'sent') and 'Yêu cầu báo giá - %s' % (object.name) or 'Đơn mua hàng - %s' % (object.name))"-->
+<!--            menu="Fasle"-->
+<!--        />-->
+<!--    </data>-->
+
+<!--    <data>-->
+<!--        <report-->
+<!--            id="purchase.report_purchase_quotation"-->
+<!--            string="Yêu cầu báo giá"-->
+<!--            model="purchase.order"-->
+<!--            report_type="qweb-pdf"-->
+<!--            file="purchase.report_purchasequotation"-->
+<!--            name="purchase.report_purchasequotation"-->
+<!--            print_report_name="'Yêu cầu báo giá - %s' % (object.name)"-->
+<!--            menu="Fasle"-->
+<!--        />-->
+<!--    </data>-->
+
+</odoo>
