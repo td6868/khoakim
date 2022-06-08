@@ -19,30 +19,34 @@
             <div class="page">
                 <div class="oe_structure"/>
 
-                <h2 class="mt16 text-center" style="font-size: 25px">
+                <h2 class="mt16 text-center" style="font-size: 34px">
                     <p>ĐƠN ĐẶT HÀNG #<span t-field="o.name"/></p>
                     <p>订货单 #<span t-field="o.name"/></p>
                 </h2>
 
-                <div class="row col-12 mt32 mb32" style="font-size: 14px">
+                <div class="row col-12 mt32 mb32" style="font-size: 17px">
                     <div t-if="o.date_order" class="col-12 mt32 mb32 text-center" name="date_order">
                         <strong>Ngày cần hàng/ 收货日期: </strong><span t-field="o.date_order"/>
                     </div>
                 </div>
 
-                <div class="mt64 mb32" id="customer_info" style="font-size: 14px">
-                    <div class="row mw-100 mb-2">
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
+                    <div class="col-12 mw-100 mb-2">
                         <t t-if="o.partner_id.name">
                             <strong>Kính gửi 发送至: </strong>
                             <span t-field="o.partner_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
+                </div>
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
                     <div class="row mw-100 mb-2">
                         <t t-if="o.company_id">
                             <strong>Nhận hàng 接收者: </strong>
                             <span t-field="o.company_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
+                </div>
+                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
                     <div class="row mw-100 mb-2">
                         <t t-if="o.company_id">
                             <strong>Địa chỉ 交货地址:</strong>
@@ -57,13 +61,13 @@
                             <span t-if="o.company_id.country_id.name" t-field="o.company_id.country_id.name" t-options='{"widget": "text"}'/>
                         </t>
                     </div>
+                </div>
 
-                    <div class="col-12 mw-100 mb-2" style="font-size: 14px">
-                        <t t-if="o.company_id.mobile or o.company_id.phone">
-                            <strong>Số điện thoại 电话号码:  </strong>
-                            <span t-field="o.company_id.mobile or o.company_id.phone" t-options='{"widget": "text"}'/>
-                        </t>
-                    </div>
+                <div class="row mw-100 mb-2" style="font-size: 17px">
+                    <t t-if="o.company_id.mobile or o.company_id.phone">
+                        <strong>Số điện thoại 电话号码:  </strong>
+                        <span t-field="o.company_id.mobile or o.company_id.phone" t-options='{"widget": "text"}'/>
+                    </t>
                 </div>
 
 
@@ -82,7 +86,7 @@
 <!--                    </div>-->
 <!--                </div>-->
 
-                <table class="table table-sm o_main_table mt64" style="font-size: 14px">
+                <table class="table table-sm o_main_table mt64 table-bordered" style="font-size: 17px">
                     <thead>
                         <tr>
                             <th name="th_description" class="text-center"><strong>Tên sản phẩm</strong><p>产品名称</p></th>
@@ -107,7 +111,7 @@
                                         <span t-field="line.name"/>
                                     </td>
                                     <td id="prod_image" class="text-center">
-                                        <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 100px;"/>
+                                        <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 90px;"/>
                                     </td>
                                     <td id="brand" class="text-center">
                                         <span t-field="line.brand"/>
