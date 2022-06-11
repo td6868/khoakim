@@ -66,6 +66,26 @@
                                     </p>
                                 </div>
                             </div>
+
+                            <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
+                                <div class="col-12 mw-100 mb-2">
+                                    <t t-if="o.partner_id.mobile or o.partner_id.phone">
+                                        <strong style="color: #5b4931;">Số điện thoại: </strong>
+                                        <span t-field="o.partner_id.mobile or o.partner_id.phone" t-options='{"widget": "text"}'/>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="row mt32 mb32" id="div_scheduled_date" style="font-size: 17px">
+                                <div class="col-12 mw-100 mb-2">
+                                    <t t-if="o.scheduled_date">
+                                        <strong style="color: #5b4931;">Ngày đặt hàng: </strong>
+                                        <span t-field="o.scheduled_date" t-options='{"widget": "text"}'/>
+                                    </t>
+                                </div>
+                            </div>
+
+
 <!--                            <div class="row justify-content-end mb16">-->
 <!--                                <div class="col-4" name="right_box">-->
 <!--                                    <div t-field="o.name" t-options="{'widget': 'barcode', 'width': 600, 'height': 100, 'img_style': 'width:300px;height:50px;'}"/>-->
@@ -231,16 +251,16 @@
                                 </div>
                             </div>
                             <p style="page-break-before:always;"></p>
-                                <div class="row col-12">
-                                    <div width="100%" class="mt64 mt128 ml32 mr32" style="border: 2px solid black important!; radius: 2px;">
-                                        <h2 class="text-center" style="font-size: 36px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
+                                <table class="table table-sm table-bordered" style="border: 2px solid black important!;">
+                                    <div width="100%" class="mt64 mt128 ml32 mr32" >
+                                        <h2 class="mt16 text-center" style="font-size: 36px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
                                         <div style="font-size: 25px">
                                             <strong style="color: #5b4931;">Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
                                                 <p>Người nhận: <span t-field="o.partner_id.name"/></p>
                                                 <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
                                             </strong>
                                                 <p t-if="o.partner_id">
-                                                <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
+                                                    <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
                                                     <span t-if="o.partner_id.street"> , </span>
                                                     <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
                                                     <span t-if="o.partner_id.street2"> , </span>
@@ -252,7 +272,7 @@
                                                 </p>
                                         </div>
                                     </div>
-                                </div>
+                                </table>
                         </div>
                     </t>
     </template>

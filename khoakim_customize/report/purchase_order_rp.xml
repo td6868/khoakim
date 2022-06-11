@@ -66,7 +66,7 @@
                 </div>
 
                 <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
-                    <div class="row mw-100 mb-2" style="font-size: 17px">
+                    <div class="col-12 mw-100 mb-2" style="font-size: 17px">
                         <t t-if="o.company_id.mobile or o.company_id.phone">
                             <strong>Số điện thoại 电话号码:  </strong>
                             <span t-field="o.company_id.mobile or o.company_id.phone" t-options='{"widget": "text"}'/>

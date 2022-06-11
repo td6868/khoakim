@@ -10,6 +10,14 @@
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
             </xpath>
 
+            <xpath expr="//button[@name='preview_sale_order']" position="replace">
+                <button name="%(action_report_saleorder_customize)d" type="action" class="oe_stat_button" icon="fa-globe icon">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">In báo giá</span>
+                    </div>
+                </button>
+            </xpath>
+
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
                 <attribute name="readonly">1</attribute>
                 <attribute name="force_save">1</attribute>
@@ -123,6 +131,12 @@
                 <field name="brand" invisible="1"/>
                 <field name="color" invisible="1"/>
             </xpath>
+            <xpath expr="//button[@name='print_quotation']" position="replace">
+            </xpath>
+            <xpath expr="//button[@name='print_quotation']" position="replace">
+                <button name="%(action_report_purchase_order_customize)d" string="In" type="action" groups="base.group_user" data-hotkey="k"/>
+            </xpath>
+
 <!--            <xpath expr="//field[@name='order_line']/form//field[@name='price_subtotal']" position="after">-->
 <!--                <field name="note"/>-->
 <!--            </xpath>-->
@@ -341,6 +355,10 @@
                 <button name="action_check_out_wh" attrs="{'invisible': [('show_mark_as_todo', '=', False)]}" string="Xác nhận phiếu"
                         type="object" class="oe_highlight" groups="base.group_user"/>
             </xpath>
+            <button name='%(stock.action_report_delivery)d' position="replace">
+                <button name="%(action_report_stock_pick_customize)d" string="In" type="action"/>
+            </button>
+
             <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
