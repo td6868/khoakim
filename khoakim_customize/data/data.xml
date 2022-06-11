@@ -49,6 +49,12 @@
             <field name="doall" eval="False"/>
         </record>
 
+        <record id="A4_landscape_perform_print" model="report.paperformat">
+            <field name="name">A4L</field>
+            <field name="format">A4</field>
+            <field name="orientation">Landscape</field>
+        </record>
+
     </data>
 
 </odoo>

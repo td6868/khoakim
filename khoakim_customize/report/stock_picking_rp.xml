@@ -10,12 +10,12 @@
                             </h2>
                             <div class="row mt32 mb32" style="font-size: 17px">
                                 <div t-if="o.origin" class="col-12 mt32 mb32 text-center" name="div_origin">
-                                    <strong>Đơn hàng: </strong><span t-field="o.origin"/>
+                                    <strong style="color: #5b4931;">Đơn hàng: </strong><span t-field="o.origin"/>
                                 </div>
                             </div>
                             <div class="row mt64 mb32" style="font-size: 17px">
                                 <div t-if="o.partner_id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
-                                    <strong>Địa chỉ khách hàng: </strong>
+                                    <strong style="color: #5b4931;">Địa chỉ khách hàng: </strong>
                                     <p t-if="o.partner_id">
                                         <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
                                         <span t-if="o.partner_id.street"> , </span>
@@ -31,7 +31,7 @@
                             </div>
                             <div class="row mt64 mb32" style="font-size: 17px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id">
                                 <div class="col-12 col-6 mw-100 mb-2" name="partner_shipping_id">
-                                    <strong>Địa chỉ bàn giao: </strong>
+                                    <strong style="color: #5b4931;">Địa chỉ bàn giao: </strong>
                                     <p t-if="o.move_ids_without_package[0].partner_id">
                                         <span t-if="o.move_ids_without_package[0].partner_id.street"
                                               t-field="o.move_ids_without_package[0].partner_id.street" t-options='{"widget": "text"}'/>
@@ -52,7 +52,7 @@
                             </div>
                             <div class="row mt64 mb32" style="font-size: 17px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id">
                                 <div class="col-12 col-6 mw-100 mb-2" name="partner_id">
-                                    <strong>Địa chỉ bàn giao: </strong>
+                                    <strong style="color: #5b4931;">Địa chỉ bàn giao: </strong>
                                     <p t-if="o.partner_id">
                                         <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
                                         <span t-if="o.partner_id.street"> , </span>
@@ -74,23 +74,23 @@
 <!--                            <div class="row">-->
 <!--                                <div class="col-6" name="div_outgoing_address">-->
 <!--                                    <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id">-->
-<!--                                        <span><strong>Delivery Address:</strong></span>-->
+<!--                                        <span><strong style="color: #5b4931;">Delivery Address:</strong></span>-->
 <!--                                        <div t-field="o.move_ids_without_package[0].partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>-->
 <!--                                    </div>-->
 <!--                                    <div t-if="o.picking_type_id.code != 'internal' and (not o.move_ids_without_package or not o.move_ids_without_package[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">-->
-<!--                                        <span><strong>Warehouse Address:</strong></span>-->
+<!--                                        <span><strong style="color: #5b4931;">Warehouse Address:</strong></span>-->
 <!--                                        <div t-field="o.picking_type_id.warehouse_id.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>-->
 <!--                                    </div>-->
 <!--                                </div>-->
 <!--                                <div class="col-5 offset-1" name="div_incoming_address">-->
 <!--                                    <div t-if="o.picking_type_id.code=='incoming' and o.partner_id">-->
-<!--                                        <span><strong>Vendor Address:</strong></span>-->
+<!--                                        <span><strong style="color: #5b4931;">Vendor Address:</strong></span>-->
 <!--                                    </div>-->
 <!--                                    <div t-if="o.picking_type_id.code=='internal' and o.partner_id">-->
-<!--                                        <span><strong>Warehouse Address:</strong></span>-->
+<!--                                        <span><strong style="color: #5b4931;">Warehouse Address:</strong></span>-->
 <!--                                    </div>-->
 <!--                                    <div t-if="o.picking_type_id.code=='outgoing' and o.partner_id">-->
-<!--                                        <span><strong>Customer Address:</strong></span>-->
+<!--                                        <span><strong style="color: #5b4931;">Customer Address:</strong></span>-->
 <!--                                    </div>-->
 <!--                                    <div t-if="o.partner_id" name="partner_header">-->
 <!--                                        <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>-->
@@ -103,43 +103,43 @@
 <!--                            <h1 t-field="o.name" class="mt0 float-left"/>-->
 <!--                            <div class="row mt48 mb32">-->
 <!--                                <div t-if="o.origin" class="col-12" name="div_origin">-->
-<!--                                    <strong>Order:</strong>-->
+<!--                                    <strong style="color: #5b4931;">Order:</strong>-->
 <!--                                    <p t-field="o.origin"/>-->
 <!--                                </div>-->
 <!--                                <div class="col-12" name="div_state">-->
-<!--                                    <strong>Status:</strong>-->
+<!--                                    <strong style="color: #5b4931;">Status:</strong>-->
 <!--                                    <p t-field="o.state"/>-->
 <!--                                </div>-->
 <!--                                <div class="col-12" name="div_sched_date">-->
-<!--                                    <strong>Scheduled Date:</strong>-->
+<!--                                    <strong style="color: #5b4931;">Scheduled Date:</strong>-->
 <!--                                    <p t-field="o.scheduled_date"/>-->
 <!--                                </div>-->
 <!--                            </div>-->
-                            <table class="table table-sm text-center table-bordered" t-if="o.move_line_ids and o.move_ids_without_package" style="font-size: 17px">
+                            <table class="table table-sm text-center table-bordered" t-if="o.move_line_ids and o.move_ids_without_package" style="font-size: 17px; ">
                                 <t t-set="has_barcode" t-value="any(move_line.product_id and move_line.product_id.sudo().barcode or move_line.package_id for move_line in o.move_line_ids)"/>
                                 <t t-set="has_serial_number" t-value="any(move_line.lot_id or move_line.lot_name for move_line in o.move_line_ids)" groups="stock.group_production_lot"/>
                                 <thead>
                                     <tr>
                                         <th name="th_product">
-                                            <strong>Sản phẩm</strong>
+                                            <strong style="color: #5b4931;">Sản phẩm</strong>
                                         </th>
                                         <th t-if="o.state == 'done'">
-                                            <strong>Số lượng đặt hàng</strong>
+                                            <strong style="color: #5b4931;">Số lượng đặt hàng</strong>
                                         </th>
                                         <th name="th_from" t-if="o.picking_type_id.code != 'incoming'" align="left" groups="stock.group_stock_multi_locations">
-                                            <strong>Từ</strong>
+                                            <strong style="color: #5b4931;">Từ</strong>
                                         </th>
                                         <th name="th_to" t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">
-                                            <strong>Đến</strong>
+                                            <strong style="color: #5b4931;">Đến</strong>
                                         </th>
                                         <th name="th_serial_number" class="text-center" t-if="has_serial_number">
-                                           <strong>Lô/ Số Seri</strong>
+                                           <strong style="color: #5b4931;">Lô/ Số Seri</strong>
                                         </th>
                                         <th>
-                                            <strong>Số lượng giao hàng</strong>
+                                            <strong style="color: #5b4931;">Số lượng giao hàng</strong>
                                         </th>
                                         <th name="th_barcode" class="text-center" t-if="has_barcode">
-                                            <strong>Mã Barcode</strong>
+                                            <strong style="color: #5b4931;">Mã Barcode</strong>
                                         </th>
                                     </tr>
                                 </thead>
@@ -218,24 +218,24 @@
                             <p t-field="o.note" style="font-size: 17px"/>
                             <div class="row mt64 mb128 text-center" id="informations">
                                 <div class="col-auto col-3 mw-100 mb-2">
-                                    <strong>Khách hàng</strong>
+                                    <strong style="color: #5b4931;">Khách hàng</strong>
                                 </div>
                                 <div class="col-auto col-3 mw-100 mb-2">
-                                    <strong>Giao vận</strong>
+                                    <strong style="color: #5b4931;">Giao vận</strong>
                                 </div>
                                 <div class="col-auto col-3 mw-100 mb-2">
-                                    <strong>Thủ kho</strong>
+                                    <strong style="color: #5b4931;">Thủ kho</strong>
                                 </div>
                                 <div class="col-auto col-3 mw-100 mb-2">
-                                    <strong>Kế toán</strong>
+                                    <strong style="color: #5b4931;">Kế toán</strong>
                                 </div>
                             </div>
                             <p style="page-break-before:always;"></p>
                                 <div class="row col-12">
-                                    <div width="100%" class="mt64 mt128 ml32 mr32" style="border: 3px solid black important!">
+                                    <div width="100%" class="mt64 mt128 ml32 mr32" style="border: 2px solid black important!; radius: 2px;">
                                         <h2 class="text-center" style="font-size: 36px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
                                         <div style="font-size: 25px">
-                                            <strong>Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
+                                            <strong style="color: #5b4931;">Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
                                                 <p>Người nhận: <span t-field="o.partner_id.name"/></p>
                                                 <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
                                             </strong>

@@ -44,12 +44,17 @@
             id="action_report_purchase_order_customize"
             string="Phiếu đặt hàng"
             model="purchase.order"
-            report_type="qweb-html"
+            report_type="qweb-pdf"
             file="khoakim_customize.report_purchase_order_khoakim"
             name="khoakim_customize.report_purchase_order_khoakim"
             print_report_name="'Phiếu mua hàng - %s - %s' % (object.name or '', object.partner_id.name)"
             menu="True"
         />
+
+        <record id="khoakim_customize.action_report_purchase_order_customize" model="ir.actions.report">
+          <field name="paperformat_id" ref="khoakim_customize.A4_landscape_perform_print"/>
+        </record>
+
     </data>
 
 <!--    delete old rec-->

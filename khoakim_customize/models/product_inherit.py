@@ -756,20 +756,28 @@ class PurchaseOrderLine(models.Model):
         ('yes', 'Có'),
     ],
         string="KBHQ", default='no')
-    brand = fields.Char(string="Hãng")
-    color = fields.Char(string="Màu")
+    brand = fields.Char(string="Hãng", compute='onchange_attrs_prod')
+    color = fields.Char(string="Màu", compute='onchange_attrs_prod')
     note = fields.Text(string="Ghi chú")
 
-    @api.onchange('product_id')
+    @api.depends('product_id.product_template_attribute_value_ids')
     def onchange_attrs_prod(self):
-        if self.product_id:
-            attrs = self.product_id.product_template_attribute_value_ids
-            if attrs:
-                for a in attrs:
-                    if a.attribute_id.sequence == 0:
-                        self.brand = a.attribute_id.name
-                    if a.attribute_id.sequence == 1:
-                        self.color = a.attribute_id.name
+        for line in self:
+            brand = ''
+            color = ''
+            if line.product_id:
+                attrs = line.product_id.product_template_attribute_value_ids
+                if attrs:
+                    for a in attrs:
+                        if a.attribute_id.sequence == 0:
+                            brand = a.attribute_id.name
+                        if a.attribute_id.sequence == 1:
+                            color = a.attribute_id.name
+                else:
+                    brand = 'Không có'
+                    color = 'Không có'
+                line.brand = brand
+                line.color = color
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
