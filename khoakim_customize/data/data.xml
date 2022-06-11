@@ -55,6 +55,43 @@
             <field name="orientation">Landscape</field>
         </record>
 
+        <record id="purchase.seq_purchase_order" model="ir.sequence">
+          <field name="prefix">KK</field>
+        </record>
+
+    </data>
+
+    <data noupdate="1">
+        <record id="email_temp_khoakim_purchase" model="mail.template">
+            <field name="name">Mẫu gửi nhà cung cấp</field>
+            <field name="model_id" ref="purchase.model_purchase_order"/>
+            <field name="subject">发货单/Đơn mua hàng {{ object.name or 'n/a' }} - {{ object.company_id.name }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear <t t-out="object.partner_id.name or ''">Brandon Freeman</t>
+        <t t-if="object.partner_id.parent_id">
+            (<t t-out="object.partner_id.parent_id.name or ''">Azure Interior</t>)
+        </t>
+        <br/><br/>
+        Here is in attachment a request for quotation <strong t-out="object.name or ''">P00015</strong>
+        <t t-if="object.partner_ref">
+            with reference: <t t-out="object.partner_ref or ''">REF_XXX</t>
+        </t>
+        from <t t-out="object.company_id.name or ''">YourCompany</t>.
+        <br/><br/>
+        If you have any questions, please do not hesitate to contact us.
+        <br/><br/>
+        Best regards,
+    </p>
+</div></field>
+            <field name="report_template" ref="action_report_purchase_order_customize"/>
+            <field name="report_name">KK_{{ (object.name or '').replace('/','_') }}</field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+
     </data>
 
 </odoo>

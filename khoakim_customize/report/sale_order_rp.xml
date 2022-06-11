@@ -39,11 +39,13 @@
                     <span t-field="doc.name"/>
                 </h2>
 
-                <div class="row mt32 mb64 text-center" style="font-size: 17px;">
-                    <t t-if="doc.date_order">
-                        <strong style="color: #5b4931;">Ngày báo giá: </strong>
-                        <span t-field="doc.date_order" t-options='{"widget": "date"}'/>
-                    </t>
+                <div class="row mt32 mb64" style="font-size: 17px;">
+                    <div class="col-12 mw-100 mb-2 text-center">
+                        <t t-if="doc.date_order">
+                            <strong style="color: #5b4931;" class="text-center">Ngày báo giá: </strong>
+                            <span t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                        </t>
+                    </div>
                 </div>
 
                 <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
@@ -123,7 +125,7 @@
                 <t t-set="display_per_discount" t-value="any(l.discount for l in doc.order_line)"/>
                 <t t-set="display_fix_discount" t-value="any(l.cus_discount for l in doc.order_line)"/>
 
-                <table class="table table-sm o_main_table table-bordered" style="font-size: 17px; border: 2px solid black;">
+                <table class="table table-sm o_main_table table-bordered" style="font-size: 17px; border: 1px solid black;">
                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                     <thead style="display: table-row-group">
                         <tr>

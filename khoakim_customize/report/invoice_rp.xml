@@ -269,7 +269,7 @@
 <!--                            </p>-->
 <!--                        </div>-->
 
-                        <div class="row mt64 mb128 text-center" id="signature" style="font-size: 17px">
+                        <div class="row mt128 mb128 text-center" id="signature" style="font-size: 17px">
                             <div class="col-auto col-3 mw-100 mb-2">
                                 <strong style="color: #5b4931;">Khách hàng</strong>
                             </div>
