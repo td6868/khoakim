@@ -97,7 +97,7 @@
                             <th name="th_prod_image" class="text-center"><strong>Hình ảnh</strong><p>图片</p></th>
                             <th name="th_brand" class="text-center"><strong>Hãng</strong><p>品牌</p></th>
                             <th name="th_color" class="text-center"><strong>Màu sắc</strong><p>颜色</p></th>
-                            <th name="th_price_unit" class="text-center"><strong>Đơn giá nhận</strong><p>出厂价格</p></th>
+                            <th name="th_price_unit" class="text-center"><strong>Đơn giá nhập</strong><p>出厂价格</p></th>
                             <th name="th_quantity" class="text-center"><strong>SL</strong><p>数量</p></th>
                             <th name="th_declare_ok" class="text-center"><strong>Khai hải quan</strong><p>报正关</p></th>
                             <th name="th_note" class="text-center"><strong>Ghi chú</strong><p>笔记</p></th>

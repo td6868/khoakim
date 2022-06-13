@@ -204,16 +204,20 @@
                             <tree string="Thông tin tài khoản" editable="bottom">
                                 <field name="company_id" invisible="1"/>
                                 <field name="name" invisible="1"/>
-                                <field name="qr_code" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
+                                <field name="qr_code" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
                                 <field name="bank_id"/>
+                                <field name="branch"/>
+                                <field name="type"/>
                                 <field name="acc_holder"/>
                                 <field name="acc_number"/>
                             </tree>
                             <form>
                                 <field name="company_id" invisible="1"/>
                                 <field name="name" invisible="1"/>
-                                <field name="qr_code" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}"/>
+                                <field name="qr_code" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
                                 <field name="bank_id"/>
+                                <field name="branch"/>
+                                <field name="type"/>
                                 <field name="acc_holder"/>
                                 <field name="acc_number"/>
                             </form>
@@ -358,13 +362,17 @@
             <button name='%(stock.action_report_delivery)d' position="replace">
                 <button name="%(action_report_stock_pick_customize)d" string="In" type="action"/>
             </button>
-
+            <button name='do_print_picking' position="replace">
+            </button>
+            <button name='action_set_quantities_to_reservation' position="replace">
+            </button>
             <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
             <xpath expr="//field[@name='move_ids_without_package']/form//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
+
         </field>
     </record>
 
