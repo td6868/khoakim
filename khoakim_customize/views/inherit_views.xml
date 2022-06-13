@@ -99,6 +99,13 @@
                 <field name="pst_by_word"/>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_subtotal']" position="after">
+                <field name="note"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_subtotal']" position="after">
+                <field name="note"/>
+            </xpath>
+
         </field>
     </record>
 
@@ -401,6 +408,17 @@
             <xpath expr="//field[@name='narration']" position="before">
                 <field name="pst_by_word"/>
             </xpath>
+
+            <button name="action_invoice_sent" position="replace">
+                <button name="%(action_report_account_move_customize)d" string="In" type="action" class="oe_highlight"/>
+            </button>
+
+            <button name="action_invoice_sent" position="replace">
+            </button>
+
+            <button name="preview_invoice" position="replace">
+            </button>
+
         </field>
     </record>
 
