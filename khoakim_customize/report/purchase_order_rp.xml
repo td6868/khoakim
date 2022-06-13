@@ -111,58 +111,58 @@
 
                             <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
-                                    <td id="product" class="text-center">
+                                    <td style="border-color: #000;" id="product" class="text-center">
                                         <span t-field="line.name"/>
                                     </td>
-                                    <td id="prod_image" class="text-center">
+                                    <td style="border-color: #000;" id="prod_image" class="text-center">
                                         <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 90px;"/>
                                     </td>
-                                    <td id="brand" class="text-center">
+                                    <td style="border-color: #000;" id="brand" class="text-center">
                                         <span t-field="line.brand"/>
                                     </td>
-                                    <td id="color" class="text-center">
+                                    <td style="border-color: #000;" id="color" class="text-center">
                                         <span t-field="line.color"/>
                                     </td>
-                                    <td class="text-center">
+                                    <td style="border-color: #000;" class="text-center">
                                         <span t-field="line.price_unit"/>
                                     </td>
-<!--                                    <td name="td_taxes">-->
+<!--                                    <td style="border-color: #000;" name="td_taxes">-->
 <!--                                        <span t-esc="', '.join(map(lambda x: x.name, line.taxes_id))"/>-->
 <!--                                    </td>-->
-<!--                                    <td class="text-center">-->
+<!--                                    <td style="border-color: #000;" class="text-center">-->
 <!--                                        <span t-field="line.date_planned"/>-->
 <!--                                    </td>-->
-                                    <td class="text-center">
+                                    <td style="border-color: #000;" class="text-center">
                                         <span t-field="line.product_qty"/>
                                         <span t-field="line.product_uom.name" groups="uom.group_uom"/>
                                     </td>
-                                    <td class="text-center">
+                                    <td style="border-color: #000;" class="text-center">
                                         <span t-field="line.declare_ok"/>
                                     </td>
-                                    <td class="text-center">
+                                    <td style="border-color: #000;" class="text-center">
                                         <span t-field="line.note"/>
                                     </td>
 
-<!--                                    <td class="text-right">-->
+<!--                                    <td style="border-color: #000;" class="text-right">-->
 <!--                                        <span t-field="line.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>-->
 <!--                                    </td>-->
                                 </t>
                                 <t t-if="line.display_type == 'line_section'">
-                                    <td colspan="99" id="section">
+                                    <td style="border-color: #000;" colspan="99" id="section">
                                         <span t-field="line.name"/>
                                     </td>
                                     <t t-set="current_section" t-value="line"/>
                                     <t t-set="current_subtotal" t-value="0"/>
                                 </t>
                                 <t t-if="line.display_type == 'line_note'">
-                                    <td colspan="99" id="note">
+                                    <td style="border-color: #000;" colspan="99" id="note">
                                         <span t-field="line.name"/>
                                     </td>
                                 </t>
                             </tr>
 <!--                            <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">-->
 <!--                                <tr class="is-subtotal text-right">-->
-<!--                                    <td colspan="99" id="subtotal">-->
+<!--                                    <td style="border-color: #000;" colspan="99" id="subtotal">-->
 <!--                                        <strong class="mr16">Tổng tiền</strong>-->
 <!--                                        <span t-esc="current_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>-->
 <!--                                    </td>-->
