@@ -264,7 +264,7 @@
                                         <div t-if="al.acc_number">Số TK ngân hàng: <span t-field="al.acc_number"/> tại Ngân hàng <span t-field="al.bank_id.name"/> Chi nhánh <span t-field="al.branch"/></div>
                                     </div>
                                     <div class="col-auto col-3 mw-100 mb-2 text-center" t-if="al.qr_code">
-                                        <strong style="color: #5b4931;">Quét và thanh toán tài khoản cá nhân</strong>
+                                        <strong style="color: #5b4931;">Quét và thanh toán tài khoản công ty</strong>
                                         <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
                                     </div>
                                 </div>
@@ -284,10 +284,10 @@
                             </t>
 
                             <div class="row mt128 mb32 text-center" id="informations">
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-auto col-6 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Khách hàng</strong>
                                 </div>
-                                <div class="col-auto col-9 mw-100 mb-2">
+                                <div class="col-auto col-6 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Đơn vị bán hàng</strong>
                                 </div>
 
@@ -303,15 +303,15 @@
                             </div>
 
                             <div class="row mt32 mb128 text-center" id="informations-2">
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-auto col-6 mw-100 mb-2">
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-auto col-2 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Giao vận</strong>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-auto col-2 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Thủ kho</strong>
                                 </div>
-                                <div class="col-auto col-3 mw-100 mb-2">
+                                <div class="col-auto col-2 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Kế toán</strong>
                                 </div>
                             </div>
@@ -320,28 +320,34 @@
                     </t>
         <t t-call="web.basic_layout">
             <div class="page">
-                <table class="table table-sm" style="border: 2px solid black important!;">
-                    <div width="100%" class="mt64 mt128 ml32 mr32" >
-                        <h2 class="mt16 text-center" style="font-size: 48px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
-                        <div style="font-size: 30px">
-                            <strong style="color: #5b4931;">Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
-                                <p>Người nhận: <span t-field="o.partner_id.name"/></p>
-                                <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
-                            </strong>
-                            <p t-if="o.partner_id">
-                                <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
-                                <span t-if="o.partner_id.street"> , </span>
-                                <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
-                                <span t-if="o.partner_id.street2"> , </span>
-                                <span t-if="o.partner_id.city" t-field="o.partner_id.city" t-options='{"widget": "text"}'/>
-                                <span t-if="o.partner_id.city"> , </span>
-                                <span t-if="o.partner_id.state_id.name" t-field="o.partner_id.state_id.name" t-options='{"widget": "text"}'/>
-                                <span t-if="o.partner_id.state_id.name"> , </span>
-                                <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
-                            </p>
-                        </div>
+                <div style="max-height:50%;max-width:100%;font-family: Roboto;padding: 100px 20px 100px 20px;">
+                    <div class="page">
+                        <table class="table table-sm" style="border: 4px solid #000; border-radius: 25px;">
+                            <th>
+                                <div class="mt256 mt256 ml32 mr32" style="padding: 50px 25px 100px 25px;">
+                                    <h2 class="mt16 text-center" style="font-size: 48px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
+                                    <div style="font-size: 30px">
+                                        <strong style="color: #000;">Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
+                                            <div>Người nhận: <span t-field="o.partner_id.name"/></div>
+                                            <div>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></div>
+                                        </strong>
+                                        <div t-if="o.partner_id">
+                                            <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
+                                            <span t-if="o.partner_id.street"> , </span>
+                                            <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
+                                            <span t-if="o.partner_id.street2"> , </span>
+                                            <span t-if="o.partner_id.city" t-field="o.partner_id.city" t-options='{"widget": "text"}'/>
+                                            <span t-if="o.partner_id.city"> , </span>
+                                            <span t-if="o.partner_id.state_id.name" t-field="o.partner_id.state_id.name" t-options='{"widget": "text"}'/>
+                                            <span t-if="o.partner_id.state_id.name"> , </span>
+                                            <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                        </table>
                     </div>
-                </table>
+                </div>
             </div>
         </t>
     </template>
