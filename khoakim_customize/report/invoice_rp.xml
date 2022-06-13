@@ -256,31 +256,35 @@
                         <div t-if="not is_html_empty(o.narration)" name="comment">
                             <span t-field="o.narration"/>
                         </div>
-                        <t t-foreach="o.company_id.account_lines" t-as="al">
-                            <div class="row mt32 mb32 text-left" id="account_person_info" t-if="al.type == 'company'" style="font-size: 17px">
-                                    <div class="col-9 mw-100 mb-2">
+                            <t t-foreach="o.company_id.account_lines" t-as="al">
+                                <div class="row mt32 mb32 text-left" id="account_person_info" t-if="al.type == 'company'" style="font-size: 17px">
+                                    <div class="col-8 col-auto mw-100 mb-2">
                                         <strong style="color: #5b4931;">Thông tin tài khoản công ty</strong>
                                         <div t-if="al.acc_holder">Chủ TK: <span t-field="al.acc_holder"/></div>
                                         <div t-if="al.acc_number">Số TK ngân hàng: <span t-field="al.acc_number"/> tại Ngân hàng <span t-field="al.bank_id.name"/> Chi nhánh <span t-field="al.branch"/></div>
                                     </div>
-                                    <div class="col-3 mw-100 mb-2 text-center" t-if="al.qr_code">
-                                        <div style="color: #5b4931;">Quét QR Code tài khoản</div>
-                                        <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
+                                    <div class="col-3 col-auto offset-1 mw-100 mb-2 text-center" t-if="al.qr_code">
+                                            <div style="color: #5b4931;">Quét QR Code tài khoản</div>
+                                            <div>
+                                                <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
+                                            </div>
                                     </div>
-                            </div>
-                            <div class="row mt32 mb32 text-left" id="account_company_info" t-if="al.type == 'person'" style="font-size: 17px">
-                                    <div class="col-9 mw-100 mb-2">
+                                </div>
+                                <div class="row mt32 mb32 text-left" id="account_company_info" t-if="al.type == 'person'" style="font-size: 17px">
+                                    <div class="col-8 col-auto mw-100 mb-2">
                                         <strong style="color: #5b4931;">Thông tin tài khoản cá nhân</strong>
                                         <div t-if="al.bank_id">Ngân hàng: <span t-field="al.bank_id.name"/> CN <span t-field="al.branch"/></div>
                                         <div t-if="al.acc_number">Số TK: <span t-field="al.acc_number"/></div>
                                         <div t-if="al.acc_holder">Chủ TK: <span t-field="al.acc_holder"/></div>
                                     </div>
-                                    <div class="col-3 mw-100 mb-2 text-center" t-if="al.qr_code">
-                                        <div style="color: #5b4931;">Quét QR Code tài khoản</div>
-                                        <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
+                                    <div class="col-3 col-auto offset-1 mw-100 mb-2 text-center" t-if="al.qr_code">
+                                            <div style="color: #5b4931;">Quét QR Code tài khoản</div>
+                                            <div>
+                                                <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
+                                            </div>
                                     </div>
-                            </div>
-                        </t>
+                                </div>
+                            </t>
 <!--                        <p t-if="not is_html_empty(o.fiscal_position_id.note)" name="note">-->
 <!--                            <span t-field="o.fiscal_position_id.note"/>-->
 <!--                        </p>-->
@@ -295,27 +299,27 @@
 <!--                        </div>-->
 
                             <div class="row mt128 mb32 text-center" id="informations">
-                                <div class="col-6 mw-100 mb-2">
+                                <div class="col-6 col-auto mw-100 mb-2">
                                     <strong style="color: #5b4931;">Khách hàng</strong>
                                 </div>
-                                <div class="col-6 mw-100 mb-2">
+                                <div class="col-6 col-auto mw-100 mb-2">
                                     <strong style="color: #5b4931;">Đơn vị bán hàng</strong>
                                 </div>
                             </div>
-
-                            <div class="row mt32 mb128 text-center" id="informations-2">
-                                <div class="col-6 mw-100 mb-2">
-                                </div>
-                                <div class="col-2 mw-100 mb-2">
+                            <div class="row mt32 mb32 text-center" id="informations-2">
+                                <div class="col-2 offset-6 col-auto mw-100 mb-2">
                                     <strong style="color: #5b4931;">Giao vận</strong>
                                 </div>
-                                <div class="col-2 mw-100 mb-2">
+                                <div class="col-2 col-auto mw-100 mb-2">
                                     <strong style="color: #5b4931;">Thủ kho</strong>
                                 </div>
-                                <div class="col-2 mw-100 mb-2">
+                                <div class="col-2 col-auto mw-100 mb-2">
                                     <strong style="color: #5b4931;">Kế toán</strong>
                                 </div>
                             </div>
+
+
+
                     </div>
                 </t>
         </template>
