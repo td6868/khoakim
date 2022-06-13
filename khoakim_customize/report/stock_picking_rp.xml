@@ -8,12 +8,20 @@
                                 <span t-if="o.state == 'draft'">PHIẾU XUẤT KHO (Nháp)</span>
                                 <span t-if="o.state == 'cancel'">PHIẾU XUẤT KHO (Huỷ)</span>
                             </h2>
-                            <div class="row mt32 mb32" style="font-size: 17px">
+                            <div class="row mt32 mb64" style="font-size: 17px">
                                 <div t-if="o.origin" class="col-12 mt32 mb32 text-center" name="div_origin">
                                     <strong style="color: #5b4931;">Đơn hàng: </strong><span t-field="o.origin"/>
                                 </div>
                             </div>
-                            <div class="row mt64 mb32" style="font-size: 17px">
+
+                            <div class="row mt128 mb32" style="font-size: 17px">
+                                <div t-if="o.partner_id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
+                                    <strong style="color: #5b4931;">Tên khách hàng: </strong>
+                                    <span t-if="o.partner_id.name" t-field="o.partner_id.name" t-options='{"widget": "text"}'/>
+                                </div>
+                            </div>
+
+                            <div class="row mt32 mb32" style="font-size: 17px">
                                 <div t-if="o.partner_id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
                                     <strong style="color: #5b4931;">Địa chỉ khách hàng: </strong>
                                     <p t-if="o.partner_id">
@@ -29,7 +37,18 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="row mt64 mb32" style="font-size: 17px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id">
+
+                            <div class="row mt32 mb32" style="font-size: 17px">
+                                <div t-if="o.partner_id" class="col-12 col-6 mw-100 mb-2" name="partner_id">
+                                    <strong style="color: #5b4931;">Tên người nhận: </strong>
+                                    <span t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id"
+                                          t-field="o.move_ids_without_package[0].partner_id.name" t-options='{"widget": "text"}'/>
+                                    <span t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id"
+                                          t-field="o.partner_id.name" t-options='{"widget": "text"}'/>
+                                </div>
+                            </div>
+
+                            <div class="row mt32 mb32" style="font-size: 17px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id">
                                 <div class="col-12 col-6 mw-100 mb-2" name="partner_shipping_id">
                                     <strong style="color: #5b4931;">Địa chỉ bàn giao: </strong>
                                     <p t-if="o.move_ids_without_package[0].partner_id">
@@ -50,7 +69,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="row mt64 mb32" style="font-size: 17px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id">
+                            <div class="row mt32 mb32" style="font-size: 17px" t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id == o.partner_id.id">
                                 <div class="col-12 col-6 mw-100 mb-2" name="partner_id">
                                     <strong style="color: #5b4931;">Địa chỉ bàn giao: </strong>
                                     <p t-if="o.partner_id">
@@ -69,7 +88,7 @@
 
                             <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
                                 <div class="col-12 mw-100 mb-2">
-                                    <t t-if="o.partner_id.mobile or o.partner_id.phone">
+                                    <t>
                                         <strong style="color: #5b4931;">Số điện thoại: </strong>
                                         <span t-field="o.partner_id.mobile or o.partner_id.phone" t-options='{"widget": "text"}'/>
                                     </t>
@@ -143,18 +162,18 @@
                                         <th name="th_product">
                                             <strong style="color: #5b4931;">Sản phẩm</strong>
                                         </th>
-                                        <th t-if="o.state == 'done'">
+                                        <th>
                                             <strong style="color: #5b4931;">Số lượng đặt hàng</strong>
                                         </th>
-                                        <th name="th_from" t-if="o.picking_type_id.code != 'incoming'" align="left" groups="stock.group_stock_multi_locations">
-                                            <strong style="color: #5b4931;">Từ</strong>
-                                        </th>
-                                        <th name="th_to" t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">
-                                            <strong style="color: #5b4931;">Đến</strong>
-                                        </th>
-                                        <th name="th_serial_number" class="text-center" t-if="has_serial_number">
-                                           <strong style="color: #5b4931;">Lô/ Số Seri</strong>
-                                        </th>
+<!--                                        <th name="th_from" t-if="o.picking_type_id.code != 'incoming'" align="left" groups="stock.group_stock_multi_locations">-->
+<!--                                            <strong style="color: #5b4931;">Từ</strong>-->
+<!--                                        </th>-->
+<!--                                        <th name="th_to" t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">-->
+<!--                                            <strong style="color: #5b4931;">Đến</strong>-->
+<!--                                        </th>-->
+<!--                                        <th name="th_serial_number" class="text-center" t-if="has_serial_number">-->
+<!--                                           <strong style="color: #5b4931;">Lô/ Số Seri</strong>-->
+<!--                                        </th>-->
                                         <th>
                                             <strong style="color: #5b4931;">Số lượng giao hàng</strong>
                                         </th>
@@ -172,28 +191,28 @@
                                                 <span t-field="ml.product_id.description_picking"/>
                                             </td>
                                             <td>
-                                                <span t-if="o.state != 'done'" t-field="ml.product_uom_qty"/>
+                                                <span t-field="ml.product_uom_qty"/>
                                                 <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
                                             </td>
-                                            <td t-if="o.picking_type_id.code != 'incoming'" groups="stock.group_stock_multi_locations">
-                                                <span t-esc="ml.location_id.display_name"/>
-                                                    <t t-if="ml.package_id">
-                                                        <span t-field="ml.package_id"/>
-                                                    </t>
-                                            </td>
-                                            <td t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">
-                                                <div>
-                                                    <span t-field="ml.location_dest_id"/>
-                                                    <t t-if="ml.result_package_id">
-                                                        <span t-field="ml.result_package_id"/>
-                                                    </t>
-                                                </div>
-                                            </td>
-                                            <td class=" text-center h6" t-if="has_serial_number">
-                                                <div t-if="has_serial_number and (ml.lot_id or ml.lot_name)" t-esc="ml.lot_id.name or ml.lot_name" t-options="{'widget': 'barcode', 'humanreadable': 1, 'width': 400, 'height': 100, 'img_style': 'width:100%;height:35px;'}"/>
-                                            </td>
+<!--                                            <td t-if="o.picking_type_id.code != 'incoming'" groups="stock.group_stock_multi_locations">-->
+<!--                                                <span t-esc="ml.location_id.display_name"/>-->
+<!--                                                    <t t-if="ml.package_id">-->
+<!--                                                        <span t-field="ml.package_id"/>-->
+<!--                                                    </t>-->
+<!--                                            </td>-->
+<!--                                            <td t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">-->
+<!--                                                <div>-->
+<!--                                                    <span t-field="ml.location_dest_id"/>-->
+<!--                                                    <t t-if="ml.result_package_id">-->
+<!--                                                        <span t-field="ml.result_package_id"/>-->
+<!--                                                    </t>-->
+<!--                                                </div>-->
+<!--                                            </td>-->
+<!--                                            <td class=" text-center h6" t-if="has_serial_number">-->
+<!--                                                <div t-if="has_serial_number and (ml.lot_id or ml.lot_name)" t-esc="ml.lot_id.name or ml.lot_name" t-options="{'widget': 'barcode', 'humanreadable': 1, 'width': 400, 'height': 100, 'img_style': 'width:100%;height:35px;'}"/>-->
+<!--                                            </td>-->
                                             <td class=" text-center h6" t-if="ml.qty_done">
-                                                <span t-if="o.state == 'done'" t-field="ml.qty_done"/>
+                                                <span t-field="ml.qty_done"/>
                                                 <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
                                             </td>
                                             <td class="text-center" t-if="has_barcode">
@@ -235,10 +254,56 @@
                             <p style="font-size: 17px" t-if="o.state in ['draft', 'waiting', 'confirmed'] or no_reserved_product"><i class="fa fa-exclamation-triangle"/>
                                 Không có sản phẩm nào hợp lệ. Xin vui lòng kiểm tra lại sản phẩm và tồn kho!
                             </p>
-                            <p t-field="o.note" style="font-size: 17px"/>
-                            <div class="row mt64 mb128 text-center" id="informations">
+                            <p t-if="o.note" t-field="o.note" style="font-size: 17px"/>
+
+                            <t t-foreach="o.company_id.account_lines" t-as="al">
+                                <div class="row mt32 mb32 text-left" id="account_person_info" t-if="al.type == 'company'" style="font-size: 17px">
+                                    <div class="col-auto col-9 mw-100 mb-2">
+                                        <strong style="color: #5b4931;">Thông tin tài khoản công ty</strong>
+                                        <div t-if="al.acc_holder">Chủ TK: <span t-field="al.acc_holder"/></div>
+                                        <div t-if="al.acc_number">Số TK ngân hàng: <span t-field="al.acc_number"/> tại Ngân hàng <span t-field="al.bank_id.name"/> Chi nhánh <span t-field="al.branch"/></div>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2 text-center" t-if="al.qr_code">
+                                        <strong style="color: #5b4931;">Quét và thanh toán tài khoản cá nhân</strong>
+                                        <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
+                                    </div>
+                                </div>
+                                <div class="row mt32 mb32 text-left" id="account_company_info" t-if="al.type == 'person'" style="font-size: 17px">
+                                    <div class="col-auto col-9 mw-100 mb-2">
+                                        <strong style="color: #5b4931;">Thông tin tài khoản cá nhân</strong>
+                                        <div t-if="al.bank_id">Ngân hàng: <span t-field="al.bank_id.name"/> CN <span t-field="al.branch"/></div>
+                                        <div t-if="al.acc_number">Số TK: <span t-field="al.acc_number"/></div>
+                                        <div t-if="al.acc_holder">Chủ TK: <span t-field="al.acc_holder"/></div>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2 text-center" t-if="al.qr_code">
+                                        <strong style="color: #5b4931;">Quét và thanh toán tài khoản cá nhân</strong>
+                                        <img t-att-src="image_data_uri(al.qr_code)" style="max-width: 100px;"/>
+                                    </div>
+                                </div>
+
+                            </t>
+
+                            <div class="row mt128 mb32 text-center" id="informations">
                                 <div class="col-auto col-3 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Khách hàng</strong>
+                                </div>
+                                <div class="col-auto col-9 mw-100 mb-2">
+                                    <strong style="color: #5b4931;">Đơn vị bán hàng</strong>
+                                </div>
+
+<!--                                <div class="col-auto col-3 mw-100 mb-2">-->
+<!--                                    <strong style="color: #5b4931;">Giao vận</strong>-->
+<!--                                </div>-->
+<!--                                <div class="col-auto col-3 mw-100 mb-2">-->
+<!--                                    <strong style="color: #5b4931;">Thủ kho</strong>-->
+<!--                                </div>-->
+<!--                                <div class="col-auto col-3 mw-100 mb-2">-->
+<!--                                    <strong style="color: #5b4931;">Kế toán</strong>-->
+<!--                                </div>-->
+                            </div>
+
+                            <div class="row mt32 mb128 text-center" id="informations-2">
+                                <div class="col-auto col-3 mw-100 mb-2">
                                 </div>
                                 <div class="col-auto col-3 mw-100 mb-2">
                                     <strong style="color: #5b4931;">Giao vận</strong>
@@ -250,31 +315,35 @@
                                     <strong style="color: #5b4931;">Kế toán</strong>
                                 </div>
                             </div>
-                            <p style="page-break-before:always;"></p>
-                                <table class="table table-sm table-bordered" style="border: 2px solid black important!;">
-                                    <div width="100%" class="mt64 mt128 ml32 mr32" >
-                                        <h2 class="mt16 text-center" style="font-size: 36px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
-                                        <div style="font-size: 25px">
-                                            <strong style="color: #5b4931;">Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
-                                                <p>Người nhận: <span t-field="o.partner_id.name"/></p>
-                                                <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
-                                            </strong>
-                                                <p t-if="o.partner_id">
-                                                    <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
-                                                    <span t-if="o.partner_id.street"> , </span>
-                                                    <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
-                                                    <span t-if="o.partner_id.street2"> , </span>
-                                                    <span t-if="o.partner_id.city" t-field="o.partner_id.city" t-options='{"widget": "text"}'/>
-                                                    <span t-if="o.partner_id.city"> , </span>
-                                                    <span t-if="o.partner_id.state_id.name" t-field="o.partner_id.state_id.name" t-options='{"widget": "text"}'/>
-                                                    <span t-if="o.partner_id.state_id.name"> , </span>
-                                                    <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
-                                                </p>
-                                        </div>
-                                    </div>
-                                </table>
                         </div>
+                        <p style="page-break-after:always;"></p>
                     </t>
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <table class="table table-sm" style="border: 2px solid black important!;">
+                    <div width="100%" class="mt64 mt128 ml32 mr32" >
+                        <h2 class="mt16 text-center" style="font-size: 48px">HÀNG DỄ VỠ XIN NHẸ TAY</h2>
+                        <div style="font-size: 30px">
+                            <strong style="color: #5b4931;">Người gửi: <span t-field="o.company_id.name"/> - <span t-field="o.company_id.phone"/>
+                                <p>Người nhận: <span t-field="o.partner_id.name"/></p>
+                                <p>Số điện thoại: <span t-if="o.partner_id.mobile" t-field="o.partner_id.mobile"/> / <span t-if="o.partner_id.phone" t-field="o.company_id.phone"/></p>
+                            </strong>
+                            <p t-if="o.partner_id">
+                                <span t-if="o.partner_id.street" t-field="o.partner_id.street" t-options='{"widget": "text"}'/>
+                                <span t-if="o.partner_id.street"> , </span>
+                                <span t-if="o.partner_id.street2" t-field="o.partner_id.street2" t-options='{"widget": "text"}'/>
+                                <span t-if="o.partner_id.street2"> , </span>
+                                <span t-if="o.partner_id.city" t-field="o.partner_id.city" t-options='{"widget": "text"}'/>
+                                <span t-if="o.partner_id.city"> , </span>
+                                <span t-if="o.partner_id.state_id.name" t-field="o.partner_id.state_id.name" t-options='{"widget": "text"}'/>
+                                <span t-if="o.partner_id.state_id.name"> , </span>
+                                <span t-if="o.partner_id.country_id.name" t-field="o.partner_id.country_id.name" t-options='{"widget": "text"}'/>
+                            </p>
+                        </div>
+                    </div>
+                </table>
+            </div>
+        </t>
     </template>
 
     <template id="report_stock_picking_khoakim">

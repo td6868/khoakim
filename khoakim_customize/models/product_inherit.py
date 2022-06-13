@@ -766,18 +766,20 @@ class PurchaseOrderLine(models.Model):
             brand = ''
             color = ''
             if line.product_id:
+                print(line.product_id)
                 attrs = line.product_id.product_template_attribute_value_ids
                 if attrs:
+                    print(attrs)
                     for a in attrs:
                         if a.attribute_id.sequence == 0:
-                            brand = a.attribute_id.name
+                            brand = a.name
                         if a.attribute_id.sequence == 1:
-                            color = a.attribute_id.name
+                            color = a.name
                 else:
                     brand = 'Không có'
                     color = 'Không có'
-                line.brand = brand
-                line.color = color
+            line.brand = brand
+            line.color = color
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -889,17 +891,23 @@ class ResCompanyAccountLine(models.Model):
 
     company_id = fields.Many2one('res.company', string='Công ty')
     name = fields.Char(string='Tài khoản', compute='_compute_name')
+    type = fields.Selection([
+                                ('person', 'Cá nhân'),
+                                ('company', 'Công ty'),
+                            ],string= 'Loại tài khoản', default='person', require=True)
     acc_holder = fields.Char(string='Tên tài khoản', require=True)
     acc_number = fields.Char(string='Số tài khoản', require=True)
     bank_id = fields.Many2one('res.bank', string="Ngân hàng", require=True)
+    branch = fields.Char(string='Chi nhánh')
     qr_code = fields.Binary(string='Mã QR code')
 
     @api.depends('acc_number', 'bank_id.name')
     def _compute_name(self):
-        if self.bank_id.name and self.acc_number:
-            self.name = self.acc_number + ' - ' + self.bank_id.name
-        else:
-            self.name = ''
+        for line in self:
+            if line.bank_id.name and line.acc_number:
+                line.name = line.acc_number + ' - ' + line.bank_id.name
+            else:
+                line.name = ''
 
 class ResCompanyCustomize(models.Model):
     _inherit = 'res.company'

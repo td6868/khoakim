@@ -125,7 +125,7 @@
                 <t t-set="display_per_discount" t-value="any(l.discount for l in doc.order_line)"/>
                 <t t-set="display_fix_discount" t-value="any(l.cus_discount for l in doc.order_line)"/>
 
-                <table class="table table-sm o_main_table table-bordered" style="font-size: 17px; border: 1px solid black;">
+                <table class="table table-sm o_main_table" style="font-size: 17px;">
                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                     <thead style="display: table-row-group">
                         <tr>
