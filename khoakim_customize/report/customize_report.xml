@@ -15,6 +15,19 @@
 
     <data>
         <report
+            id="action_report_saleorder_xlsx_customize"
+            model="sale.order"
+            string="Báo giá/ Đơn hàng Excel"
+            report_type="xlsx"
+            name="khoakim_customize.report_saleorder_xlsx"
+            file="report_saleorder_xlsx"
+            print_report_name="(object.state in ('draft', 'sent') and 'Báo giá - %s' % (object.name)) or 'Đơn hàng - %s' % (object.name)"
+            menu="True"
+        />
+    </data>
+
+    <data>
+        <report
             id="action_report_account_move_customize"
             string="Hoá đơn/ Công nợ"
             model="account.move"
@@ -122,5 +135,6 @@
 <!--            menu="Fasle"-->
 <!--        />-->
 <!--    </data>-->
+
 
 </odoo>
