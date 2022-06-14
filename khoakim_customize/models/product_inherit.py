@@ -701,11 +701,12 @@ class ResPartnerCustomize(models.Model):
     def action_def_pricelist(self):
         if self.name:
             pl = self.env['product.pricelist']
+            def_pl = pl.search([('type_pl', '=', 'main')], limit=1)
             if self.roles:
-                def_pl = pl.search([('roles', '=', self.roles)], limit=1)
-            else:
-                def_pl = pl.search([('type_pl', '=', 'main')])
-            self.propety_product_pricelist = def_pl.id
+                pl = pl.search([('roles', '=', self.roles)], limit=1)
+                if pl:
+                    def_pl = pl
+            self.property_product_pricelist = def_pl.id
 
     def create_acc_distributor(self):
         com_id = self.env.company
