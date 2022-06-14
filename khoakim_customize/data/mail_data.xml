@@ -7,5 +7,16 @@
             <field name="res_model">sale.order</field>
 <!--            <field name="res_model_id" ref="khoakim_customize.model_sale_order"/>-->
         </record>
+
+        <record id="A4_landscape_perform_print" model="report.paperformat">
+            <field name="name">A4L</field>
+            <field name="format">A4</field>
+            <field name="orientation">Landscape</field>
+        </record>
+
+        <record id="purchase.seq_purchase_order" model="ir.sequence">
+          <field name="prefix">KK</field>
+        </record>
+
     </data>
 </odoo>

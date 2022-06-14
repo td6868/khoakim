@@ -13,19 +13,20 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        'views/inherit_views.xml',
-        'data/data.xml',
         'data/mail_data.xml',
         'report/sale_order_rp.xml',
         'report/invoice_rp.xml',
         'report/stock_picking_rp.xml',
         'report/purchase_order_rp.xml',
         'report/customize_report.xml',
+        'views/inherit_views.xml',
+        'data/data.xml',
     ],
     "depends": [
         "sale",
         "base",
         "product",
+        "report_xlsx",
     ],
     'demo': [
     ],
