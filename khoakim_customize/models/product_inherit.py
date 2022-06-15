@@ -115,15 +115,20 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
-    qty_available = fields.Float(string="TK khả dụng", related="product_id.qty_available")
+    qty_available = fields.Float(string="Tồn kho", related="product_id.qty_available")
+    virtual_available = fields.Float(string="Khả dụng", related="product_id.virtual_available")
+    virtual_qty = fields.Char(string="TKKD/ TKTT", compute="_virtual_qty")
     cus_discount = fields.Float(string='C.Khấu ($)')
-    new_price_unit = fields.Float(string='Giá sau CK')
+    new_price_unit = fields.Float(string='Giá sau CK', readonly=True)
     note = fields.Char(string='Ghi chú')
 
-    # def _compute_qty_available_all(self):
-    #     prod = self.env['product.product']
-    #     qty_prod = prod.search()
-    #     qty_available = self.product_id.qty_available
+    @api.depends("qty_available", "virtual_available")
+    def _virtual_qty(self):
+        for line in self:
+            virtual_qty = ''
+            if line.product_id:
+                virtual_qty = ("%s/%s") % (line.virtual_available, line.qty_available)
+            line.virtual_qty = virtual_qty
 
     @api.onchange("cus_discount", "discount")
     def _onchange_discount(self):
@@ -828,7 +833,7 @@ class SaleOrder(models.Model):
         else:
             sum = 0
             for l in self.order_line:
-                sum += l.discount
+                sum += l.discount + l.cus_discount
             if sum:
                 self.write({'state': 'waiting'})
                 self.notify_manager()

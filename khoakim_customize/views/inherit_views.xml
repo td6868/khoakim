@@ -38,12 +38,12 @@
 
             <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
-                <field name="new_price_unit"/>
+                <field name="new_price_unit" attrs="{'force_save': True}"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
-                <field name="new_price_unit"/>
+                <field name="new_price_unit" attrs="{'force_save': True}"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="attributes">
@@ -59,11 +59,11 @@
             </xpath>
 
             <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_qty']" position="after">
-                <field name="qty_available"/>
+                <field name="virtual_qty"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="after">
-                <field name="qty_available"/>
+                <field name="virtual_qty"/>
             </xpath>
 
             <xpath expr="//button[@name='action_confirm']" position="replace">
