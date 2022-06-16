@@ -159,7 +159,7 @@
                                         <span t-field="line.product_uom"/>
                                     </td>
                                     <td style="border-color: #000;" name="td_priceunit" class="text-center">
-                                        <span t-field="line.new_price_unit"/>
+                                        <span t-field="line.new_price_unit" t-options='{"widget": "monetary"}'/>
                                     </td>
                                     <td style="border-color: #000;" name="td_taxes" class="text-center">
                                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
@@ -227,8 +227,8 @@
                     <div class="offset-8">
                         <strong class="mt64 mb64">Người báo giá</strong>
                     </div>
-                    <div class="offset-8" t-if="doc.user_id.sign_signature">
-                        <img t-att-src="image_data_uri(doc.user_id.sign_signature)" style="max-height: 4cm; max-width: 8cm;"/>
+                    <div class="offset-8" t-if="doc.sm_signture">
+                        <img t-att-src="image_data_uri(doc.sm_signture)" style="max-height: 4cm; max-width: 8cm;"/>
                     </div>
                     <div class="offset-8">
                         <div class="mt64 mb64" t-field="doc.user_id.name"/>

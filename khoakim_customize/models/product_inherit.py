@@ -794,11 +794,13 @@ class SaleOrder(models.Model):
     state = fields.Selection(selection=[
         ('draft', 'Báo giá'),
         ('waiting', 'Chờ duyệt báo giá'),
+        ('approved', 'Đã duyệt báo giá'),
         ('sent', 'Báo giá đã gửi'),
         ('sale', 'Đơn hàng'),
         ('done', 'Đã khóa'),
         ('cancel', 'Đã hủy'),
     ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
+    sm_signture = fields.Binary(string="Chữ ký NVKD", related="user_id.sign_signature")
 
     pst_by_word = fields.Char(string="Số tiền bằng chữ", compute='_compute_subtotal_word')
 
@@ -828,17 +830,20 @@ class SaleOrder(models.Model):
         group_pass = 'khoakim_customize.group_pass_approval_sale_order'
         user = self.env.user
         iv = False
-        if user.has_group(group_pass):
-            iv = self.customize_sale_confirm()
-        else:
-            sum = 0
-            for l in self.order_line:
-                sum += l.discount + l.cus_discount
-            if sum:
-                self.write({'state': 'waiting'})
-                self.notify_manager()
-            else:
+        if self.state in ['draft', 'waiting', 'sent']:
+            if user.has_group(group_pass):
                 iv = self.customize_sale_confirm()
+            else:
+                sum = 0
+                for l in self.order_line:
+                    sum += l.discount + l.cus_discount
+                if sum > 0.0:
+                    self.write({'state': 'waiting'})
+                    self.notify_manager()
+                else:
+                    iv = self.customize_sale_confirm()
+        else:
+            iv = self.customize_sale_confirm()
 
         if iv:
             return iv.action_register_payment()
@@ -851,16 +856,17 @@ class SaleOrder(models.Model):
             }
 
     def action_accept_approval(self):
-        iv = self.customize_sale_confirm()
-        if iv:
-            return iv.action_register_payment()
-        else:
-            return {
-                'warning': {
-                                'title': ('Kiểm tra lại cấu hình sản phẩm'),
-                                'message': ("Không thể tạo hóa đơn theo đơn hàng"),
-                            },
-            }
+        # iv = self.customize_sale_confirm()
+        # if iv:
+        #     return iv.action_register_payment()
+        # else:
+        #     return {
+        #         'warning': {
+        #                         'title': ('Kiểm tra lại cấu hình sản phẩm'),
+        #                         'message': ("Không thể tạo hóa đơn theo đơn hàng"),
+        #                     },
+        #     }
+        self.write({'state': 'approved'})
         self.notify_manager()
 
     def action_deny_approval(self):
