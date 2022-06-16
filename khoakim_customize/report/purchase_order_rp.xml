@@ -114,8 +114,13 @@
                                     <td style="border-color: #000;" id="product" class="text-center">
                                         <span t-field="line.name"/>
                                     </td>
-                                    <td style="border-color: #000;" id="prod_image" class="text-center">
-                                        <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 90px;"/>
+                                    <td style="border-color: #000;" id="td_prod_image" class="text-center">
+                                        <div t-if="line.prod_image">
+                                            <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 100px;"/>
+                                        </div>
+                                        <div t-if="line.prod_image == False">
+                                            <div></div>
+                                        </div>
                                     </td>
                                     <td style="border-color: #000;" id="brand" class="text-center">
                                         <span t-field="line.brand"/>

@@ -57,7 +57,7 @@
             id="action_report_purchase_order_customize"
             string="Phiếu đặt hàng"
             model="purchase.order"
-            report_type="qweb-pdf"
+            report_type="qweb-html"
             file="khoakim_customize.report_purchase_order_khoakim"
             name="khoakim_customize.report_purchase_order_khoakim"
             print_report_name="'Phiếu mua hàng - %s - %s' % (object.name or '', object.partner_id.name)"
