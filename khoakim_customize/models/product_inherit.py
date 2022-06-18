@@ -4,6 +4,8 @@ import json
 import time
 import ssl
 from vietnam_number import n2w
+import string
+import random
 
 from woocommerce import API
 from odoo import api, fields, models
@@ -685,6 +687,8 @@ class ResPartnerCustomize(models.Model):
         ('daily3', 'Đại lý cấp 3'),
         ('customer', 'Khách hàng lẻ')
     ], string='Cấp đại lý', default='customer', required=True)
+    # wp_user = fields.Char(string="Tài khoản portal")
+    # wp_password = fields.Char(string="Mật khẩu portal")
 
     @api.onchange('phone')
     def action_duplicate_customer(self):
@@ -717,20 +721,24 @@ class ResPartnerCustomize(models.Model):
         com_id = self.env.company
         wp_user = com_id.wp_user
         wp_pass = com_id.wp_pass
+        c = string.ascii_lowercase + string.ascii_uppercase + string.digits
+        username = ''
+        password = ''
 
         if (com_id.wp_url or wp_user or wp_pass):
             wp_url = com_id.wp_url + '/wp-json/wp/v2/users'
 
-            if self.email:
-                email = self.email
-            else:
-                email = self.phone + '@khoakim.com.vn'
+            if self.phone:
+                if self.email:
+                    email = self.email
+                else:
+                    email = self.phone + '@khoakim.com.vn'
+                username = str(self.phone)[0:6] + random.choice(c)
+                password = str(self.phone) + random.choice(c)
 
-            if (self.phone and self.roles):
-                username = str(self.phone)[0:6]
-                password = str(self.phone)
+            if self.roles:
                 data = {
-                    "username": str(self.phone)[0:7],
+                    "username": username,
                     "password": password,
                     "name": self.name,
                     "email": email,
@@ -751,7 +759,24 @@ class ResPartnerCustomize(models.Model):
                             'message': (("Đã có lỗi %s . Liên hệ với admin để giải đáp!") % (r.status_code)),
                         },
                     }
+            else:
+                return {
+                    'warning': {
+                        'title': ('Đã có lỗi'),
+                        'message': (("Chưa cập nhật chính sách đại lý cho khách hàng này!")),
+                    }
+                }
         return UserError('Lỗi chưa có thông tin về website Đại lý. Hãy vào công ty để khai báo!')
+
+    # def reset_wp_password(self):
+    #     com_id = self.env.company
+    #     wp_user = com_id.wp_user
+    #     wp_pass = com_id.wp_pass
+    #
+    #     if (com_id.wp_url or wp_user or wp_pass):
+    #         wp_url = com_id.wp_url + '/wp-json/wp/v2/users'
+
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'

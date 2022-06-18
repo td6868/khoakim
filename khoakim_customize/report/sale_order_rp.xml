@@ -152,7 +152,14 @@
 
                             <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
-                                    <td style="border-color: #000;" name="td_prod_image" class="text-center"><img t-att-src="image_data_uri(line.prod_image)" style="max-width: 90px;"/></td>
+                                    <td style="border-color: #000;" name="td_prod_image" class="text-center">
+                                        <t t-if="line.prod_image">
+                                            <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 90px;"/>
+                                        </t>
+                                        <t t-if="line.prod_image == False">
+                                            <div></div>
+                                        </t>
+                                    </td>
                                     <td style="border-color: #000;" name="td_name" class="text-left"><span t-field="line.name"/></td>
                                     <td style="border-color: #000;" name="td_quantity" class="text-center">
                                         <span t-field="line.product_uom_qty"/>
