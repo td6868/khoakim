@@ -71,8 +71,8 @@
 
             <xpath expr="//button[@name='action_confirm']" position="replace">
                 <button name="action_quotation_approval" id="customize_sale_approval" string="Xác nhận" class="btn-primary"
-                        type="object" attrs="{'invisible': [('state', 'not in', ['draft', 'waiting'])]}"/>
-                <button name="action_accept_approval" string="Xác nhận" class="btn-success"
+                        type="object" attrs="{'invisible': [('state', 'not in', ['draft', 'approved'])]}"/>
+                <button name="action_accept_approval" string="Xét duyệt" class="btn-success"
                         groups="khoakim_customize.group_approval_sale_order"
                         type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
 <!--                <button name="customize_sale_confirm" string="Xác nhận" class="btn-success"-->
@@ -82,7 +82,7 @@
                         groups="khoakim_customize.group_approval_sale_order" class="btn-warning"
                         type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
                 <button name="action_cancel" id="action_cancel" string="Hủy"
-                        type="object" attrs="{'invisible': [('state', 'not in', ['waiting'])]}"/>
+                        type="object" attrs="{'invisible': [('state', 'not in', ['waiting', 'approved'])]}"/>
             </xpath>
 
             <xpath expr="//button[@name='action_quotation_send']" position="replace">

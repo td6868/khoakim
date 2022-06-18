@@ -818,9 +818,9 @@ class SaleOrder(models.Model):
     total_due = fields.Monetary(string="Công nợ hiện tại", related="partner_id.total_due")
     state = fields.Selection(selection=[
         ('draft', 'Báo giá'),
-        ('waiting', 'Chờ duyệt báo giá'),
-        ('approved', 'Đã duyệt báo giá'),
-        ('sent', 'Báo giá đã gửi'),
+        ('waiting', 'Chờ duyệt'),
+        ('approved', 'Đã duyệt'),
+        ('sent', 'Đã gửi'),
         ('sale', 'Đơn hàng'),
         ('done', 'Đã khóa'),
         ('cancel', 'Đã hủy'),
@@ -837,6 +837,7 @@ class SaleOrder(models.Model):
         else:
             self.pst_by_word = ''
 
+    #tạo hoá đơn
     def customize_sale_confirm(self):
         self.action_confirm()
         iv = self._create_invoices(final=True)
@@ -846,6 +847,7 @@ class SaleOrder(models.Model):
         else:
             return False
 
+    #xét duyệt báo giá
     def action_quotation_approval(self):
         if self.order_line:
             for line in self.order_line:
@@ -880,6 +882,7 @@ class SaleOrder(models.Model):
                             },
             }
 
+    #xác nhận báo giá
     def action_accept_approval(self):
         # iv = self.customize_sale_confirm()
         # if iv:
@@ -900,11 +903,10 @@ class SaleOrder(models.Model):
     def notify_manager(self):
         if self.state == 'waiting':
             manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1).parent_id
-            print('run notify')
             if manager:
                 for sale_approval in self.filtered(lambda hol: hol.state == 'waiting'):
-                    print(sale_approval)
-                    self.activity_schedule(
+                    # print(sale_approval)
+                    sale_approval.activity_schedule(
                         'khoakim_customize.mail_act_sale_approval_kk',
                         user_id=manager.user_id.id or self.env.uid)
             else:
@@ -915,10 +917,16 @@ class SaleOrder(models.Model):
                         },
                     }
 
-        self.filtered(lambda hol: hol.state in ['sale', 'done']).activity_feedback(
+        self.filtered(lambda hol: hol.state in ['sale', 'approved', 'done']).activity_feedback(
             ['khoakim_customize.mail_act_sale_approval_kk'])
-        self.filtered(lambda hol: hol.state == 'cancel').activity_unlink(
+        self.filtered(lambda hol: hol.state in ['draft', 'cancel']).activity_unlink(
             ['khoakim_customize.mail_act_sale_approval_kk'])
+        if self.state == 'draft':
+            for sale_deny in self.filtered(lambda hol: hol.state == 'draft'):
+                # print(sale_approval)
+                sale_deny.activity_schedule(
+                    'khoakim_customize.mail_act_sale_approval_kk',
+                    user_id=sale_deny.user_id.id or self.env.uid)
 
 class ResCompanyAccountLine(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
