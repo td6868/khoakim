@@ -1,3 +1,6 @@
+import random
+import string
+
 import requests
 import base64
 from woocommerce import API
@@ -81,6 +84,11 @@ def woocommerce_test_api():
         post = wcapi.post("products", data).json()
         print(post)
 
+def random_char():
+    c = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    r = random.choice(c)
+    print(r)
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    woocommerce_test_api()
+    random_char()
