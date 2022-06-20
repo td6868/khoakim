@@ -861,14 +861,19 @@ class SaleOrder(models.Model):
             if user.has_group(group_pass):
                 iv = self.customize_sale_confirm()
             else:
-                sum = 0
                 for l in self.order_line:
-                    sum += l.discount + l.cus_discount
-                if sum > 0.0:
-                    self.write({'state': 'waiting'})
-                    self.notify_manager()
-                else:
-                    iv = self.customize_sale_confirm()
+                    sum = l.discount or l.cus_discount
+                    if sum > 0.0:
+                        self.write({'state': 'waiting'})
+                        self.notify_manager()
+                        return {
+                                    'warning': {
+                                                    'title': ('Hãy chờ chút'),
+                                                    'message': (("Do sản phẩm %s đang được chiết khấu nên cần phải duyệt! Vui lòng thông báo tới khách hàng") % (l.product_id.name)),
+                                                },
+                                }
+                    else:
+                        iv = self.customize_sale_confirm()
         else:
             iv = self.customize_sale_confirm()
 
@@ -939,7 +944,7 @@ class ResCompanyAccountLine(models.Model):
     type = fields.Selection([
                                 ('person', 'Cá nhân'),
                                 ('company', 'Công ty'),
-                            ],string= 'Loại tài khoản', default='person', require=True)
+                            ], string= 'Loại tài khoản', default='person', require=True)
     acc_holder = fields.Char(string='Tên tài khoản', require=True)
     acc_number = fields.Char(string='Số tài khoản', require=True)
     bank_id = fields.Many2one('res.bank', string="Ngân hàng", require=True)

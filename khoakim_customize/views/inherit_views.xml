@@ -422,6 +422,22 @@
         </field>
     </record>
 
+    <record id="view_backorder_confirmation_inherit" model="ir.ui.view">
+        <field name="name">stock_backorder_confirmation_inherit</field>
+        <field name="model">stock.backorder.confirmation</field>
+        <field name="inherit_id" ref="stock.view_backorder_confirmation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='process']" position="replace">
+                <button name="process" string="Tạo dở dang" type="object" class="btn-success" data-hotkey="q"/>
+            </xpath>
+            <xpath expr="//button[@name='process_cancel_backorder']" position="replace">
+                <button name="process_cancel_backorder" string="Không tạo tạo phần dở dang" type="object" class="btn-danger" attrs="{'invisible': [('show_transfers', '=', True)]}" data-hotkey="w"/>
+            </xpath>
+        </field>
+    </record>
+
+
+
 <!--    <record id="view_res_users_signa_form_inherit" model="ir.ui.view">-->
 <!--        <field name="name">res.users.signa.inherit</field>-->
 <!--        <field name="model">res.users</field>-->
