@@ -8,7 +8,7 @@ import string
 import random
 
 from woocommerce import API
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import Warning, UserError
 import requests
 import base64
@@ -296,13 +296,20 @@ class ProductTemplate(models.Model):
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code', store=True)
     wp_ok = fields.Boolean(string="Khả dụng ở website")
     prod_code = fields.Char(string="Mã SP/NSX", required=True)
+    sale_ok = fields.Boolean('Có thể bán', default=False)
+    purchase_ok = fields.Boolean('Có thể mua', default=False)
+    appr_state = fields.Boolean('Trạng thái duyệt', default=False)
+    # product_ok = fields.Boolean('Là sản phẩm', default=False)
 
-    # @api.model
-    # def create(self, vals):
-    #     rec = super(ProductTemplate, self).create(vals)
-    #     if self.wp_ok == True:
-    #         self.update_product_wp()
-    #     return rec
+    @api.model
+    def create(self, vals):
+        rec = super(ProductTemplate, self).create(vals)
+        # if self.wp_ok == True:
+        #     self.update_product_wp()
+        check_pass = self.check_perm_product_temp()
+        if check_pass:
+            self.write({'appr_state': True,})
+        return rec
 
     # def write(self, vals):
     #     super(ProductTemplate, self).write(vals)
@@ -345,6 +352,34 @@ class ProductTemplate(models.Model):
                 "image_256": img_b64,
                 "image_512": img_b64,
             })
+
+    def check_perm_product_temp(self):
+        group_pass = 'khoakim_customize.group_approval_product_temp'
+        user_id = self.env.user
+        if user_id.has_group(group_pass):
+            return True
+        return False
+
+    @api.model
+    def prod_temp_approvaled(self):
+        check_perm = self.check_perm_product_temp()
+        if check_perm:
+            for p in self:
+                p.write({
+                    'sale_ok': True,
+                    'purchase_ok': True,
+                    'appr_state': True,
+                })
+
+    @api.model
+    def prod_temp_deny(self):
+        check_perm = self.check_perm_product_temp()
+        if check_perm:
+            for p in self:
+                try:
+                    p.unlink()
+                except:
+                    p.write({'active': False,})
 
     # def create_woo_product(self, vals):
     #     com_id = self.env.company
@@ -776,8 +811,6 @@ class ResPartnerCustomize(models.Model):
     #     if (com_id.wp_url or wp_user or wp_pass):
     #         wp_url = com_id.wp_url + '/wp-json/wp/v2/users'
 
-
-
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
@@ -797,10 +830,10 @@ class PurchaseOrderLine(models.Model):
             brand = ''
             color = ''
             if line.product_id:
-                print(line.product_id)
+                # print(line.product_id)
                 attrs = line.product_id.product_template_attribute_value_ids
                 if attrs:
-                    print(attrs)
+                    # print(attrs)
                     for a in attrs:
                         if a.attribute_id.sequence == 0:
                             brand = a.name
@@ -840,52 +873,86 @@ class SaleOrder(models.Model):
     #tạo hoá đơn
     def customize_sale_confirm(self):
         self.action_confirm()
-        iv = self._create_invoices(final=True)
-        if iv:
-            iv.action_post()
-            return iv
-        else:
-            return False
+        return {
+            'name': _('Ghi nhận thanh toán'),
+            'res_model': 'sale.order.invoice.kk',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'sale.order',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
 
-    #xét duyệt báo giá
-    def action_quotation_approval(self):
+    #kiem tra quyen duyet
+    def check_pass_perm(self):
+        group_pass = 'khoakim_customize.group_pass_approval_sale_order'
+        user_id = self.env.user
+        if user_id.has_group(group_pass):
+            return True
+        return False
+
+    #kiem tra gia tien bao gia
+    def check_price_quotation(self):
         if self.order_line:
             for line in self.order_line:
                 if line.price_unit == 0:
-                    raise UserError(("Vui lòng kiểm tra lại sản phẩm %s chưa có giá tiền") % (line.name))
+                    return line.name
+        return False
 
-        group_pass = 'khoakim_customize.group_pass_approval_sale_order'
-        user = self.env.user
-        iv = False
+    #check có chiet khau
+    def check_discount(self):
+        for l in self.order_line:
+            discount = l.discount or l.cus_discount
+            if discount > 0.0:
+                return l.product_id.name
+        return False
+
+    #xét duyệt báo giá
+    def action_quotation_approval(self):
+
+        check_price = self.check_price_quotation()
+        if check_price:
+            raise UserError(("Vui lòng kiểm tra lại sản phẩm %s chưa có giá tiền") % (check_price))
+
+        check_perm_pass = self.check_pass_perm()
+        # iv = False
         if self.state in ['draft', 'waiting', 'sent']:
-            if user.has_group(group_pass):
-                iv = self.customize_sale_confirm()
-            else:
-                for l in self.order_line:
-                    sum = l.discount or l.cus_discount
-                    if sum > 0.0:
-                        self.write({'state': 'waiting'})
-                        self.notify_manager()
-                        return {
-                                    'warning': {
-                                                    'title': ('Hãy chờ chút'),
-                                                    'message': (("Do sản phẩm %s đang được chiết khấu nên cần phải duyệt! Vui lòng thông báo tới khách hàng") % (l.product_id.name)),
-                                                },
-                                }
-                    else:
-                        iv = self.customize_sale_confirm()
-        else:
-            iv = self.customize_sale_confirm()
+            if check_perm_pass == False:
+                disc = self.check_discount()
+                if disc:
+                    self.write({'state': 'waiting'})
+                    self.notify_manager()
+                    return {
+                                'warning': {
+                                                'title': ('Hãy chờ chút'),
+                                                'message': (("Do sản phẩm %s đang được chiết khấu nên cần phải duyệt! Vui lòng thông báo tới khách hàng") % (disc)),
+                                            },
+                            }
+        return {
+            'name': _('Ghi nhận thanh toán'),
+            'res_model': 'sale.order.invoice.kk',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'sale.order',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
 
-        if iv:
-            return iv.action_register_payment()
-        else:
-            return {
-                'warning': {
-                                'title': ('Kiểm tra lại cấu hình sản phẩm'),
-                                'message': ("Không thể tạo hóa đơn theo đơn hàng"),
-                            },
-            }
+        # iv = self.customize_sale_confirm()
+
+        # if iv:
+        #     return iv.action_register_payment()
+        # else:
+        #     return {
+        #         'warning': {
+        #                         'title': ('Kiểm tra lại cấu hình sản phẩm'),
+        #                         'message': ("Không thể tạo hóa đơn theo đơn hàng"),
+        #                     },
+        #     }
 
     #xác nhận báo giá
     def action_accept_approval(self):
