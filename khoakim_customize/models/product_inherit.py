@@ -360,7 +360,23 @@ class ProductTemplate(models.Model):
             return True
         return False
 
-    @api.model
+    def prod_temp_approvaled_batch(self):
+        check_perm = self.check_perm_product_temp()
+        if check_perm:
+            for p in self.browse(self.env.context['active_ids']):
+                p.write({
+                    'sale_ok': True,
+                    'purchase_ok': True,
+                    'appr_state': True,
+                })
+        else:
+            return {
+                'warning': {
+                    'title': ('Lỗi người dùng'),
+                    'message': (("Người dùng không được quyền truy cập"))
+                },
+            }
+
     def prod_temp_approvaled(self):
         check_perm = self.check_perm_product_temp()
         if check_perm:
@@ -370,8 +386,30 @@ class ProductTemplate(models.Model):
                     'purchase_ok': True,
                     'appr_state': True,
                 })
+        else:
+            return {
+                'warning': {
+                    'title': ('Lỗi người dùng'),
+                    'message': (("Người dùng không được quyền truy cập"))
+                },
+            }
 
-    @api.model
+    # def prod_temp_deny_batch(self):
+    #     check_perm = self.check_perm_product_temp()
+    #     if check_perm:
+    #         for p in self.browse(self.env.context['active_ids']):
+    #             try:
+    #                 p.unlink()
+    #             except:
+    #                 p.write({'active': False,})
+    #     else:
+    #         return {
+    #             'warning': {
+    #                 'title': ('Lỗi người dùng'),
+    #                 'message': (("Người dùng không được quyền truy cập"))
+    #             },
+    #         }
+
     def prod_temp_deny(self):
         check_perm = self.check_perm_product_temp()
         if check_perm:
@@ -380,6 +418,13 @@ class ProductTemplate(models.Model):
                     p.unlink()
                 except:
                     p.write({'active': False,})
+        else:
+            return {
+                'warning': {
+                    'title': ('Lỗi người dùng'),
+                    'message': (("Người dùng không được quyền truy cập"))
+                },
+            }
 
     # def create_woo_product(self, vals):
     #     com_id = self.env.company
