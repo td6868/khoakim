@@ -20,6 +20,7 @@
         'report/purchase_order_rp.xml',
         'report/customize_report.xml',
         'views/inherit_views.xml',
+        'wizard/invoice_so.xml',
         'data/data.xml',
     ],
     "depends": [

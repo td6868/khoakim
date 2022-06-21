@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="module_sale_kk" model="ir.module.category">
-        <field name="name">Quyền được duyệt</field>
+        <field name="name">Quyền liên quan đến báo giá</field>
         <field name="sequence">21</field>
     </record>
 
@@ -14,6 +14,16 @@
     <record id="group_pass_approval_sale_order" model="res.groups">
          <field name="name">Cho phép bỏ qua duyệt báo giá</field>
          <field name="category_id" ref="module_sale_kk"/>
-     </record>
+    </record>
+
+    <record id="module_product_template_kk" model="ir.module.category">
+        <field name="name">Quyền liên quan đến sản phẩm</field>
+        <field name="sequence">22</field>
+    </record>
+
+    <record id="group_approval_product_temp" model="res.groups">
+         <field name="name">Cho phép duyệt sản phẩm</field>
+         <field name="category_id" ref="module_product_template_kk"/>
+    </record>
 
 </odoo>

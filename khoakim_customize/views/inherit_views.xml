@@ -276,7 +276,24 @@
             </xpath>
             <xpath expr="//field[@name='barcode']" position="after">
                 <field name="wp_ok"/>
+                <field name="appr_state" invisible="1"/>
             </xpath>
+
+            <field name="purchase_ok" position="attributes">
+                <attribute name="groups">khoakim_customize.group_approval_product_temp</attribute>
+            </field>
+            <field name="sale_ok" position="attributes">
+                <attribute name="groups">khoakim_customize.group_approval_product_temp</attribute>
+            </field>
+
+            <button name="action_open_label_layout" position="before">
+                <button name="prod_temp_approvaled" class="btn-success"
+                        type="object" string="Duyệt" attrs="{'invisible': [('appr_state', '=', True)]}"
+                        groups="khoakim_customize.group_approval_product_temp"/>
+                <button name="prod_temp_deny" class="btn-warning" type="object"
+                        string="Không duyệt" attrs="{'invisible': [('appr_state', '=', True)]}"
+                        groups="khoakim_customize.group_approval_product_temp"/>
+            </button>
 
         </field>
     </record>

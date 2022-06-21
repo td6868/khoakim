@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_res_company_bank,account.res.company.bank,model_res_company_account_lines,,1,1,1,1
+access_sale_order_invoice_kk,access.sale.order.invoice.kk,model_sale_order_invoice_kk,,1,1,1,1
