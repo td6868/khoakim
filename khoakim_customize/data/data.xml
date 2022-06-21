@@ -15,18 +15,19 @@
             <field name="model_id" ref="product.model_product_template"/>
             <field name="binding_model_id" ref="product.model_product_template"/>
             <field name="state">code</field>
-            <field name="code">model.prod_temp_approvaled</field>
+            <field name="code">model.prod_temp_approvaled_batch()</field>
             <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>
         </record>
 
-        <record model="ir.actions.server" id="deny_product_template">
-            <field name="name">Huỷ sản phẩm</field>
-            <field name="model_id" ref="product.model_product_template"/>
-            <field name="binding_model_id" ref="product.model_product_template"/>
-            <field name="state">code</field>
-            <field name="code">model.prod_temp_deny</field>
-            <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>
-        </record>
+
+<!--        <record model="ir.actions.server" id="deny_product_template">-->
+<!--            <field name="name">Huỷ sản phẩm</field>-->
+<!--            <field name="model_id" ref="product.model_product_template"/>-->
+<!--            <field name="binding_model_id" ref="product.model_product_template"/>-->
+<!--            <field name="state">code</field>-->
+<!--            <field name="code">model.prod_temp_deny_batch()</field>-->
+<!--            <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>-->
+<!--        </record>-->
 
 <!--        <record model="ir.actions.server" id="woo_sync_product">-->
 <!--            <field name="name">Đồng bộ hóa woocommerce</field>-->

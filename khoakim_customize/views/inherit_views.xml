@@ -453,7 +453,17 @@
         </field>
     </record>
 
-
+    <record id="product_template_search_view_inherit_kk" model="ir.ui.view">
+        <field name="name">product.template.search.inherit.kk</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='consumable']" position="after">
+                <separator/>
+                <filter string="Trạng thái duyệt" name="filter_approval" domain="[('appr_state', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
 
 <!--    <record id="view_res_users_signa_form_inherit" model="ir.ui.view">-->
 <!--        <field name="name">res.users.signa.inherit</field>-->
