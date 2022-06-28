@@ -317,7 +317,7 @@ class ProductTemplate(models.Model):
     sku_wp = fields.Char(string="ID WP")
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code', store=True)
     wp_ok = fields.Boolean(string="Khả dụng ở website")
-    prod_code = fields.Char(string="Mã SP/NSX", required=True)
+    prod_code = fields.Char(string="Mã SP/NSX", required=False)
     sale_ok = fields.Boolean('Có thể bán', default=False)
     purchase_ok = fields.Boolean('Có thể mua', default=False)
     appr_state = fields.Boolean('Trạng thái duyệt', default=False)
@@ -330,7 +330,7 @@ class ProductTemplate(models.Model):
         #     self.update_product_wp()
         check_pass = self.check_perm_product_temp()
         if check_pass:
-            self.write({'appr_state': True,})
+            self.write({'appr_state': True})
         return rec
 
     # def write(self, vals):
@@ -436,10 +436,11 @@ class ProductTemplate(models.Model):
         check_perm = self.check_perm_product_temp()
         if check_perm:
             for p in self:
-                try:
-                    p.unlink()
-                except:
-                    p.write({'active': False,})
+                p.write({'active': False,
+                         'sale_ok': False,
+                         'purchase_ok': False,
+                         'appr_state': False,
+                         })
         else:
             return {
                 'warning': {
@@ -1112,10 +1113,9 @@ class SaleOrder(models.Model):
                     user_id=sale_deny.user_id.id or self.env.uid)
 
     #thông báo khi cập nhật đơn hàng
-    @api.model
     def notify_so_mess(self):
+
         if self.state:
-            print('run')
             channel_all = self.env['mail.channel'].search([('id', '=', 1)])
             vals = {
                 'message_type': 'comment',

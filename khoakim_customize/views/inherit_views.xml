@@ -252,7 +252,7 @@
                 </div>
             </xpath>
             <xpath expr="//field[@name='default_code']" position="replace">
-                <field name="prod_code"/>
+                <field name="prod_code" attrs="{'required': [('detailed_type', '=', 'product')]}"/>
                 <field name="default_code" force_save="1" readonly="1"/>
             </xpath>
             <xpath expr="//field[@name='barcode']" position="after">
@@ -457,12 +457,12 @@
 
     <record id="product_template_search_view_inherit_kk" model="ir.ui.view">
         <field name="name">product.template.search.inherit.kk</field>
-        <field name="model">product.template</field>
+        <field name="model">product.template.search</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='consumable']" position="after">
+            <xpath expr="//filter[@name='favorites']" position="before">
+                <filter string="Chờ duyệt" name="filter_approval" domain="[('appr_state', '=', False)]"/>
                 <separator/>
-                <filter string="Trạng thái duyệt" name="filter_approval" domain="[('appr_state', '=', False)]"/>
             </xpath>
         </field>
     </record>
