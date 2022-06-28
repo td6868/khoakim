@@ -12,6 +12,7 @@ import base64
 import urllib.request
 import gspread
 import time
+from gspread.cell import Cell
 import json
 
 INFO = {
@@ -667,7 +668,6 @@ class ProductCategory(models.Model):
     cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
     cate_id = fields.Char(string="WP ID")
     wp_ok = fields.Char(string="Khả dụng trên website")
-    gs_id = fields.Char(string="GS ID")
 
     @api.depends('ccode', 'parent_id')
     def _gene_code_cate(self):
@@ -725,35 +725,28 @@ class ProductCategory(models.Model):
                 self.cate_id = js['id']
         print(status)
 
-    N_COL = 5
-
     # Đồng bộ hoá gsheet
     def sync_odoo_catg_gsheet(self):
         catg_ids = self.browse(self.env.context['active_ids'])
         time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for rec in catg_ids:
-            cell = rec.gs_id
+            cell = WS_CATG.find(query=str(rec.id), in_row=2)
             vals = [time_update, rec.id, rec.name, rec.ccode, rec.parent_id.name]
             if cell:
                 row = cell.row
-                gvals = WS_CATG.row_values(row)
-                for i in range(self.N_COL):
-                    if vals[i] != gvals[i]:
-                        WS_CATG.update_cell(row=row, col=i+1, value=vals[i])
-                        time.sleep(2)
             else:
                 row = next_available_row(WS_CATG)
-                for i in range(self.N_COL):
-                    WS_CATG.update_cell(row=row, col=i+1, value=vals[i])
-                    rec.gs_id = row
-                    time.sleep(2)
+            cells=[]
+            for i in range(len(vals)):
+                cells.append(Cell(row=int(row), col=i + 1, value=vals[i]))
+            WS_CATG.update_cells(cells)
+            time.sleep(2)
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code', store=True)
-    gs_id = fields.Integer(string="GS ID")
 
     @api.model
     def create(self, vals):
@@ -803,36 +796,33 @@ class ProductProduct(models.Model):
                 "image_variant_128": img_b64,
             })
 
-    N_COL = 10
-
     # Đồng bộ hoá gsheet
     def sync_odoo_prod_gsheet(self):
         prod_ids = self.browse(self.env.context['active_ids'])
         time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for rec in prod_ids:
-            cell = rec.gs_id
+            cell = WS_PROD.find(query=str(rec.id), in_column=2)
             attr_prod = rec.product_template_attribute_value_ids
             attrs = ''
             brand = 'Không có'
+            name = rec.name
             if attr_prod:
                 for a in attr_prod:
                     if a.attribute_id.sequence == 0:
                         brand = a.name
                     attrs += '<p>' + a.attribute_id.name + ' : ' + a.name + '</p>'
-            vals = [time_update, rec.id, rec.url_img or '', rec.url_img or rec.product_tmpl_id.url_img, rec.name, rec.prod_code, rec.categ_id.name, brand, attrs, rec.list_price, rec.virtual_available]
+                    name += ' ' + a.name
+            vals = [time_update, rec.id, rec.url_img or '', rec.url_img or rec.product_tmpl_id.url_img or '', name, rec.prod_code, rec.categ_id.name, brand, attrs, rec.list_price, rec.virtual_available]
             if cell:
                 row = cell.row
-                gvals = WS_PROD.row_values(row)
-                for i in range(self.N_COL):
-                    if vals[i] != gvals[i]:
-                        WS_PROD.update_cell(row=row, col=i + 1, value=vals[i])
-                        time.sleep(1)
             else:
                 row = next_available_row(WS_PROD)
-                for i in range(self.N_COL):
-                    WS_PROD.update_cell(row=row, col=i + 1, value=vals[i])
-                    rec.gs_id = row
-                    time.sleep(1)
+            # WS_PROD.update_cell(values=vals, row=int(row))
+            cells = []
+            for i in range(len(vals)):
+                cells.append(Cell(row=int(row), col=i + 1, value=vals[i]))
+            WS_PROD.update_cells(cells)
+            time.sleep(2)
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
