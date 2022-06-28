@@ -86,6 +86,8 @@
             </xpath>
 
             <xpath expr="//button[@name='action_quotation_send']" position="replace">
+<!--                <button name="notify_so_mess" id="notify_so_mess" string="Test notify"-->
+<!--                        type="object"/>-->
             </xpath>
 
             <xpath expr="//button[@name='action_quotation_send']" position="replace">

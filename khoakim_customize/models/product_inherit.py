@@ -1,18 +1,39 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import json
-import time
 import ssl
 from vietnam_number import n2w
 import string
 import random
-
 from woocommerce import API
 from odoo import api, fields, models, _
 from odoo.exceptions import Warning, UserError
 import requests
 import base64
 import urllib.request
+import gspread
+import time
+import json
+
+INFO = {
+          "type": "service_account",
+          "project_id": "gsodsync",
+          "private_key_id": "23521eba50f0f7e57f857777fb40dbc40a0227dc",
+          "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDQ3Pkn7iuLvfj1\nQ3Q9IRYj847mxCzQM+vxCQxFN0q8zISwf3C0AWvoacDc/XmMaRLd5bno3Eg3NmFi\nt1JePA7yszZ0eBX5+EvNgoLCafmSVeWMZyyV4C92bqu8QZ/MXe7go+6Nn1z4khni\nXKquyj1k/XJj+hZJQ5H5hsCDEKwFxKcAKEn4XzBYer+bntjcBrvt0BW9A/QiB/nY\niqQvu+QwZ11bTsK6felHLayzeckgzeh99JWR7GKnOMvXcujh6F2igzAlrkr1SeV3\nKWLQ8I8zF7vSPxQziSztlDWnzH5Twa2zqsoSa/STB2kFjikBGKDiaiXny+EHl2YL\nmhgW8jzhAgMBAAECggEALDTI62Gmh9Iykj6vqIyLMhrHwSH+VibXJlIC7ddxExq6\nbtzaTs8KNsvDTUK86jIHEz4fJiERi9YPsKQaY+WUSFwUB3yvMhQSfzHDWUCy2P0j\nM59WuXYUtZ1g7dx55Phwqc0onYMAW4AYyGdSnOIjMm/OOUjiVKlfiQ+zSUpLDoEZ\n2Ua1wCaLsWqPtKMZjhM3M8jupCLjZBV38DhoRN/ykj5Cn4XGq54O5ZYRLswDhkYP\nHxCH3XrzahdrYv0B2dLMru8HOhs75wbNYDwY9NV9cqtWKnBHHuqcIeGlXiPwH+4J\ngVfVcPDb46ilXJahPrc8GQRktXf3LHMpQKfA8GEz/QKBgQDxnjPJAkRL1AvTKO3o\nBoj2RhlUAYvNhClR/VsCEAsA7VUWR5AMXxdEjSsMPWXnLorQgWw9duz0StMA1R7N\nV+xtbrPzi+Om1fl3+LspqWgHCr9eu9bcveSFuFtd+arcNEyhtV3thI82hcZab0J0\nfm1igWSR+DMWKXsOoOfqTutczwKBgQDdS6Z0LJAEDxY5Ep0whYbUKU7OVhm4rRkt\ntAQ8GFdxXi+f8he9SgVHn7FoP1pJEma5eOAjuk+3NH/TRQ6uD/948jRfEtpYx/Mz\nPyyEZl3y/r/1eyFo9E9i98S21TcOOIRk3ozQlJyObSPzrJvhS9P15gYB5eBtB+Nt\n6vHuu+YXTwKBgQDrOaSaze0lkZPNiKxM1ofikw43faXYeBEuNCS01l+QEH5kyVjQ\n4oapg3HkYaXisqoMIeP51t0LXAkeZ12sdivDwiHJOmhwVSKhDPNRtQ6ExI7YsLCW\niPyAvqGc1OLlrLjqOcLu6L3wS7527phZB3iAjQ4XGfbKXani7P27XAfBewKBgQDN\nHVaOrdNa/8TgZ6FtHQbI1fTmiaXTqBYDZ6zZKtK6EMvh29onKFnWdm1QrA/6VOUE\nGsbeNs22iSHF6Gdf7RIlv5HNYcMisUp5gJ+5pMyF85xnY5anGnQOzor10JD0TGxi\ntmkc1/J4jS7aqG3fmJJBhNCip7iqNrqV4kQWvPDbPwKBgG1TjB99rHM6WY3GoBHd\nz6FJcdJXRpjYpEKE2nWHt8rec9P61fYIrYnk/4zWHm0kbQlMxUbVoaiuzhAa0XcH\nge3VJpBmjvOqJDtcV7EyOadAIw6HgXSeKUwosvl/o4l/v7ByDFkuth4tLE3Fo7Sg\nCK5m9S/urxMLC9As8J45S21q\n-----END PRIVATE KEY-----\n",
+          "client_email": "odoogsheetkk@gsodsync.iam.gserviceaccount.com",
+          "client_id": "116816502838220913532",
+          "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+          "token_uri": "https://oauth2.googleapis.com/token",
+          "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+          "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/odoogsheetkk%40gsodsync.iam.gserviceaccount.com"
+        }
+SA = gspread.service_account_from_dict(INFO)
+WB = SA.open("SyncOdooProd")
+WS_PROD = WB.worksheet("MasterProd")
+WS_CATG = WB.worksheet("MasterCatg")
+
+def next_available_row(worksheet):
+    str_list = list(filter(None, worksheet.col_values(1)))
+    return str(len(str_list)+1)
 
 class Pricelist(models.Model):
     _inherit = 'product.pricelist'
@@ -26,7 +47,7 @@ class Pricelist(models.Model):
     discount = fields.Float(string='Chiết khấu theo bảng giá (%)', tracking=True)
     type_dics = fields.Selection([
         ('perc', 'Phần trăm'),
-        ('fix', 'Tiền cố định')
+        ('fix', 'Tiền cố định'),
     ], string='Loại chiết khấu')
     catg_id = fields.Many2one('product.category',string='Danh mục SP', tracking=True, onchange=True)
     catg_disc = fields.Float(string='Chiết khấu', tracking=True)
@@ -34,7 +55,7 @@ class Pricelist(models.Model):
         ('daily1', 'Đại lý cấp 1'),
         ('daily2', 'Đại lý cấp 2'),
         ('daily3', 'Đại lý cấp 3'),
-        ('customer', 'Khách hàng lẻ')
+        ('customer', 'Khách hàng lẻ'),
     ], string='Cấp đại lý', default='customer', required=True)
 
     # def write(self, vals):
@@ -644,8 +665,9 @@ class ProductCategory(models.Model):
 
     ccode = fields.Char(string="Mã nhóm sản phẩm", required=True)
     cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
-    cate_id = fields.Char(string="ID")
+    cate_id = fields.Char(string="WP ID")
     wp_ok = fields.Char(string="Khả dụng trên website")
+    gs_id = fields.Char(string="GS ID")
 
     @api.depends('ccode', 'parent_id')
     def _gene_code_cate(self):
@@ -703,11 +725,35 @@ class ProductCategory(models.Model):
                 self.cate_id = js['id']
         print(status)
 
+    N_COL = 5
+
+    # Đồng bộ hoá gsheet
+    def sync_odoo_catg_gsheet(self):
+        catg_ids = self.browse(self.env.context['active_ids'])
+        time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        for rec in catg_ids:
+            cell = rec.gs_id
+            vals = [time_update, rec.id, rec.name, rec.ccode, rec.parent_id.name]
+            if cell:
+                row = cell.row
+                gvals = WS_CATG.row_values(row)
+                for i in range(self.N_COL):
+                    if vals[i] != gvals[i]:
+                        WS_CATG.update_cell(row=row, col=i+1, value=vals[i])
+                        time.sleep(2)
+            else:
+                row = next_available_row(WS_CATG)
+                for i in range(self.N_COL):
+                    WS_CATG.update_cell(row=row, col=i+1, value=vals[i])
+                    rec.gs_id = row
+                    time.sleep(2)
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code', store=True)
+    gs_id = fields.Integer(string="GS ID")
 
     @api.model
     def create(self, vals):
@@ -756,6 +802,37 @@ class ProductProduct(models.Model):
                 "image_variant_256": img_b64,
                 "image_variant_128": img_b64,
             })
+
+    N_COL = 10
+
+    # Đồng bộ hoá gsheet
+    def sync_odoo_prod_gsheet(self):
+        prod_ids = self.browse(self.env.context['active_ids'])
+        time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        for rec in prod_ids:
+            cell = rec.gs_id
+            attr_prod = rec.product_template_attribute_value_ids
+            attrs = ''
+            brand = 'Không có'
+            if attr_prod:
+                for a in attr_prod:
+                    if a.attribute_id.sequence == 0:
+                        brand = a.name
+                    attrs += '<p>' + a.attribute_id.name + ' : ' + a.name + '</p>'
+            vals = [time_update, rec.id, rec.url_img or '', rec.url_img or rec.product_tmpl_id.url_img, rec.name, rec.prod_code, rec.categ_id.name, brand, attrs, rec.list_price, rec.virtual_available]
+            if cell:
+                row = cell.row
+                gvals = WS_PROD.row_values(row)
+                for i in range(self.N_COL):
+                    if vals[i] != gvals[i]:
+                        WS_PROD.update_cell(row=row, col=i + 1, value=vals[i])
+                        time.sleep(1)
+            else:
+                row = next_available_row(WS_PROD)
+                for i in range(self.N_COL):
+                    WS_PROD.update_cell(row=row, col=i + 1, value=vals[i])
+                    rec.gs_id = row
+                    time.sleep(1)
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
@@ -956,7 +1033,6 @@ class SaleOrder(models.Model):
 
     #xét duyệt báo giá
     def action_quotation_approval(self):
-
         check_price = self.check_price_quotation()
         if check_price:
             raise UserError(("Vui lòng kiểm tra lại sản phẩm %s chưa có giá tiền") % (check_price))
@@ -1044,6 +1120,23 @@ class SaleOrder(models.Model):
                 sale_deny.activity_schedule(
                     'khoakim_customize.mail_act_sale_approval_kk',
                     user_id=sale_deny.user_id.id or self.env.uid)
+
+    #thông báo khi cập nhật đơn hàng
+    @api.model
+    def notify_so_mess(self):
+        if self.state:
+            print('run')
+            channel_all = self.env['mail.channel'].search([('id', '=', 1)])
+            vals = {
+                'message_type': 'comment',
+                'subtype_id': self.env.ref('mail.mt_note').id,
+                'model': 'mail.channel',
+                'res_id': channel_all.id,
+                'body': "Test đơn hàng",
+            }
+            mess = self.env['mail.message'].create(vals)
+            print(mess)
+            return mess
 
 class ResCompanyAccountLine(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
