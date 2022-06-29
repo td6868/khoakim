@@ -355,6 +355,13 @@
                     <button name="action_update_main_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'main')]}"/>
                 </header>
             </xpath>
+            <xpath expr="//field[@name='name']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_pricelist" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('count_pl', '=', 0)]}">
+                        <field name="count_pl" widget="statinfo" string="Sản phẩm"/>
+                    </button>
+                </div>
+            </xpath>
             <xpath expr="//group[@name='pricelist_settings']" position="inside">
                 <field name="roles" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>
             </xpath>
@@ -457,7 +464,7 @@
 
     <record id="product_template_search_view_inherit_kk" model="ir.ui.view">
         <field name="name">product.template.search.inherit.kk</field>
-        <field name="model">product.template.search</field>
+        <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='favorites']" position="before">
@@ -477,5 +484,41 @@
 <!--            </xpath>-->
 <!--        </field>-->
 <!--    </record>-->
+
+<!--    tree view-->
+    <record model="ir.ui.view" id="view_price_list_item_kk">
+        <field name="name">Chi tiết bảng giá</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="arch" type="xml">
+            <tree string="Chi tiết bảng giá" editable="bottom">
+                <field name="product_tmpl_id" string="Sản phẩm" required="1"/>
+                <field name="product_id" string="Biến thể" groups="product.group_product_variant" domain="[('product_tmpl_id', '=', product_tmpl_id)]" options="{'no_create':1}"/>
+                <field name="min_quantity" string="Số lượng tối thiệu"/>
+                <field name="fixed_price" string="Giá"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="pricelist_id" invisible="1"/>
+                  <!-- Pricelist ID is here only for related fields to be correctly computed -->
+                <field name="date_start" string="Ngày bắt đầu"/>
+                <field name="date_end" string="Ngày kết thúc"/>
+                <field name="base" invisible="1"/>
+                <field name="applied_on" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+<!--    filter-->
+    <record id="view_price_list_item_filter_kk" model="ir.ui.view">
+        <field name="name">product.pricelist.item.search</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm bảng giá">
+                <field name="product_id"/>
+                <field name="product_tmpl_id"/>
+                <separator />
+            </search>
+        </field>
+    </record>
+
 
 </odoo>

@@ -58,9 +58,30 @@ class Pricelist(models.Model):
         ('daily3', 'Đại lý cấp 3'),
         ('customer', 'Khách hàng lẻ'),
     ], string='Cấp đại lý', default='customer', required=True)
+    count_pl = fields.Integer(string='Số lượng SP', compute='count_all_pl')
 
     # def write(self, vals):
     #     super(Pricelist, self).write(vals)
+
+    def action_view_pricelist(self):
+        self.ensure_one()
+        view_id = self.env.ref('khoakim_customize.view_price_list_item_kk')
+        search_view_id = self.env.ref('khoakim_customize.view_price_list_item_filter_kk')
+        result = {
+            "name": "Bảng giá chi tiết",
+            "res_model": "product.pricelist.item",
+            "type": "ir.actions.act_window",
+            'view_mode': 'tree',
+            "domain": [('pricelist_id.id', '=', self.id)],
+            "context": {"create": False},
+            "view_id": view_id.ids,
+            "search_view_id": search_view_id.ids,
+        }
+        return result
+
+    def count_all_pl(self):
+        count = self.env['product.pricelist.item'].search_count([('pricelist_id.id', '=', self.id)])
+        self.count_pl = count
 
     def action_price_categ(self):
         if self.catg_id and self.catg_disc and self.type_dics:
