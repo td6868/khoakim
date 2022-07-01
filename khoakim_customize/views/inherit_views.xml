@@ -49,6 +49,9 @@
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="replace">
+                <field name="new_price_unit" force_save="1" readonly="1"/>
+                <field name="price_unit" attrs="{'force_save': True, 'readonly':True}"/>
+                <field name="cus_discount"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="after">
