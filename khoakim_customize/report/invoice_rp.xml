@@ -6,7 +6,7 @@
                     <div class="page">
                         <div class="oe_structure"/>
 
-                        <h2 class="mt16 text-center" style="font-size: 34px;">
+                        <h2 class="mt16 text-center" style="font-size: 34px; color: #5b4931;">
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Hoá đơn bán hàng </span>
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Hoá đơn bán hàng (Nháp)</span>
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Hoá đơn đã huỷ (Đã huỷ)</span>
@@ -75,22 +75,22 @@
                                 </t>
                             </div>
                         </div>
-                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
-                            <div class="col-12 col-auto mw-100 mb-2">
-                                <t t-if="o.partner_shipping_id">
-                                    <strong style="color: #5b4931;">Địa chỉ giao hàng: </strong>
-                                    <span t-if="o.partner_shipping_id.street" t-field="o.partner_shipping_id.street" t-options='{"widget": "text"}'/>
-                                    <span t-if="o.partner_shipping_id.street"> , </span>
-                                    <span t-if="o.partner_shipping_id.street2" t-field="o.partner_shipping_id.street2" t-options='{"widget": "text"}'/>
-                                    <span t-if="o.partner_shipping_id.street2"> , </span>
-                                    <span t-if="o.partner_shipping_id.city" t-field="o.partner_shipping_id.city" t-options='{"widget": "text"}'/>
-                                    <span t-if="o.partner_shipping_id.city"> , </span>
-                                    <span t-if="o.partner_shipping_id.state_id.name" t-field="o.partner_shipping_id.state_id.name" t-options='{"widget": "text"}'/>
-                                    <span t-if="o.partner_shipping_id.state_id.name"> , </span>
-                                    <span t-if="o.partner_shipping_id.country_id.name" t-field="o.partner_shipping_id.country_id.name" t-options='{"widget": "text"}'/>
-                                </t>
-                            </div>
-                        </div>
+<!--                        <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">-->
+<!--                            <div class="col-12 col-auto mw-100 mb-2">-->
+<!--                                <t t-if="o.partner_shipping_id">-->
+<!--                                    <strong style="color: #5b4931;">Địa chỉ giao hàng: </strong>-->
+<!--                                    <span t-if="o.partner_shipping_id.street" t-field="o.partner_shipping_id.street" t-options='{"widget": "text"}'/>-->
+<!--                                    <span t-if="o.partner_shipping_id.street"> , </span>-->
+<!--                                    <span t-if="o.partner_shipping_id.street2" t-field="o.partner_shipping_id.street2" t-options='{"widget": "text"}'/>-->
+<!--                                    <span t-if="o.partner_shipping_id.street2"> , </span>-->
+<!--                                    <span t-if="o.partner_shipping_id.city" t-field="o.partner_shipping_id.city" t-options='{"widget": "text"}'/>-->
+<!--                                    <span t-if="o.partner_shipping_id.city"> , </span>-->
+<!--                                    <span t-if="o.partner_shipping_id.state_id.name" t-field="o.partner_shipping_id.state_id.name" t-options='{"widget": "text"}'/>-->
+<!--                                    <span t-if="o.partner_shipping_id.state_id.name"> , </span>-->
+<!--                                    <span t-if="o.partner_shipping_id.country_id.name" t-field="o.partner_shipping_id.country_id.name" t-options='{"widget": "text"}'/>-->
+<!--                                </t>-->
+<!--                            </div>-->
+<!--                        </div>-->
                         <div class="row mt32 mb32" id="customer_info" style="font-size: 17px">
                             <div class="col-12 col-auto mw-100 mb-2">
                                 <t t-if="o.partner_id.mobile or o.partner_id.phone">
