@@ -166,7 +166,7 @@
                                         <span t-field="line.product_uom"/>
                                     </td>
                                     <td style="border-color: #000;" name="td_priceunit" class="text-center">
-                                        <span t-field="line.new_price_unit" t-options='{"widget": "monetary"}'/>
+                                        <span t-field="line.price_unit" t-options='{"widget": "monetary"}'/>
                                     </td>
                                     <td style="border-color: #000;" name="td_taxes" class="text-center">
                                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
