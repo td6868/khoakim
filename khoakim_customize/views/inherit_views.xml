@@ -18,37 +18,51 @@
                 </button>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
-                <attribute name="readonly">1</attribute>
-                <attribute name="force_save">1</attribute>
-            </xpath>
-
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
 
-            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
-                <attribute name="readonly">1</attribute>
-                <attribute name="force_save">1</attribute>
-            </xpath>
+<!--            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">-->
+<!--                <attribute name="readonly">1</attribute>-->
+<!--                <attribute name="force_save">1</attribute>-->
+<!--            </xpath>-->
+<!--            -->
+<!--            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="attributes">-->
+<!--                <attribute name="readonly">1</attribute>-->
+<!--                <attribute name="force_save">1</attribute>-->
+<!--            </xpath>-->
+<!--            -->
+<!--            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">-->
+<!--                <attribute name="readonly">1</attribute>-->
+<!--                <attribute name="force_save">1</attribute>-->
+<!--            </xpath>-->
 
             <xpath expr="//field[@name='order_line']/kanban//field[@name='name']" position="before">
                 <field name="prod_image" widget="image" options="{'preview_image': 'image_1920', 'zoom': true, 'zoom_delay': 1000}" height="50"/>
             </xpath>
 
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
+                <field name="new_price_unit" attrs="{'force_save': True}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="replace">
+                <field name="new_price_unit" attrs="{'force_save': True}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="replace">
+                <field name="new_price_unit" attrs="{'force_save': True}"/>
+            </xpath>
+
             <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
-                <field name="new_price_unit" attrs="{'force_save': True}"/>
+<!--                <field name="new_price_unit" attrs="{'force_save': True}"/>-->
+                <field name="price_unit" attrs="{'force_save': True, 'readonly':True}"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
-                <field name="new_price_unit" attrs="{'force_save': True}"/>
-            </xpath>
-
-            <xpath expr="//field[@name='order_line']/kanban//field[@name='price_unit']" position="attributes">
-                <attribute name="readonly">1</attribute>
-                <attribute name="force_save">1</attribute>
+<!--                <field name="new_price_unit" attrs="{'force_save': True}"/>-->
+                <field name="price_unit" attrs="{'force_save': True, 'readonly':True}"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban/templates//t[@t-name='kanban-box']//div[1]//t[1]" position="before">

@@ -164,7 +164,7 @@ class SaleOrderLine(models.Model):
     virtual_available = fields.Float(string="Khả dụng", related="product_id.virtual_available")
     virtual_qty = fields.Char(string="TKKD/ TKTT", compute="_virtual_qty")
     cus_discount = fields.Float(string='C.Khấu ($)')
-    new_price_unit = fields.Float(string='Giá sau CK', readonly=True)
+    new_price_unit = fields.Float(string='Giá trước CK', readonly=True)
     note = fields.Char(string='Ghi chú')
 
     @api.depends("qty_available", "virtual_available")
@@ -175,15 +175,18 @@ class SaleOrderLine(models.Model):
                 virtual_qty = ("%s/%s") % (line.virtual_available, line.qty_available)
             line.virtual_qty = virtual_qty
 
-    @api.onchange("cus_discount", "discount")
+    @api.onchange("discount")
     def _onchange_discount(self):
         if self.cus_discount:
-                self.write({
-                    'discount': 0.0,
-                })
-        if self.discount:
-            self.write({
+            self.update({
                     'cus_discount': 0.0,
+                })
+
+    @api.onchange("cus_discount")
+    def _onchange_cusdiscount(self):
+        if self.discount:
+            self.update({
+                    'discount': 0.0,
                 })
 
     @api.depends("product_uom_qty", "discount", "price_unit", "tax_id", "cus_discount")
@@ -191,16 +194,16 @@ class SaleOrderLine(models.Model):
         vals = {}
         res = {}
         for line in self:
-            real_price = line.price_unit * (1 - (line.discount or 0.0) / 100.0) - (
+            old_price = line.new_price_unit or line.price_unit
+            real_price = line.new_price_unit * (1 - (line.discount or 0.0) / 100.0) - (
                     line.cus_discount or 0.0
             )
             if real_price >= 0.0:
-                twicked_price = real_price / (1 - (line.discount or 0.0) / 100.0)
                 vals[line] = {
-                    "price_unit": line.price_unit,
-                    "new_price_unit": real_price,
+                    "price_unit": real_price,
+                    "new_price_unit": old_price,
                 }
-                line.update({"price_unit": twicked_price})
+                line.update({"price_unit": real_price})
                 res = super(SaleOrderLine, self)._compute_amount()
             else:
                 vals[line] = {
@@ -225,7 +228,7 @@ class AccountMove(models.Model):
     @api.depends('amount_total')
     def _compute_subtotal_word(self):
         if self.amount_total:
-            pst_word = n2w(str(self.amount_total))
+            pst_word = n2w(str(self.amount_total/10))
             self.pst_by_word = pst_word.capitalize() + ' đồng'
         else:
             self.pst_by_word = ''
@@ -284,30 +287,30 @@ class AccountMoveLine(models.Model):
             price_unit, quantity, discount, currency, product, partner, taxes, move_type
         )
 
-    # @api.model
-    # def _get_fields_onchange_balance_model(
-    #     self,
-    #     quantity,
-    #     discount,
-    #     balance,
-    #     move_type,
-    #     currency,
-    #     taxes,
-    #     price_subtotal,
-    #     force_computation=False,
-    # ):
-    #     if self.cus_discount:
-    #         discount = ((self.cus_discount) / self.price_unit) * 100 or 0.00
-    #     return super(AccountMoveLine, self)._get_fields_onchange_balance_model(
-    #         quantity,
-    #         discount,
-    #         balance,
-    #         move_type,
-    #         currency,
-    #         taxes,
-    #         price_subtotal,
-    #         force_computation=force_computation,
-    #     )
+    @api.model
+    def _get_fields_onchange_balance_model(
+        self,
+        quantity,
+        discount,
+        amount_currency,
+        move_type,
+        currency,
+        taxes,
+        price_subtotal,
+        force_computation=False,
+    ):
+        if self.cus_discount:
+            discount = ((self.cus_discount) / self.price_unit) * 100 or 0.00
+        return super(AccountMoveLine, self)._get_fields_onchange_balance_model(
+            quantity,
+            discount,
+            amount_currency,
+            move_type,
+            currency,
+            taxes,
+            price_subtotal,
+            force_computation=force_computation,
+        )
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -999,7 +1002,7 @@ class SaleOrder(models.Model):
     @api.depends('amount_total')
     def _compute_subtotal_word(self):
         if self.amount_total:
-            pst_word = n2w(str(self.amount_total))
+            pst_word = n2w(str(self.amount_total/10))
             self.pst_by_word = pst_word.capitalize() + ' đồng'
         else:
             self.pst_by_word = ''
