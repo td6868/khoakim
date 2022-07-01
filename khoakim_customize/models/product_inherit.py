@@ -164,7 +164,7 @@ class SaleOrderLine(models.Model):
     virtual_available = fields.Float(string="Khả dụng", related="product_id.virtual_available")
     virtual_qty = fields.Char(string="TKKD/ TKTT", compute="_virtual_qty")
     cus_discount = fields.Float(string='C.Khấu ($)')
-    new_price_unit = fields.Float(string='Giá trước CK', readonly=True)
+    new_price_unit = fields.Float(string='Giá trước CK', readonly=False)
     note = fields.Char(string='Ghi chú')
 
     @api.depends("qty_available", "virtual_available")
@@ -177,14 +177,14 @@ class SaleOrderLine(models.Model):
 
     @api.onchange("discount")
     def _onchange_discount(self):
-        if self.cus_discount:
+        if self.cus_discount and self.discount:
             self.update({
                     'cus_discount': 0.0,
                 })
 
     @api.onchange("cus_discount")
     def _onchange_cusdiscount(self):
-        if self.discount:
+        if self.discount and self.cus_discount:
             self.update({
                     'discount': 0.0,
                 })
