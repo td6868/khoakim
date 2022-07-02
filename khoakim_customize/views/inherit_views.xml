@@ -105,6 +105,11 @@
 <!--                        type="object"/>-->
             </xpath>
 
+            <xpath expr="//button[@name='update_prices']" position="replace">
+                <button name="update_prices_custom" type="object" string=" Cập nhật giá" help="Tính toán lại giá sản theo bảng giá!" class="btn-link mb-1 px-0" icon="fa-refresh" confirm="Cập nhập lại toàn bộ giá theo bảng giá này."
+                        attrs="{'invisible': ['|', ('show_update_pricelist', '=', False), ('state', 'in', ['sale', 'done','cancel'])]}"/>
+            </xpath>
+
             <xpath expr="//button[@name='action_quotation_send']" position="replace">
             </xpath>
 
@@ -366,8 +371,8 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header>
-                    <button name="action_update_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'policy')]}"/>
-                    <button name="action_update_main_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'main')]}"/>
+<!--                    <button name="action_update_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'policy')]}"/>-->
+<!--                    <button name="action_update_main_price" type="object" string="Đồng bộ bảng giá" attrs="{'invisible': [('type_pl', '!=', 'main')]}"/>-->
                 </header>
             </xpath>
             <xpath expr="//field[@name='name']" position="before">
@@ -383,17 +388,17 @@
             <xpath expr="//group[@name='pricelist_settings']" position="after">
                 <group name="pricelist_st">
                     <field name="type_pl"/>
-                    <field name="def_pl_id" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>
-                    <field name="discount" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>
+<!--                    <field name="def_pl_id" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>-->
+<!--                    <field name="discount" attrs="{'invisible': [('type_pl', '!=', 'policy')], 'required': [('type_pl', '=', 'policy')]}"/>-->
                 </group>
-                <group name="catg_id">
-                    <field name="catg_id"/>
-                    <field name="type_dics"/>
-                </group>
-                <group name="catg_disc">
-                    <field name="catg_disc"/>
-                    <button name="action_price_categ" string="Cập nhật giá" type="object" class="btn-warning"/>
-                </group>
+<!--                <group name="catg_id">-->
+<!--                    <field name="catg_id"/>-->
+<!--                    <field name="type_dics"/>-->
+<!--                </group>-->
+<!--                <group name="catg_disc">-->
+<!--                    <field name="catg_disc"/>-->
+<!--                    <button name="action_price_categ" string="Cập nhật giá" type="object" class="btn-warning"/>-->
+<!--                </group>-->
             </xpath>
         </field>
     </record>
