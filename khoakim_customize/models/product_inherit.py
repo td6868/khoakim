@@ -44,14 +44,14 @@ class Pricelist(models.Model):
         ('policy', 'Theo chính sách'),
         ('non_policy', 'Không theo chính sách')
     ], string="Loại bảng giá", default='main', required=True)
-    def_pl_id = fields.Many2one('product.pricelist',string="Bảng giá NY", domain=[('type_pl', '=', 'main')])
+    # def_pl_id = fields.Many2one('product.pricelist', string="Bảng giá NY", domain=[('type_pl', '=', 'main')])
     discount = fields.Float(string='Chiết khấu theo bảng giá (%)', tracking=True)
-    type_dics = fields.Selection([
-        ('perc', 'Phần trăm'),
-        ('fix', 'Tiền cố định'),
-    ], string='Loại chiết khấu')
-    catg_id = fields.Many2one('product.category',string='Danh mục SP', tracking=True, onchange=True)
-    catg_disc = fields.Float(string='Chiết khấu', tracking=True)
+    # type_dics = fields.Selection([
+    #     ('perc', 'Phần trăm'),
+    #     ('fix', 'Tiền cố định'),
+    # ], string='Loại chiết khấu')
+    # catg_id = fields.Many2one('product.category', string='Danh mục SP', tracking=True, onchange=True)
+    # catg_disc = fields.Float(string='Chiết khấu', tracking=True)
     roles = fields.Selection([
         ('daily1', 'Đại lý cấp 1'),
         ('daily2', 'Đại lý cấp 2'),
@@ -68,93 +68,93 @@ class Pricelist(models.Model):
         view_id = self.env.ref('khoakim_customize.view_price_list_item_kk')
         search_view_id = self.env.ref('khoakim_customize.view_price_list_item_filter_kk')
         result = {
-            "name": "Bảng giá chi tiết",
-            "res_model": "product.pricelist.item",
-            "type": "ir.actions.act_window",
-            'view_mode': 'tree',
-            "domain": [('pricelist_id.id', '=', self.id)],
-            "context": {"create": False},
-            "view_id": view_id.ids,
-            "search_view_id": search_view_id.ids,
-        }
+                    "name": "Bảng giá chi tiết",
+                    "res_model": "product.pricelist.item",
+                    "type": "ir.actions.act_window",
+                    'view_mode': 'tree',
+                    "domain": [('pricelist_id.id', '=', self.id)],
+                    "context": {"create": False},
+                    "view_id": view_id.ids,
+                    "search_view_id": search_view_id.ids,
+                }
         return result
 
     def count_all_pl(self):
         count = self.env['product.pricelist.item'].search_count([('pricelist_id.id', '=', self.id)])
         self.count_pl = count
 
-    def action_price_categ(self):
-        if self.catg_id and self.catg_disc and self.type_dics:
-            for l in self.item_ids:
-                categ_ids = self.env['product.category'].search([('id', 'child_of', [self.catg_id.id])])
-                for cid in categ_ids:
-                    if l.product_tmpl_id.categ_id.id == cid.id:
-                        cur_price = l.fixed_price
-                        if self.type_dics == 'perc':
-                            l.fixed_price = ((100.00 - self.catg_disc) / 100.00) * cur_price
-                        elif self.type_dics == 'fix':
-                            l.fixed_price = cur_price - self.catg_disc
-            self.write({
-                'catg_id': False,
-                'type_dics': False,
-                'catg_disc': False
-            })
+    # def action_price_categ(self):
+    #     if self.catg_id and self.catg_disc and self.type_dics:
+    #         for l in self.item_ids:
+    #             categ_ids = self.env['product.category'].search([('id', 'child_of', [self.catg_id.id])])
+    #             for cid in categ_ids:
+    #                 if l.product_tmpl_id.categ_id.id == cid.id:
+    #                     cur_price = l.fixed_price
+    #                     if self.type_dics == 'perc':
+    #                         l.fixed_price = ((100.00 - self.catg_disc) / 100.00) * cur_price
+    #                     elif self.type_dics == 'fix':
+    #                         l.fixed_price = cur_price - self.catg_disc
+    #         self.write({
+    #             'catg_id': False,
+    #             'type_dics': False,
+    #             'catg_disc': False
+    #         })
+    #
+    # def _update_price_policy(self):
+    #     if self.discount:
+    #         for l in self.item_ids:
+    #             cur_price = l.fixed_price
+    #             l.fixed_price = ((100.00 - self.discount) / 100.00) * cur_price
+    #
+    # def action_update_main_price(self):
+    #     pl = self.env['product.pricelist']
+    #     pl_ids = pl.search([('def_pl_id', '=', self.id)])
+    #     pl_item_ids = []
+    #     pl_update = ''
+    #     for item in self.item_ids:
+    #         pl_item_ids.append((0, item.id,
+    #                             {
+    #                                 'product_tmpl_id': item.product_tmpl_id.id,
+    #                                 'product_id': item.product_id.id,
+    #                                 'min_quantity': item.min_quantity,
+    #                                 'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price,
+    #                                 'date_start': item.date_start,
+    #                                 'date_end': item.date_end
+    #                             }))
+    #     for pl_id in pl_ids:
+    #         if pl_id.item_ids:
+    #             for i in pl_id.item_ids:
+    #                 i.unlink()
+    #         pl_id.write({
+    #             'item_ids': pl_item_ids,
+    #             })
+    #         pl_id._update_price_policy()
+    #         pl_update += str(pl_id.name) + ', '
+    #     return {
+    #                 'warning': {
+    #                     'title': ('Đã hoàn thành'),
+    #                     'message': (("Đã cập nhật các bảng giá sau %s") % (pl_update))
+    #                 },
+    #             }
 
-    def _update_price_policy(self):
-        if self.discount:
-            for l in self.item_ids:
-                cur_price = l.fixed_price
-                l.fixed_price = ((100.00 - self.discount) / 100.00) * cur_price
-
-    def action_update_main_price(self):
-        pl = self.env['product.pricelist']
-        pl_ids = pl.search([('def_pl_id', '=', self.id)])
-        pl_item_ids = []
-        pl_update = ''
-        for item in self.item_ids:
-            pl_item_ids.append((0, item.id,
-                                {
-                                    'product_tmpl_id': item.product_tmpl_id.id,
-                                    'product_id': item.product_id.id,
-                                    'min_quantity': item.min_quantity,
-                                    'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price,
-                                    'date_start': item.date_start,
-                                    'date_end': item.date_end
-                                }))
-        for pl_id in pl_ids:
-            if pl_id.item_ids:
-                for i in pl_id.item_ids:
-                    i.unlink()
-            pl_id.write({
-                'item_ids': pl_item_ids,
-                })
-            pl_id._update_price_policy()
-            pl_update += str(pl_id.name) + ', '
-        return {
-                    'warning': {
-                        'title': ('Đã hoàn thành'),
-                        'message': (("Đã cập nhật các bảng giá sau %s") % (pl_update))
-                    },
-                }
-
-    def action_update_price(self):
-            pl_item_ids = []
-            for item in self.def_pl_id.item_ids:
-                pl_item_ids.append((0, item.id,
-                {
-                    'product_tmpl_id': item.product_tmpl_id.id,
-                    'product_id': item.product_id.id,
-                    'min_quantity': item.min_quantity,
-                    'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price ,
-                    'date_start': item.date_start,
-                    'date_end': item.date_end
-                }))
-            if self.item_ids:
-                for i in self.item_ids:
-                    i.unlink()
-            self.write({
-                'item_ids': pl_item_ids,
-            })
+    # def action_update_price(self):
+    #         pl_item_ids = []
+    #         for item in self.def_pl_id.item_ids:
+    #             pl_item_ids.append((0, item.id,
+    #             {
+    #                 'product_tmpl_id': item.product_tmpl_id.id,
+    #                 'product_id': item.product_id.id,
+    #                 'min_quantity': item.min_quantity,
+    #                 'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price ,
+    #                 'date_start': item.date_start,
+    #                 'date_end': item.date_end
+    #             }))
+    #         if self.item_ids:
+    #             for i in self.item_ids:
+    #                 i.unlink()
+    #         self.write({
+    #             'item_ids': pl_item_ids,
+    #         })
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -1151,6 +1151,20 @@ class SaleOrder(models.Model):
             mess = self.env['mail.message'].create(vals)
             print(mess)
             return mess
+
+    #cập nhật giá sản phẩm
+    def update_prices_custom(self):
+        self.ensure_one()
+        for line in self.order_line.filtered(lambda line: not line.display_type):
+            line.new_price_unit = 0.0
+            line.product_uom_change()
+            line.discount = 0  # Force 0 as discount for the cases when _onchange_discount directly returns
+            line._onchange_discount()
+            line.new_price_unit = line.price_unit
+
+        self.show_update_pricelist = False
+        self.message_post(body=_("Giá của sản phẩm đã được cập nhật theo bảng giá <b>%s<b> ", self.pricelist_id.display_name))
+
 
 class ResCompanyAccountLine(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
