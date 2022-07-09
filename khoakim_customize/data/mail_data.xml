@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <data noupdate="1">
         <record id="mail_act_sale_approval_kk" model="mail.activity.type">
             <field name="name">Duyệt báo giá</field>
             <field name="icon">fa-line-chart</field>

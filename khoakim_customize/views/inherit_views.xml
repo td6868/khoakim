@@ -175,6 +175,9 @@
             <xpath expr="//field[@name='order_line']/kanban//field[@name='price_subtotal']" position="after">
                 <field name="note"/>
             </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="vend_name"/>
+            </xpath>
         </field>
     </record>
 
@@ -209,6 +212,10 @@
             <xpath expr="//field[@name='vat']" position="before">
                 <field name="roles"/>
             </xpath>
+            <group name="purchase" position="inside">
+                <field name="type_vend"/>
+                <field name="vend_code" attrs="{'invisible': [('type_vend', '=', False)], 'required': [('type_vend', '=', True)]}"/>
+            </group>
         </field>
     </record>
 
