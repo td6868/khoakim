@@ -31,6 +31,13 @@ SA = gspread.service_account_from_dict(INFO)
 WB = SA.open("SyncOdooProd")
 WS_PROD = WB.worksheet("MasterProd")
 WS_CATG = WB.worksheet("MasterCatg")
+# WP_URL =
+WP_PROD = "products"
+WP_CATG = "products/categories"
+WP_ATTR = "products/attributes"
+WP_TAGS = "products/tags"
+WP_TERMS = "/terms"
+
 
 def next_available_row(worksheet):
     str_list = list(filter(None, worksheet.col_values(1)))
@@ -406,23 +413,6 @@ class ProductTemplate(models.Model):
             return True
         return False
 
-    def prod_temp_approvaled_batch(self):
-        check_perm = self.check_perm_product_temp()
-        if check_perm:
-            for p in self.browse(self.env.context['active_ids']):
-                p.write({
-                    'sale_ok': True,
-                    'purchase_ok': True,
-                    'appr_state': True,
-                })
-        else:
-            return {
-                'warning': {
-                    'title': ('Lỗi người dùng'),
-                    'message': (("Người dùng không được quyền truy cập"))
-                },
-            }
-
     def prod_temp_approvaled(self):
         check_perm = self.check_perm_product_temp()
         if check_perm:
@@ -439,6 +429,10 @@ class ProductTemplate(models.Model):
                     'message': (("Người dùng không được quyền truy cập"))
                 },
             }
+
+    def prod_temp_approvaled_batch(self):
+        for p in self.browse(self.env.context['active_ids']):
+            p.prod_temp_approvaled()
 
     # def prod_temp_deny_batch(self):
     #     check_perm = self.check_perm_product_temp()
@@ -859,8 +853,10 @@ class ResPartnerCustomize(models.Model):
         ('daily3', 'Đại lý cấp 3'),
         ('customer', 'Khách hàng lẻ')
     ], string='Cấp đại lý', default='customer', required=True)
-    # wp_user = fields.Char(string="Tài khoản portal")
-    # wp_password = fields.Char(string="Mật khẩu portal")
+    wp_user = fields.Char(string="Tài khoản portal")
+    wp_password = fields.Char(string="Mật khẩu portal")
+    type_vend = fields.Boolean(string="NCC TQ")
+    vend_code = fields.Char(string="Mã phiếu GH")
 
     @api.onchange('phone')
     def action_duplicate_customer(self):
@@ -948,13 +944,55 @@ class ResPartnerCustomize(models.Model):
     #     if (com_id.wp_url or wp_user or wp_pass):
     #         wp_url = com_id.wp_url + '/wp-json/wp/v2/users'
 
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    vend_name = fields.Char(string='Mã phiếu TQ')
+
+    @api.model
+    def create(self, vals):
+        partner_id = vals["partner_id"]
+        name_vend = self._compute_vendor_purchase(partner_id)
+        print(name_vend)
+        if name_vend:
+            vals['vend_name'] = name_vend
+        rec = super(PurchaseOrder, self).create(vals)
+        return rec
+
+    # tính seq cho phiếu mua cùng vendor
+    def _compute_vendor_purchase(self, p_id):
+        partner_id = self.env['res.partner'].search([('id', '=', p_id)])
+        if partner_id.type_vend and partner_id.vend_code:
+            vend_code = partner_id.vend_code
+            po = self.env['purchase.order']
+            num_po = po.search_count([('partner_id', '=', partner_id.id)]) + 1
+            name = vend_code + self.compute_seq(num_po)
+            return name
+        else:
+            return False
+
+    #tính seq cho phiếu mua cùng vendor
+    def compute_seq(self, num_po):
+        MAX_LEN = 6
+        str_num = str(num_po)
+        l_str = MAX_LEN - len(str_num)
+        if l_str > 0:
+            name = ''
+            for i in range(l_str):
+                name += '0'
+            name += str_num
+        else:
+            name = False
+        return name
+
+
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
     declare_ok = fields.Selection([
-        ('no', 'Không'),
-        ('yes', 'Có'),
+        ('no', 'Không (不)'),
+        ('yes', 'Có (有)'),
     ],
         string="KBHQ", default='no')
     brand = fields.Char(string="Hãng", compute='onchange_attrs_prod')
@@ -994,9 +1032,9 @@ class SaleOrder(models.Model):
         ('sale', 'Đơn hàng'),
         ('done', 'Đã khóa'),
         ('cancel', 'Đã hủy'),
-    ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
+    ], string='Trạng thái', readonly=True, copy=False, index=True, track_visibility='onchange',
+        track_sequence=3, default='draft')
     sm_signture = fields.Binary(string="Chữ ký NVKD", related="user_id.sign_signature")
-
     pst_by_word = fields.Char(string="Số tiền bằng chữ", compute='_compute_subtotal_word')
 
     @api.depends('amount_total')
@@ -1138,7 +1176,6 @@ class SaleOrder(models.Model):
 
     #thông báo khi cập nhật đơn hàng
     def notify_so_mess(self):
-
         if self.state:
             channel_all = self.env['mail.channel'].search([('id', '=', 1)])
             vals = {

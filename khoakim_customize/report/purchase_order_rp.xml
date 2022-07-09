@@ -19,7 +19,12 @@
             <div class="page">
                 <div class="oe_structure"/>
 
-                <h2 class="mt16 text-center" style="font-size: 34px">
+                <h2 t-if="o.vend_name" class="mt16 text-center" style="font-size: 34px">
+                    <div>ĐƠN ĐẶT HÀNG #<span t-field="o.vend_name"/></div>
+                    <div>订货单 #<span t-field="o.vend_name"/></div>
+                </h2>
+
+                <h2 t-if="o.vend_name == False" class="mt16 text-center" style="font-size: 34px">
                     <div>ĐƠN ĐẶT HÀNG #<span t-field="o.name"/></div>
                     <div>订货单 #<span t-field="o.name"/></div>
                 </h2>
