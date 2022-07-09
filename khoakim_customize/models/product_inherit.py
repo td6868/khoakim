@@ -352,6 +352,10 @@ class ProductTemplate(models.Model):
     sale_ok = fields.Boolean('Có thể bán', default=False)
     purchase_ok = fields.Boolean('Có thể mua', default=False)
     appr_state = fields.Boolean('Trạng thái duyệt', default=False)
+    url_img2 = fields.Char(string="URL Ảnh 2")
+    url_img3 = fields.Char(string="URL Ảnh 3")
+    url_img4 = fields.Char(string="URL Ảnh 4")
+    url_img5 = fields.Char(string="URL Ảnh 5")
     # product_ok = fields.Boolean('Là sản phẩm', default=False)
 
     @api.model

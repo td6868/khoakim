@@ -19,21 +19,21 @@
             <div class="page">
                 <div class="oe_structure"/>
 
-                <h2 t-if="o.vend_name" class="mt16 text-center" style="font-size: 34px">
+                <h2 t-if="o.vend_name" class="text-center" style="font-size: 34px">
                     <div>ĐƠN ĐẶT HÀNG #<span t-field="o.vend_name"/></div>
                     <div>订货单 #<span t-field="o.vend_name"/></div>
                 </h2>
 
-                <h2 t-if="o.vend_name == False" class="mt16 text-center" style="font-size: 34px">
+                <h2 t-if="o.vend_name == False" class="text-center" style="font-size: 34px">
                     <div>ĐƠN ĐẶT HÀNG #<span t-field="o.name"/></div>
                     <div>订货单 #<span t-field="o.name"/></div>
                 </h2>
 
-                <div class="row col-12 mt32 mb32" style="font-size: 17px">
-                    <div t-if="o.date_order" class="col-12 mt32 mb32 text-center" name="date_order">
-                        <strong>Ngày cần hàng/ 收货日期: </strong><span t-field="o.date_order" t-options='{"widget": "date"}'/>
-                    </div>
-                </div>
+<!--                <div class="row col-12 mt32 mb32" style="font-size: 17px">-->
+<!--                    <div t-if="o.date_order" class="col-12 mt32 mb32 text-center" name="date_order">-->
+<!--                        <strong>Ngày cần hàng/ 收货日期: </strong><span t-field="o.date_order" t-options='{"widget": "date"}'/>-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
                     <div class="col-12 mw-100 mb-2">
@@ -53,31 +53,31 @@
                     </div>
                 </div>
 
-                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
-                    <div class="col-12 mw-100 mb-2">
-                        <t t-if="o.company_id">
-                            <strong>Địa chỉ 交货地址:</strong>
-                            <span t-if="o.company_id.street" t-field="o.company_id.street" t-options='{"widget": "text"}'/>
-                            <span t-if="o.company_id.street"> , </span>
-                            <span t-if="o.company_id.street2" t-field="o.company_id.street2" t-options='{"widget": "text"}'/>
-                            <span t-if="o.company_id.street2"> , </span>
-                            <span t-if="o.company_id.city" t-field="o.company_id.city" t-options='{"widget": "text"}'/>
-                            <span t-if="o.company_id.city"> , </span>
-                            <span t-if="o.company_id.state_id.name" t-field="o.company_id.state_id.name" t-options='{"widget": "text"}'/>
-                            <span t-if="o.company_id.state_id.name"> , </span>
-                            <span t-if="o.company_id.country_id.name" t-field="o.company_id.country_id.name" t-options='{"widget": "text"}'/>
-                        </t>
-                    </div>
-                </div>
+<!--                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">-->
+<!--                    <div class="col-12 mw-100 mb-2">-->
+<!--                        <t t-if="o.company_id">-->
+<!--                            <strong>Địa chỉ 交货地址:</strong>-->
+<!--                            <span t-if="o.company_id.street" t-field="o.company_id.street" t-options='{"widget": "text"}'/>-->
+<!--                            <span t-if="o.company_id.street"> , </span>-->
+<!--                            <span t-if="o.company_id.street2" t-field="o.company_id.street2" t-options='{"widget": "text"}'/>-->
+<!--                            <span t-if="o.company_id.street2"> , </span>-->
+<!--                            <span t-if="o.company_id.city" t-field="o.company_id.city" t-options='{"widget": "text"}'/>-->
+<!--                            <span t-if="o.company_id.city"> , </span>-->
+<!--                            <span t-if="o.company_id.state_id.name" t-field="o.company_id.state_id.name" t-options='{"widget": "text"}'/>-->
+<!--                            <span t-if="o.company_id.state_id.name"> , </span>-->
+<!--                            <span t-if="o.company_id.country_id.name" t-field="o.company_id.country_id.name" t-options='{"widget": "text"}'/>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
-                    <div class="col-12 mw-100 mb-2" style="font-size: 17px">
-                        <t t-if="o.company_id.mobile or o.company_id.phone">
-                            <strong>Số điện thoại 电话号码:  </strong>
-                            <span t-field="o.company_id.mobile or o.company_id.phone" t-options='{"widget": "text"}'/>
-                        </t>
-                    </div>
-                </div>
+<!--                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">-->
+<!--                    <div class="col-12 mw-100 mb-2" style="font-size: 17px">-->
+<!--                        <t t-if="o.company_id.mobile or o.company_id.phone">-->
+<!--                            <strong>Số điện thoại 电话号码:  </strong>-->
+<!--                            <span t-field="o.company_id.mobile or o.company_id.phone" t-options='{"widget": "text"}'/>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </div>-->
 
 
 <!--                <div id="informations" class="row mt32 mb32">-->
@@ -116,10 +116,10 @@
 
                             <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
-                                    <td style="border-color: #000;" id="product" class="text-center">
+                                    <td style="border-color: #000; width: 20%" id="product" class="text-center">
                                         <span t-field="line.name"/>
                                     </td>
-                                    <td style="border-color: #000;" id="td_prod_image" class="text-center">
+                                    <td style="border-color: #000; width: 10%" id="td_prod_image" class="text-center">
                                         <div t-if="line.prod_image">
                                             <img t-att-src="image_data_uri(line.prod_image)" style="max-width: 100px;"/>
                                         </div>
@@ -127,13 +127,13 @@
                                             <div></div>
                                         </div>
                                     </td>
-                                    <td style="border-color: #000;" id="brand" class="text-center">
+                                    <td style="border-color: #000; width: 10%" id="brand" class="text-center">
                                         <span t-field="line.brand"/>
                                     </td>
-                                    <td style="border-color: #000;" id="color" class="text-center">
+                                    <td style="border-color: #000; width: 10%" id="color" class="text-center">
                                         <span t-field="line.color"/>
                                     </td>
-                                    <td style="border-color: #000;" class="text-center">
+                                    <td style="border-color: #000; width: 10%" class="text-center">
                                         <span t-field="line.price_unit"/>
                                     </td>
 <!--                                    <td style="border-color: #000;" name="td_taxes">-->
@@ -142,11 +142,11 @@
 <!--                                    <td style="border-color: #000;" class="text-center">-->
 <!--                                        <span t-field="line.date_planned"/>-->
 <!--                                    </td>-->
-                                    <td style="border-color: #000;" class="text-center">
+                                    <td style="border-color: #000; width: 10%" class="text-center">
                                         <span t-field="line.product_qty"/>
                                         <span t-field="line.product_uom.name" groups="uom.group_uom"/>
                                     </td>
-                                    <td style="border-color: #000;" class="text-center">
+                                    <td style="border-color: #000; width: 10%" class="text-center">
                                         <span t-field="line.declare_ok"/>
                                     </td>
                                     <td style="border-color: #000;" class="text-center">
