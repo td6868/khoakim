@@ -92,7 +92,7 @@
         <record id="email_temp_khoakim_purchase" model="mail.template">
             <field name="name">Mẫu gửi nhà cung cấp</field>
             <field name="model_id" ref="purchase.model_purchase_order"/>
-            <field name="subject">发货单/Đơn mua hàng {{ object.name or 'n/a' }} - {{ object.company_id.name }}</field>
+            <field name="subject">发货单/Đơn mua hàng {{ object.vend_code or object.name or 'n/a' }} - {{ object.company_id.name }}</field>
             <field name="partner_to">{{ object.partner_id.id }}</field>
             <field name="body_html" type="html">
 <div style="margin: 0px; padding: 0px;">
