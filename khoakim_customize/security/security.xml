@@ -26,4 +26,12 @@
          <field name="category_id" ref="module_product_template_kk"/>
     </record>
 
+<!--    <data noupdate="1">-->
+<!--        <record id="access_expense_cost_only_see_person" model="ir.rule">-->
+<!--            <field name="name">Chỉ xem của người dùng</field>-->
+<!--            <field name="model_id" ref="model_ss_crm"/>-->
+<!--            <field name="domain_force"></field>-->
+<!--        </record>-->
+<!--    </data>-->
+
 </odoo>
