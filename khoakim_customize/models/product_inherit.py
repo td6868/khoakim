@@ -1145,7 +1145,7 @@ class SaleOrder(models.Model):
     def check_price_quotation(self):
         if self.order_line:
             for line in self.order_line:
-                if line.price_unit == 0:
+                if line.new_price_unit == 0:
                     return line.name
         return False
 
