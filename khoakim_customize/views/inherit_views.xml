@@ -52,18 +52,21 @@
                 <field name="new_price_unit" force_save="1" readonly="1"/>
                 <field name="price_unit" attrs="{'force_save': True, 'readonly':True}"/>
                 <field name="cus_discount"/>
+                <field name="cur_price_unit" force_save="1" readonly="1"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
                 <field name="new_price_unit" force_save="1" readonly="1"/>
                 <field name="price_unit" attrs="{'force_save': True, 'readonly':True}"/>
+                <field name="cur_price_unit" force_save="1" readonly="1"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="after">
                 <field name="cus_discount"/>
                 <field name="new_price_unit" force_save="1" readonly="1"/>
                 <field name="price_unit" attrs="{'force_save': True, 'readonly':True}"/>
+                <field name="cur_price_unit" force_save="1" readonly="1"/>
             </xpath>
 
             <xpath expr="//field[@name='order_line']/kanban/templates//t[@t-name='kanban-box']//div[1]//t[1]" position="before">

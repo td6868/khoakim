@@ -173,6 +173,7 @@ class SaleOrderLine(models.Model):
     cus_discount = fields.Float(string='C.Khấu ($)')
     new_price_unit = fields.Float(string='Giá trước CK', readonly=False)
     note = fields.Char(string='Ghi chú')
+    cur_price_unit = fields.Char(string='BG cũ')
 
     @api.depends("qty_available", "virtual_available")
     def _virtual_qty(self):
@@ -226,6 +227,16 @@ class SaleOrderLine(models.Model):
             for line in vals.keys():
                 line.update(vals[line])
         return res
+
+    @api.onchange('product_id', 'order_partner_id')
+    def current_price_partner(self):
+        product = self.env['sale.order.line'].search([('order_partner_id', '=', self.order_partner_id.id),
+                                                    ('state', 'in', ['sale','done']),
+                                                    ('product_id', '=', self.product_id.id)], order='order_id asc', limit=1)
+        price = 'Chưa BG'
+        if product:
+            price = product.price_unit
+        self.write({'cur_price_unit': price})
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -368,11 +379,6 @@ class ProductTemplate(models.Model):
             self.write({'appr_state': True})
         return rec
 
-    # def write(self, vals):
-    #     super(ProductTemplate, self).write(vals)
-    #     if self.wp_ok == True:
-    #         self.update_product_wp()
-
     @api.onchange('prod_code')
     def action_duplicate_code(self):
         if self.type == 'product':
@@ -438,21 +444,18 @@ class ProductTemplate(models.Model):
         for p in self.browse(self.env.context['active_ids']):
             p.prod_temp_approvaled()
 
-    # def prod_temp_deny_batch(self):
-    #     check_perm = self.check_perm_product_temp()
-    #     if check_perm:
-    #         for p in self.browse(self.env.context['active_ids']):
-    #             try:
-    #                 p.unlink()
-    #             except:
-    #                 p.write({'active': False,})
-    #     else:
-    #         return {
-    #             'warning': {
-    #                 'title': ('Lỗi người dùng'),
-    #                 'message': (("Người dùng không được quyền truy cập"))
-    #             },
-    #         }
+    def prod_temp_deny_batch(self):
+        check_perm = self.check_perm_product_temp()
+        if check_perm:
+            for p in self.browse(self.env.context['active_ids']):
+                p.prod_temp_deny()
+        else:
+            return {
+                'warning': {
+                    'title': ('Lỗi người dùng'),
+                    'message': (("Người dùng không được quyền truy cập"))
+                },
+            }
 
     def prod_temp_deny(self):
         check_perm = self.check_perm_product_temp()
@@ -519,124 +522,124 @@ class ProductTemplate(models.Model):
     #         id = ''
     #         return id
 
-    def update_product_wp(self):
-        com_id = self.env.company
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-        sku_wp = ''
+    # def update_product_wp(self):
+    #     com_id = self.env.company
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #     sku_wp = ''
+    #
+    #     if (wp_url == False or woo_ck == False or woo_cs == False):
+    #         return sku_wp
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3",
+    #         timeout=30
+    #     )
+    #
+    #     data = {
+    #         # "name": values['name'],
+    #         "name": self.name,
+    #         "type": "simple",
+    #         "regular_price": str(self.list_price),
+    #         "description": self.description or "Chưa được cập nhật",
+    #         "short_description": self.description or "Chưa được cập nhật",
+    #         "manage_stock": 1,
+    #         "stock_quantity": self.qty_available or "10",
+    #         "sku": self.default_code,
+    #         "images": [
+    #             {
+    #                 "src": self.url_img or ''
+    #             },
+    #         ]
+    #     }
+    #
+    #     if self.sku_wp:
+    #         update = wcapi.put("products/" + str(self.sku_wp), data)
+    #     else:
+    #         update = wcapi.post("products", data)
+    #
+    #     status = update.status_code
+    #     js = update.json()
+    #
+    #     if status == 201:
+    #         js = update.json()
+    #         self.write({
+    #             'sku_wp': js['id']
+    #         })
+    #
+    #     print(js['id'])
+    #     print(status)
 
-        if (wp_url == False or woo_ck == False or woo_cs == False):
-            return sku_wp
+    # @api.model
+    # def sync_product_wp(self):
+    #     com_id = self.env['res.company'].search([('id', '=', 1)])
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #     sku_wp = ''
+    #
+    #     if (wp_url == False or woo_ck == False or woo_cs == False):
+    #         return sku_wp
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3",
+    #         timeout=30
+    #     )
+    #
+    #     if self.wp_ok:
+    #         if self.sku_wp:
+    #             data = {
+    #                 "stock_quantity": self.qty_available,
+    #             }
+    #             update = wcapi.put("products/" + str(self.sku_wp), data)
+    #             status = update.status_code
+    #             js = update.json()
+    #             print(js['id'])
+    #             print(status)
+    #         else:
+    #             self.update_product_wp()
 
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3",
-            timeout=30
-        )
-
-        data = {
-            # "name": values['name'],
-            "name": self.name,
-            "type": "simple",
-            "regular_price": str(self.list_price),
-            "description": self.description or "Chưa được cập nhật",
-            "short_description": self.description or "Chưa được cập nhật",
-            "manage_stock": 1,
-            "stock_quantity": self.qty_available or "10",
-            "sku": self.default_code,
-            "images": [
-                {
-                    "src": self.url_img or ''
-                },
-            ]
-        }
-
-        if self.sku_wp:
-            update = wcapi.put("products/" + str(self.sku_wp), data)
-        else:
-            update = wcapi.post("products", data)
-
-        status = update.status_code
-        js = update.json()
-
-        if status == 201:
-            js = update.json()
-            self.write({
-                'sku_wp': js['id']
-            })
-
-        print(js['id'])
-        print(status)
-
-    @api.model
-    def sync_product_wp(self):
-        com_id = self.env['res.company'].search([('id', '=', 1)])
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-        sku_wp = ''
-
-        if (wp_url == False or woo_ck == False or woo_cs == False):
-            return sku_wp
-
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3",
-            timeout=30
-        )
-
-        if self.wp_ok:
-            if self.sku_wp:
-                data = {
-                    "stock_quantity": self.qty_available,
-                }
-                update = wcapi.put("products/" + str(self.sku_wp), data)
-                status = update.status_code
-                js = update.json()
-                print(js['id'])
-                print(status)
-            else:
-                self.update_product_wp()
-
-    @api.model
-    def _cron_product_wp(self):
-        com_id = self.env['res.company'].search([('id','=',1)])
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-        sku_wp = ''
-
-        if (wp_url == False or woo_ck == False or woo_cs == False):
-            return sku_wp
-
-        prod_vals = self.env['product.product'].search([('wp_ok', '=', True)])
-        print(prod_vals)
-
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3",
-            timeout=30
-        )
-        for p in prod_vals:
-            if p.sku_wp:
-                data = {
-                    "stock_quantity": p.qty_available,
-                    "regular_price": str(p.list_price),
-                }
-                update = wcapi.put("products/" + str(p.sku_wp), data)
-                status = update.status_code
-                js = update.json()
-                print(js['id'])
-                print(status)
-            else:
-                p.update_product_wp()
+    # @api.model
+    # def _cron_product_wp(self):
+    #     com_id = self.env['res.company'].search([('id','=',1)])
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #     sku_wp = ''
+    #
+    #     if (wp_url == False or woo_ck == False or woo_cs == False):
+    #         return sku_wp
+    #
+    #     prod_vals = self.env['product.product'].search([('wp_ok', '=', True)])
+    #     print(prod_vals)
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3",
+    #         timeout=30
+    #     )
+    #     for p in prod_vals:
+    #         if p.sku_wp:
+    #             data = {
+    #                 "stock_quantity": p.qty_available,
+    #                 "regular_price": str(p.list_price),
+    #             }
+    #             update = wcapi.put("products/" + str(p.sku_wp), data)
+    #             status = update.status_code
+    #             js = update.json()
+    #             print(js['id'])
+    #             print(status)
+    #         else:
+    #             p.update_product_wp()
 
 class ProductAttributeValues(models.Model):
     _inherit = 'product.attribute.value'
@@ -649,47 +652,46 @@ class ProductAttribute(models.Model):
 
     attr_wp = fields.Char(string='ID')
 
-    def update_attrs_wp(self):
-        com_id = self.env.company
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-
-        if (wp_url == False or woo_ck == False or woo_cs == False):
-            return True
-
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3",
-            timeout=30
-        )
-
-        data = {
-            "name": self.name,
-            "type": "select",
-            "order_by": "menu_order",
-            "has_archives": True
-        }
-
-        if self.cate_id:
-            update = wcapi.put("products/attributes/" + str(self.cate_id), data)
-            status = update.status_code
-        else:
-            update = wcapi.post("products/attributes", data)
-            status = update.status_code
-            if status == 201:
-                js = update.json()
-                self.cate_id = js['id']
-        print(status)
+    # def update_attrs_wp(self):
+    #     com_id = self.env.company
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #
+    #     if (wp_url == False or woo_ck == False or woo_cs == False):
+    #         return True
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3",
+    #         timeout=30
+    #     )
+    #
+    #     data = {
+    #         "name": self.name,
+    #         "type": "select",
+    #         "order_by": "menu_order",
+    #         "has_archives": True
+    #     }
+    #
+    #     if self.cate_id:
+    #         update = wcapi.put("products/attributes/" + str(self.cate_id), data)
+    #         status = update.status_code
+    #     else:
+    #         update = wcapi.post("products/attributes", data)
+    #         status = update.status_code
+    #         if status == 201:
+    #             js = update.json()
+    #             self.cate_id = js['id']
 
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
     ccode = fields.Char(string="Mã nhóm sản phẩm", required=True)
     cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
-    cate_id = fields.Char(string="WP ID")
+    sku_wp = fields.Char(string="WP ID")
     wp_ok = fields.Char(string="Khả dụng trên website")
 
     @api.depends('ccode', 'parent_id')
@@ -714,39 +716,39 @@ class ProductCategory(models.Model):
                         },
                     }
 
-    def update_categ_wp(self):
-        com_id = self.env.company
-        wp_url = com_id.wp_url
-        woo_ck = com_id.woo_ck
-        woo_cs = com_id.woo_cs
-
-        if (wp_url == False or woo_ck == False or woo_cs == False or self.wp_ok == False):
-            return True
-
-        wcapi = API(
-            url=wp_url,
-            consumer_key=woo_ck,
-            consumer_secret=woo_cs,
-            version="wc/v3",
-            timeout=30
-        )
-
-        data = {
-            "name": self.name,
-            "parent": self.parent_id.cate_id or 0,
-            "description": "",
-        }
-
-        if self.cate_id:
-            update = wcapi.put("products/categories/" + str(self.cate_id), data)
-            status = update.status_code
-        else:
-            update = wcapi.post("products/categories", data)
-            status = update.status_code
-            if status == 201:
-                js = update.json()
-                self.cate_id = js['id']
-        print(status)
+    # def update_categ_wp(self):
+    #     com_id = self.env.company
+    #     wp_url = com_id.wp_url
+    #     woo_ck = com_id.woo_ck
+    #     woo_cs = com_id.woo_cs
+    #
+    #     if (wp_url == False or woo_ck == False or woo_cs == False or self.wp_ok == False):
+    #         return True
+    #
+    #     wcapi = API(
+    #         url=wp_url,
+    #         consumer_key=woo_ck,
+    #         consumer_secret=woo_cs,
+    #         version="wc/v3",
+    #         timeout=30
+    #     )
+    #
+    #     data = {
+    #         "name": self.name,
+    #         "parent": self.parent_id.cate_id or 0,
+    #         "description": "",
+    #     }
+    #
+    #     if self.cate_id:
+    #         update = wcapi.put("products/categories/" + str(self.cate_id), data)
+    #         status = update.status_code
+    #     else:
+    #         update = wcapi.post("products/categories", data)
+    #         status = update.status_code
+    #         if status == 201:
+    #             js = update.json()
+    #             self.cate_id = js['id']
+    #     print(status)
 
     # Đồng bộ hoá gsheet
     def sync_odoo_catg_gsheet(self):
@@ -770,6 +772,7 @@ class ProductProduct(models.Model):
 
     prod_code = fields.Char(string="Mã SP/SX", compute='_get_temp_prod')
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_attrs_code', store=True)
+    sku_wp = fields.Char(string="ID WP")
 
     @api.model
     def create(self, vals):
@@ -847,6 +850,68 @@ class ProductProduct(models.Model):
             WS_PROD.update_cells(cells)
             time.sleep(2)
 
+    #authen wp
+    def wp_auth(self):
+        com_id = self.env.company
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
+        if (wp_url == False or woo_ck == False or woo_cs == False):
+            return True
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+        return wcapi
+
+    #create wp product
+    def create_wp_product(self):
+        for rec in self:
+            wpapi = rec.wp_auth()
+            name = rec.name
+            categ_id = rec.categ_id.sku_wp
+            tags = []
+            for v in rec.product_template_attribute_value_ids:
+                name += ' ' + v.attribute_id.name
+                tags.append({"name": v.attribute_id.name})
+
+            vals = {
+                "name": name,
+                "type": "simple",
+                # "regular_price": "21.99",
+                "description": "",
+                "short_description": "",
+                "sku": rec.default_code,
+                "manage_stock": "true",
+                "stock_quantity": 20,
+                "categories": [
+                    {
+                        "id": int(categ_id)
+                    },
+                ],
+                "images": [
+                    {
+                        "src": rec.url_img or rec.product_tmpl_id.url_img or ''
+                    },
+                    {
+                        "src": rec.url_img2 or ''
+                    },
+                    {
+                        "src": rec.url_img3 or ''
+                    },
+                    {
+                        "src": rec.url_img4 or ''
+                    },
+                    {
+                        "src": rec.url_img5 or ''
+                    },
+                ],
+                "tags": tags,
+            }
+
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
 
@@ -918,6 +983,10 @@ class ResPartnerCustomize(models.Model):
                 }
                 r = requests.post(wp_url, auth=(wp_user, wp_pass), json=data)
                 if (r.status_code == '201'):
+                    self.write({
+                        'wp_user': username,
+                        'wp_password': password,
+                    })
                     return {
                         'warning': {
                             'title': ('Tạo tài khoản thành công'),
