@@ -285,9 +285,18 @@
                 <field name="prod_code" attrs="{'required': [('detailed_type', '=', 'product')]}"/>
                 <field name="default_code" force_save="1" readonly="1"/>
             </xpath>
-            <xpath expr="//field[@name='barcode']" position="after">
+            <xpath expr="//field[@name='available_in_pos']" position="after">
                 <field name="wp_ok"/>
             </xpath>
+            <xpath expr="//group[@name='description']" position="before">
+                <group name="url_image" position="before" string="Quản lý URL ảnh">
+                    <field name="url_img2"/>
+                    <field name="url_img3"/>
+                    <field name="url_img4"/>
+                    <field name="url_img4"/>
+                </group>
+            </xpath>
+
         </field>
     </record>
 

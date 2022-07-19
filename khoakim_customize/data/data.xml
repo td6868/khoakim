@@ -19,6 +19,24 @@
             <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>
         </record>
 
+        <record model="ir.actions.server" id="sync_wp_product_template">
+            <field name="name">Đồng bộ WP</field>
+            <field name="model_id" ref="product.model_product_product"/>
+            <field name="binding_model_id" ref="product.model_product_product"/>
+            <field name="state">code</field>
+            <field name="code">model.batch_sync_product_wp()</field>
+            <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>
+        </record>
+
+        <record model="ir.actions.server" id="sync_wp_catg_template">
+            <field name="name">Đồng bộ WP</field>
+            <field name="model_id" ref="product.model_product_category"/>
+            <field name="binding_model_id" ref="product.model_product_category"/>
+            <field name="state">code</field>
+            <field name="code">model.sync_categ_product_wp()</field>
+            <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>
+        </record>
+
         <record model="ir.actions.server" id="sync_odoo_catg_gsheet">
             <field name="name">Đồng bộ Gsheet</field>
             <field name="model_id" ref="product.model_product_category"/>
@@ -55,14 +73,40 @@
 <!--            <field name="code">model.sync_product_wp</field>-->
 <!--        </record>-->
 
-        <record id="sync_woocommerce_product" model="ir.cron">
-            <field name="name">Đồng bộ tồn kho woocommerce</field>
-            <field name="model_id" ref="product.model_product_template"/>
+<!--        <record id="sync_woocommerce_product" model="ir.cron">-->
+<!--            <field name="name">Đồng bộ tồn kho woocommerce</field>-->
+<!--            <field name="model_id" ref="product.model_product_template"/>-->
+<!--            <field name="state">code</field>-->
+<!--            <field name="code">model._cron_product_wp()</field>-->
+<!--            <field name="active" eval="True"/>-->
+<!--            <field name="user_id" ref="base.user_root"/>-->
+<!--            <field name="interval_number">12</field>-->
+<!--            <field name="interval_type">hours</field>-->
+<!--            <field name="numbercall">-1</field>-->
+<!--            <field name="doall" eval="False"/>-->
+<!--        </record>-->
+
+        <record id="sync_woocommerce_product_product" model="ir.cron">
+            <field name="name">Đồng bộ sản phẩm woocommerce</field>
+            <field name="model_id" ref="product.model_product_product"/>
             <field name="state">code</field>
-            <field name="code">model._cron_product_wp()</field>
+            <field name="code">model.auto_sync_product_wp()</field>
             <field name="active" eval="True"/>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">12</field>
+            <field name="interval_number">24</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+
+        <record id="sync_woocommerce_product_category" model="ir.cron">
+            <field name="name">Đồng bộ danh mục woocommerce</field>
+            <field name="model_id" ref="product.model_product_category"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_sync_category_wp()</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">24</field>
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
