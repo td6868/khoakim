@@ -4,6 +4,7 @@ import ssl
 from vietnam_number import n2w
 import string
 import random
+import math
 from woocommerce import API
 from odoo import api, fields, models, _
 from odoo.exceptions import Warning, UserError
@@ -90,79 +91,6 @@ class Pricelist(models.Model):
         count = self.env['product.pricelist.item'].search_count([('pricelist_id.id', '=', self.id)])
         self.count_pl = count
 
-    # def action_price_categ(self):
-    #     if self.catg_id and self.catg_disc and self.type_dics:
-    #         for l in self.item_ids:
-    #             categ_ids = self.env['product.category'].search([('id', 'child_of', [self.catg_id.id])])
-    #             for cid in categ_ids:
-    #                 if l.product_tmpl_id.categ_id.id == cid.id:
-    #                     cur_price = l.fixed_price
-    #                     if self.type_dics == 'perc':
-    #                         l.fixed_price = ((100.00 - self.catg_disc) / 100.00) * cur_price
-    #                     elif self.type_dics == 'fix':
-    #                         l.fixed_price = cur_price - self.catg_disc
-    #         self.write({
-    #             'catg_id': False,
-    #             'type_dics': False,
-    #             'catg_disc': False
-    #         })
-    #
-    # def _update_price_policy(self):
-    #     if self.discount:
-    #         for l in self.item_ids:
-    #             cur_price = l.fixed_price
-    #             l.fixed_price = ((100.00 - self.discount) / 100.00) * cur_price
-    #
-    # def action_update_main_price(self):
-    #     pl = self.env['product.pricelist']
-    #     pl_ids = pl.search([('def_pl_id', '=', self.id)])
-    #     pl_item_ids = []
-    #     pl_update = ''
-    #     for item in self.item_ids:
-    #         pl_item_ids.append((0, item.id,
-    #                             {
-    #                                 'product_tmpl_id': item.product_tmpl_id.id,
-    #                                 'product_id': item.product_id.id,
-    #                                 'min_quantity': item.min_quantity,
-    #                                 'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price,
-    #                                 'date_start': item.date_start,
-    #                                 'date_end': item.date_end
-    #                             }))
-    #     for pl_id in pl_ids:
-    #         if pl_id.item_ids:
-    #             for i in pl_id.item_ids:
-    #                 i.unlink()
-    #         pl_id.write({
-    #             'item_ids': pl_item_ids,
-    #             })
-    #         pl_id._update_price_policy()
-    #         pl_update += str(pl_id.name) + ', '
-    #     return {
-    #                 'warning': {
-    #                     'title': ('Đã hoàn thành'),
-    #                     'message': (("Đã cập nhật các bảng giá sau %s") % (pl_update))
-    #                 },
-    #             }
-
-    # def action_update_price(self):
-    #         pl_item_ids = []
-    #         for item in self.def_pl_id.item_ids:
-    #             pl_item_ids.append((0, item.id,
-    #             {
-    #                 'product_tmpl_id': item.product_tmpl_id.id,
-    #                 'product_id': item.product_id.id,
-    #                 'min_quantity': item.min_quantity,
-    #                 'fixed_price': ((100.00 - self.discount) / 100.00) * item.fixed_price ,
-    #                 'date_start': item.date_start,
-    #                 'date_end': item.date_end
-    #             }))
-    #         if self.item_ids:
-    #             for i in self.item_ids:
-    #                 i.unlink()
-    #         self.write({
-    #             'item_ids': pl_item_ids,
-    #         })
-
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -230,12 +158,12 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('product_id', 'order_partner_id')
     def current_price_partner(self):
-        product = self.env['sale.order.line'].search([('order_partner_id', '=', self.order_partner_id.id),
+        sale_line = self.env['sale.order.line'].search([('order_partner_id', '=', self.order_partner_id.id),
                                                     ('state', 'in', ['sale','done']),
                                                     ('product_id', '=', self.product_id.id)], order='order_id asc', limit=1)
         price = 'Chưa BG'
-        if product:
-            price = product.price_unit
+        if sale_line:
+            price = sale_line.price_unit
         self.write({'cur_price_unit': price})
 
 class AccountMove(models.Model):
@@ -355,7 +283,7 @@ class AccountMoveLine(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    url_img = fields.Char(string="URL Ảnh")
+    url_img = fields.Char(string="URL Ảnh 1")
     sku_wp = fields.Char(string="ID WP")
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code', store=True)
     wp_ok = fields.Boolean(string="Khả dụng ở website")
@@ -474,173 +402,6 @@ class ProductTemplate(models.Model):
                 },
             }
 
-    # def create_woo_product(self, vals):
-    #     com_id = self.env.company
-    #     wp_url = com_id.wp_url
-    #     woo_ck = com_id.woo_ck
-    #     woo_cs = com_id.woo_cs
-    #
-    #     if (wp_url == False or woo_ck == False or woo_cs == False):
-    #         return True
-    #
-    #     wcapi = API(
-    #         url=wp_url,
-    #         consumer_key=woo_ck,
-    #         consumer_secret=woo_cs,
-    #         version="wc/v3",
-    #         timeout=30
-    #     )
-    #
-    #     # print(vals['name'])
-    #
-    #     data = {
-    #             "name": vals['name'],
-    #             "type": "simple",
-    #             "regular_price": str(vals['list_price']),
-    #             "description": vals['description'] or "Chưa được cập nhật",
-    #             "short_description": vals['description'] or "Chưa được cập nhật",
-    #             "manage_stock": 1,
-    #             "stock_quantity": "10",
-    #             "sku": vals['default_code'],
-    #             "images": [
-    #                 {
-    #                     "src": vals['url_img']
-    #                 },
-    #             ]
-    #         }
-    #
-    #     # if self.sku_wp:
-    #     #     wcapi.put("products" + str(self.id), data).json()
-    #     # else:
-    #     post = wcapi.post("products", data)
-    #     status = post.status_code
-    #     js = post.json()
-    #     print(status)
-    #     if status == 201:
-    #         return js["id"]
-    #     else:
-    #         id = ''
-    #         return id
-
-    # def update_product_wp(self):
-    #     com_id = self.env.company
-    #     wp_url = com_id.wp_url
-    #     woo_ck = com_id.woo_ck
-    #     woo_cs = com_id.woo_cs
-    #     sku_wp = ''
-    #
-    #     if (wp_url == False or woo_ck == False or woo_cs == False):
-    #         return sku_wp
-    #
-    #     wcapi = API(
-    #         url=wp_url,
-    #         consumer_key=woo_ck,
-    #         consumer_secret=woo_cs,
-    #         version="wc/v3",
-    #         timeout=30
-    #     )
-    #
-    #     data = {
-    #         # "name": values['name'],
-    #         "name": self.name,
-    #         "type": "simple",
-    #         "regular_price": str(self.list_price),
-    #         "description": self.description or "Chưa được cập nhật",
-    #         "short_description": self.description or "Chưa được cập nhật",
-    #         "manage_stock": 1,
-    #         "stock_quantity": self.qty_available or "10",
-    #         "sku": self.default_code,
-    #         "images": [
-    #             {
-    #                 "src": self.url_img or ''
-    #             },
-    #         ]
-    #     }
-    #
-    #     if self.sku_wp:
-    #         update = wcapi.put("products/" + str(self.sku_wp), data)
-    #     else:
-    #         update = wcapi.post("products", data)
-    #
-    #     status = update.status_code
-    #     js = update.json()
-    #
-    #     if status == 201:
-    #         js = update.json()
-    #         self.write({
-    #             'sku_wp': js['id']
-    #         })
-    #
-    #     print(js['id'])
-    #     print(status)
-
-    # @api.model
-    # def sync_product_wp(self):
-    #     com_id = self.env['res.company'].search([('id', '=', 1)])
-    #     wp_url = com_id.wp_url
-    #     woo_ck = com_id.woo_ck
-    #     woo_cs = com_id.woo_cs
-    #     sku_wp = ''
-    #
-    #     if (wp_url == False or woo_ck == False or woo_cs == False):
-    #         return sku_wp
-    #
-    #     wcapi = API(
-    #         url=wp_url,
-    #         consumer_key=woo_ck,
-    #         consumer_secret=woo_cs,
-    #         version="wc/v3",
-    #         timeout=30
-    #     )
-    #
-    #     if self.wp_ok:
-    #         if self.sku_wp:
-    #             data = {
-    #                 "stock_quantity": self.qty_available,
-    #             }
-    #             update = wcapi.put("products/" + str(self.sku_wp), data)
-    #             status = update.status_code
-    #             js = update.json()
-    #             print(js['id'])
-    #             print(status)
-    #         else:
-    #             self.update_product_wp()
-
-    # @api.model
-    # def _cron_product_wp(self):
-    #     com_id = self.env['res.company'].search([('id','=',1)])
-    #     wp_url = com_id.wp_url
-    #     woo_ck = com_id.woo_ck
-    #     woo_cs = com_id.woo_cs
-    #     sku_wp = ''
-    #
-    #     if (wp_url == False or woo_ck == False or woo_cs == False):
-    #         return sku_wp
-    #
-    #     prod_vals = self.env['product.product'].search([('wp_ok', '=', True)])
-    #     print(prod_vals)
-    #
-    #     wcapi = API(
-    #         url=wp_url,
-    #         consumer_key=woo_ck,
-    #         consumer_secret=woo_cs,
-    #         version="wc/v3",
-    #         timeout=30
-    #     )
-    #     for p in prod_vals:
-    #         if p.sku_wp:
-    #             data = {
-    #                 "stock_quantity": p.qty_available,
-    #                 "regular_price": str(p.list_price),
-    #             }
-    #             update = wcapi.put("products/" + str(p.sku_wp), data)
-    #             status = update.status_code
-    #             js = update.json()
-    #             print(js['id'])
-    #             print(status)
-    #         else:
-    #             p.update_product_wp()
-
 class ProductAttributeValues(models.Model):
     _inherit = 'product.attribute.value'
 
@@ -652,40 +413,6 @@ class ProductAttribute(models.Model):
 
     attr_wp = fields.Char(string='ID')
 
-    # def update_attrs_wp(self):
-    #     com_id = self.env.company
-    #     wp_url = com_id.wp_url
-    #     woo_ck = com_id.woo_ck
-    #     woo_cs = com_id.woo_cs
-    #
-    #     if (wp_url == False or woo_ck == False or woo_cs == False):
-    #         return True
-    #
-    #     wcapi = API(
-    #         url=wp_url,
-    #         consumer_key=woo_ck,
-    #         consumer_secret=woo_cs,
-    #         version="wc/v3",
-    #         timeout=30
-    #     )
-    #
-    #     data = {
-    #         "name": self.name,
-    #         "type": "select",
-    #         "order_by": "menu_order",
-    #         "has_archives": True
-    #     }
-    #
-    #     if self.cate_id:
-    #         update = wcapi.put("products/attributes/" + str(self.cate_id), data)
-    #         status = update.status_code
-    #     else:
-    #         update = wcapi.post("products/attributes", data)
-    #         status = update.status_code
-    #         if status == 201:
-    #             js = update.json()
-    #             self.cate_id = js['id']
-
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
@@ -693,6 +420,7 @@ class ProductCategory(models.Model):
     cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
     sku_wp = fields.Char(string="WP ID")
     wp_ok = fields.Char(string="Khả dụng trên website")
+    cate_id = fields.Integer(string="ID WP")
 
     @api.depends('ccode', 'parent_id')
     def _gene_code_cate(self):
@@ -710,49 +438,14 @@ class ProductCategory(models.Model):
                 code = self.ccode
                 self.ccode = False
                 return {
-                        'warning': {
-                            'title': ('Trùng nhóm sản phẩm'),
-                            'message': (("Mã %s đã bị trùng với nhóm sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code.name))
-                        },
-                    }
+                            'warning': {
+                                'title': ('Trùng nhóm sản phẩm'),
+                                'message': (("Mã %s đã bị trùng với nhóm sản phẩm %s, vui lòng chọn mã khác") % (code, dup_code.name))
+                            },
+                        }
 
-    # def update_categ_wp(self):
-    #     com_id = self.env.company
-    #     wp_url = com_id.wp_url
-    #     woo_ck = com_id.woo_ck
-    #     woo_cs = com_id.woo_cs
-    #
-    #     if (wp_url == False or woo_ck == False or woo_cs == False or self.wp_ok == False):
-    #         return True
-    #
-    #     wcapi = API(
-    #         url=wp_url,
-    #         consumer_key=woo_ck,
-    #         consumer_secret=woo_cs,
-    #         version="wc/v3",
-    #         timeout=30
-    #     )
-    #
-    #     data = {
-    #         "name": self.name,
-    #         "parent": self.parent_id.cate_id or 0,
-    #         "description": "",
-    #     }
-    #
-    #     if self.cate_id:
-    #         update = wcapi.put("products/categories/" + str(self.cate_id), data)
-    #         status = update.status_code
-    #     else:
-    #         update = wcapi.post("products/categories", data)
-    #         status = update.status_code
-    #         if status == 201:
-    #             js = update.json()
-    #             self.cate_id = js['id']
-    #     print(status)
-
-    # Đồng bộ hoá gsheet
-    def sync_odoo_catg_gsheet(self):
-        catg_ids = self.browse(self.env.context['active_ids'])
+    #Update gsheet
+    def update_catg_gsheet(self, catg_ids):
         time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for rec in catg_ids:
             cell = WS_CATG.find(query=str(rec.id), in_row=2)
@@ -761,11 +454,76 @@ class ProductCategory(models.Model):
                 row = cell.row
             else:
                 row = next_available_row(WS_CATG)
-            cells=[]
+            cells = []
             for i in range(len(vals)):
                 cells.append(Cell(row=int(row), col=i + 1, value=vals[i]))
             WS_CATG.update_cells(cells)
             time.sleep(2)
+
+    # Đồng bộ hoá gsheet
+    def sync_odoo_catg_gsheet(self):
+        catg_ids = self.browse(self.env.context['active_ids'])
+        self.update_catg_gsheet(catg_ids=catg_ids)
+
+    # authen wp
+    def wp_auth(self):
+        com_id = self.env.company or self.env['res.company'].search([('wp_url', '=', True),
+                                                                     ('woo_ck', '=', True),
+                                                                     ('woo_cs', '=', True)], order='id asc', limit=1)
+        wp_url = com_id.wp_url
+        woo_ck = com_id.woo_ck
+        woo_cs = com_id.woo_cs
+        if (wp_url == False or woo_ck == False or woo_cs == False):
+            return False
+        wcapi = API(
+            url=wp_url,
+            consumer_key=woo_ck,
+            consumer_secret=woo_cs,
+            version="wc/v3",
+            timeout=30
+        )
+        return wcapi
+
+    # check category id create and update
+    def check_categ_wp(self, wcapi):
+        data = {
+            "name": self.name,
+            "parent": self.parent_id.cate_id or 0,
+            "description": "",
+        }
+        if self.cate_id:
+            update = wcapi.put("products/categories/" + str(self.cate_id), data)
+        else:
+            update = wcapi.post("products/categories", data)
+        status = update.status_code
+        if status == 201:
+            js = update.json()
+            self.cate_id = js['id']
+        return self.cate_id
+
+    #Đồng bộ danh mục
+    def sync_categ_product_wp(self):
+        wcapi = self.wp_auth()
+        i = 0
+        if wcapi:
+            for p in self.browse(self.env.context['active_ids']):
+                sync = p.check_categ_wp(wcapi)
+                if sync:
+                    i += 1
+        return {
+                    'warning': {
+                        'title': ('Đã có lỗi'),
+                        'message': (("Đã đồng bộ %s danh mục!") % (i)),
+                    },
+                }
+
+    # đồng bộ tự động
+    def auto_sync_category_wp(self):
+        wcapi = self.wp_auth()
+        if wcapi:
+            categ_ids = self.env['product.category'].search([], order='id asc')
+            for rec in categ_ids:
+                rec.check_categ_wp(wcapi)
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
@@ -822,23 +580,29 @@ class ProductProduct(models.Model):
                 "image_variant_128": img_b64,
             })
 
+    def compute_variant_product(self, tag=None):
+        attrs = ''
+        name = self.name
+        attr_prod = self.product_template_attribute_value_ids
+        tags = []
+        brand = 'Không có'
+        for a in attr_prod:
+            if a.attribute_id.sequence == 0:
+                brand = a.name
+            attrs += '<p>' + a.attribute_id.name + ' : ' + a.name + '</p>'
+            name += ' ' + a.name
+            if tag == True:
+                tags.append({"name": a.name})
+        return {'brand': brand, 'attrs': attrs, 'name': name, 'tags': tags}
+
     # Đồng bộ hoá gsheet
     def sync_odoo_prod_gsheet(self):
         prod_ids = self.browse(self.env.context['active_ids'])
         time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for rec in prod_ids:
             cell = WS_PROD.find(query=str(rec.id), in_column=2)
-            attr_prod = rec.product_template_attribute_value_ids
-            attrs = ''
-            brand = 'Không có'
-            name = rec.name
-            if attr_prod:
-                for a in attr_prod:
-                    if a.attribute_id.sequence == 0:
-                        brand = a.name
-                    attrs += '<p>' + a.attribute_id.name + ' : ' + a.name + '</p>'
-                    name += ' ' + a.name
-            vals = [time_update, rec.id, rec.url_img or '', rec.url_img or rec.product_tmpl_id.url_img or '', name, rec.prod_code, rec.categ_id.name, brand, attrs, rec.list_price, rec.virtual_available]
+            variants = self.compute_variant_product()
+            vals = [time_update, rec.id, rec.url_img or '', rec.url_img or rec.product_tmpl_id.url_img or '', variants['name'], rec.prod_code, rec.categ_id.name, variants['brand'], variants['attrs'], rec.list_price, rec.virtual_available]
             if cell:
                 row = cell.row
             else:
@@ -850,14 +614,35 @@ class ProductProduct(models.Model):
             WS_PROD.update_cells(cells)
             time.sleep(2)
 
+    #get pricelist product
+    def get_all_product_list(self):
+        prod_prices = self.env['product.pricelist.item'].search(['|',('product_id', '=', self.id),
+                                                                 ('applied_on', '=', '3_global'),
+                                                                 ('pricelist_id.type_pl', '=', 'policy')]
+                                                                )
+        main_price = self.env['product.pricelist.item'].search([('product_id', '=', self.id),
+                                                                 ('pricelist_id.type_pl', '=', 'main')], limit=1)
+        price_main = main_price.fixed_price or self.list_price
+        all_pu = {'main': price_main,}
+        for pl in prod_prices:
+            if (pl.applied_on == '3_global' and pl.price):
+                pl_roles = pl.pricelist_id.roles
+                price_policy = price_main - (pl.price_discount / 100 * price_main) + pl.price_surcharge
+                if pl.price_round:
+                    price_policy = math.ceil(price_policy/pl.price_round) * pl.price_round
+                all_pu.update({pl_roles: price_policy,})
+        return all_pu
+
     #authen wp
     def wp_auth(self):
-        com_id = self.env.company
+        com_id = self.env.company or self.env['res.company'].search([('wp_url', '=', True),
+                                                                     ('woo_ck', '=', True),
+                                                                     ('woo_cs', '=', True)], order='id asc', limit=1)
         wp_url = com_id.wp_url
         woo_ck = com_id.woo_ck
         woo_cs = com_id.woo_cs
         if (wp_url == False or woo_ck == False or woo_cs == False):
-            return True
+            return False
         wcapi = API(
             url=wp_url,
             consumer_key=woo_ck,
@@ -868,49 +653,151 @@ class ProductProduct(models.Model):
         return wcapi
 
     #create wp product
-    def create_wp_product(self):
-        for rec in self:
-            wpapi = rec.wp_auth()
-            name = rec.name
-            categ_id = rec.categ_id.sku_wp
-            tags = []
-            for v in rec.product_template_attribute_value_ids:
-                name += ' ' + v.attribute_id.name
-                tags.append({"name": v.attribute_id.name})
+    def update_wp_product(self, categ_id, wcapi):
+        variants = self.compute_variant_product(tag=True)
+        prices = self.get_all_product_list()
+        stock_quan = self.qty_available or 12
+        src = [self.url_img or self.product_tmpl_id.url_img, self.url_img2, self.url_img3, self.url_img4, self.url_img5]
+        images = []
+        for s in src:
+            if s:
+                images.append({"src": s})
 
-            vals = {
-                "name": name,
-                "type": "simple",
-                # "regular_price": "21.99",
-                "description": "",
-                "short_description": "",
-                "sku": rec.default_code,
-                "manage_stock": "true",
-                "stock_quantity": 20,
-                "categories": [
-                    {
-                        "id": int(categ_id)
-                    },
-                ],
-                "images": [
-                    {
-                        "src": rec.url_img or rec.product_tmpl_id.url_img or ''
-                    },
-                    {
-                        "src": rec.url_img2 or ''
-                    },
-                    {
-                        "src": rec.url_img3 or ''
-                    },
-                    {
-                        "src": rec.url_img4 or ''
-                    },
-                    {
-                        "src": rec.url_img5 or ''
-                    },
-                ],
-                "tags": tags,
-            }
+        data = {
+                    "name": variants['name'],
+                    "type": "simple",
+                    "regular_price": str(prices['main']),
+                    "description": "",
+                    "short_description": variants['attrs'],
+                    "sku": str(self.default_code),
+                    "manage_stock": 1,
+                    "stock_quantity": str(stock_quan),
+                    "categories": [
+                        {
+                            "id": int(categ_id)
+                        },
+                    ],
+                    "images": images,
+                    "tags": variants['tags'],
+                    "meta_data": [
+                        {
+                            "key": "_pricing_rules",
+                            "value": {
+                                "set_1": {
+                                    "conditions_type": "all",
+                                    "conditions": {
+                                        "1": {
+                                            "type": "apply_to",
+                                            "args": {
+                                                "applies_to": "roles",
+                                                "roles": [
+                                                    "daily1"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "collector": {
+                                        "type": "product"
+                                    },
+                                    "mode": "continuous",
+                                    "rules": {
+                                        "1": {
+                                            "from": "1",
+                                            "type": "fixed_price",
+                                            "amount": str(prices["daily1"] or 0)
+                                        }
+                                    },
+                                },
+                                "set_2": {
+                                    "conditions_type": "all",
+                                    "conditions": {
+                                        "1": {
+                                            "type": "apply_to",
+                                            "args": {
+                                                "applies_to": "roles",
+                                                "roles": [
+                                                    "daily2"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "collector": {
+                                        "type": "product"
+                                    },
+                                    "mode": "continuous",
+                                    "rules": {
+                                        "1": {
+                                            "from": "1",
+                                            "type": "fixed_price",
+                                            "amount": str(prices["daily2"] or 0)
+                                        }
+                                    },
+                                },
+                                "set_3": {
+                                    "conditions_type": "all",
+                                    "conditions": {
+                                        "1": {
+                                            "type": "apply_to",
+                                            "args": {
+                                                "applies_to": "roles",
+                                                "roles": [
+                                                    "daily3"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "collector": {
+                                        "type": "product"
+                                    },
+                                    "mode": "continuous",
+                                    "rules": {
+                                        "1": {
+                                            "from": "1",
+                                            "type": "fixed_price",
+                                            "amount": str(prices["daily3"] or 0)
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    ],
+                }
+        if self.sku_wp:
+            update = wcapi.put("products/" + str(self.sku_wp), data)
+        else:
+            update = wcapi.post("products", data)
+        status = update.status_code
+        if status == 201:
+            js = update.json()
+            self.sku_wp = js['id']
+        return self.sku_wp
+
+    #Đồng bộ hoá sản phẩm web
+    def sync_product_wp(self):
+        wcapi = self.wp_auth()
+        if wcapi:
+            categ_id = self.categ_id.check_categ_wp(wcapi)
+            self.update_wp_product(wcapi=wcapi, categ_id=categ_id)
+
+    #batch đồng bộ sản phẩm
+    def batch_sync_product_wp(self):
+        i = 0
+        for p in self.browse(self.env.context['active_ids']):
+            sync = p.sync_product_wp()
+            if sync:
+                i += 1
+        return {
+                        'warning': {
+                            'title': ('Đã có lỗi'),
+                            'message': (("Đã đồng bộ %s sản phẩm!") % (i)),
+                        },
+                    }
+
+    #đồng bộ tự động
+    def auto_sync_product_wp(self):
+        prod_ids = self.env['product.product'].search([], order='id asc')
+        for rec in prod_ids:
+            rec.sync_product_wp()
 
 class ResPartnerCustomize(models.Model):
     _inherit = 'res.partner'
@@ -955,7 +842,9 @@ class ResPartnerCustomize(models.Model):
             self.property_product_pricelist = def_pl.id
 
     def create_acc_distributor(self):
-        com_id = self.env.company
+        com_id = self.env.company or self.env['res.company'].search([('wp_url', '=', True),
+                                                                     ('woo_ck', '=', True),
+                                                                     ('woo_cs', '=', True)], order='id asc', limit=1)
         wp_user = com_id.wp_user
         wp_pass = com_id.wp_pass
         c = string.ascii_lowercase + string.ascii_uppercase + string.digits
@@ -1026,7 +915,6 @@ class PurchaseOrder(models.Model):
     def create(self, vals):
         partner_id = vals["partner_id"]
         name_vend = self._compute_vendor_purchase(partner_id)
-        print(name_vend)
         if name_vend:
             vals['vend_name'] = name_vend
         rec = super(PurchaseOrder, self).create(vals)
@@ -1242,25 +1130,23 @@ class SaleOrder(models.Model):
             ['khoakim_customize.mail_act_sale_approval_kk'])
         if self.state == 'draft':
             for sale_deny in self.filtered(lambda hol: hol.state == 'draft'):
-                # print(sale_approval)
                 sale_deny.activity_schedule(
                     'khoakim_customize.mail_act_sale_approval_kk',
                     user_id=sale_deny.user_id.id or self.env.uid)
 
     #thông báo khi cập nhật đơn hàng
-    def notify_so_mess(self):
-        if self.state:
-            channel_all = self.env['mail.channel'].search([('id', '=', 1)])
-            vals = {
-                'message_type': 'comment',
-                'subtype_id': self.env.ref('mail.mt_note').id,
-                'model': 'mail.channel',
-                'res_id': channel_all.id,
-                'body': "Test đơn hàng",
-            }
-            mess = self.env['mail.message'].create(vals)
-            print(mess)
-            return mess
+    # def notify_so_mess(self):
+    #     if self.state:
+    #         channel_all = self.env['mail.channel'].search([('id', '=', 1)])
+    #         vals = {
+    #             'message_type': 'comment',
+    #             'subtype_id': self.env.ref('mail.mt_note').id,
+    #             'model': 'mail.channel',
+    #             'res_id': channel_all.id,
+    #             'body': "Test đơn hàng",
+    #         }
+    #         mess = self.env['mail.message'].create(vals)
+    #         return mess
 
     #cập nhật giá sản phẩm
     def update_prices_custom(self):

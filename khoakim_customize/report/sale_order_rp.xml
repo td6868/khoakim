@@ -81,22 +81,22 @@
                     </div>
                 </div>
 
-                <div class="row mt32 mb32" id="sale_person_info" style="font-size: 17px">
-                    <div class="col-12 mw-100 mb-2">
-                        <t t-if="doc.user_id.name">
-                            <strong style="color: #5b4931;">Nhân viên kinh doanh: </strong>
-                            <span t-field="doc.user_id.name" t-options='{"widget": "text"}'/>
-                        </t>
-                    </div>
-                </div>
-                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">
-                    <div class="col-12 mw-100 mb-2">
-                        <t t-if="doc.user_id.mobile">
-                            <strong style="color: #5b4931;">Số điện thoại: </strong>
-                            <span t-field="doc.user_id.phone or doc.user_id.mobile" t-options='{"widget": "text"}'/>
-                        </t>
-                    </div>
-                </div>
+<!--                <div class="row mt32 mb32" id="sale_person_info" style="font-size: 17px">-->
+<!--                    <div class="col-12 mw-100 mb-2">-->
+<!--                        <t t-if="doc.user_id.name">-->
+<!--                            <strong style="color: #5b4931;">Nhân viên kinh doanh: </strong>-->
+<!--                            <span t-field="doc.user_id.name" t-options='{"widget": "text"}'/>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="row mt64 mb32" id="customer_info" style="font-size: 17px">-->
+<!--                    <div class="col-12 mw-100 mb-2">-->
+<!--                        <t t-if="doc.user_id.mobile">-->
+<!--                            <strong style="color: #5b4931;">Số điện thoại: </strong>-->
+<!--                            <span t-field="doc.user_id.phone or doc.user_id.mobile" t-options='{"widget": "text"}'/>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </div>-->
 
 <!--                <div class="row mt32 mb32" id="informations">-->
 <!--                    <div t-if="doc.client_order_ref" class="col-12 col-3 mw-100 mb-2">-->
