@@ -289,11 +289,11 @@
                 <field name="wp_ok"/>
             </xpath>
             <xpath expr="//group[@name='description']" position="before">
-                <group name="url_image" position="before" string="Quản lý URL ảnh">
+                <group name="url_image" position="before">
                     <field name="url_img2"/>
                     <field name="url_img3"/>
                     <field name="url_img4"/>
-                    <field name="url_img4"/>
+                    <field name="url_img5"/>
                 </group>
             </xpath>
 
