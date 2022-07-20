@@ -319,7 +319,6 @@
             <xpath expr="//div[@name='options']" position="after">
                 <div>
                     <field name="url_img" label="URL"/>
-                    <field name="sku_wp" invisible="1"/>
                 </div>
             </xpath>
             <xpath expr="//field[@name='default_code']" position="replace">

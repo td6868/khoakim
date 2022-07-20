@@ -5,6 +5,7 @@
     'version' : '1.1',
     'summary': 'Invoices & Payments',
     'sequence': 115,
+    "license": "AGPL-3",
     'description': """
             Module tổng hợp các tùy biến Khoa Kim ERP
     """,
