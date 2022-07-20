@@ -55,7 +55,6 @@
 <!--            <field name="groups_id" eval="[(4, ref('khoakim_customize.group_approval_product_temp'))]"/>-->
         </record>
 
-
 <!--        <record model="ir.actions.server" id="deny_product_template">-->
 <!--            <field name="name">Huỷ sản phẩm</field>-->
 <!--            <field name="model_id" ref="product.model_product_template"/>-->
@@ -136,7 +135,7 @@
         <record id="email_temp_khoakim_purchase" model="mail.template">
             <field name="name">Mẫu gửi nhà cung cấp</field>
             <field name="model_id" ref="purchase.model_purchase_order"/>
-            <field name="subject">发货单/Đơn mua hàng {{ object.vend_code or object.name or 'n/a' }} - {{ object.company_id.name }}</field>
+            <field name="subject">发货单/Đơn mua hàng {{ object.vend_name or object.name or 'n/a' }} - {{ object.company_id.name }}</field>
             <field name="partner_to">{{ object.partner_id.id }}</field>
             <field name="body_html" type="html">
 <div style="margin: 0px; padding: 0px;">
@@ -158,7 +157,7 @@
     </p>
 </div></field>
             <field name="report_template" ref="action_report_purchase_order_customize"/>
-            <field name="report_name">KK_{{ (object.name or '').replace('/','_') }}</field>
+            <field name="report_name">KK_{{ (object.vend_name or object.name or '').replace('/','_') }}</field>
             <field name="lang">{{ object.partner_id.lang }}</field>
             <field name="auto_delete" eval="True"/>
         </record>
