@@ -184,6 +184,17 @@
         </field>
     </record>
 
+    <record id="view_tree_order_purchase_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="vend_name"/>
+            </xpath>
+        </field>
+    </record>
+
 
     <record id="view_product_attribute_form_inherit" model="ir.ui.view">
         <field name="name">product.attribute.form.inherit</field>
@@ -349,7 +360,6 @@
                     <li><strong>Thực tế: <field name="qty_available"/> sản phẩm</strong></li>
                 </ul>
             </xpath>
-
         </field>
     </record>
 

@@ -284,7 +284,6 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     url_img = fields.Char(string="URL Ảnh 1")
-    sku_wp = fields.Char(string="ID WP")
     default_code = fields.Char(string="Mã nội bộ", compute='_gen_product_code', store=True)
     wp_ok = fields.Boolean(string="Khả dụng ở website")
     prod_code = fields.Char(string="Mã SP/NSX", required=False)
@@ -419,6 +418,7 @@ class ProductCategory(models.Model):
     ccode = fields.Char(string="Mã nhóm sản phẩm", required=True)
     cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
     sku_wp = fields.Char(string="WP ID")
+    url_img = fields.Char(string="URL ảnh")
     wp_ok = fields.Char(string="Khả dụng trên website")
     cate_id = fields.Integer(string="ID WP")
 
@@ -448,17 +448,18 @@ class ProductCategory(models.Model):
     def update_catg_gsheet(self, catg_ids):
         time_update = fields.Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for rec in catg_ids:
-            cell = WS_CATG.find(query=str(rec.id), in_row=2)
-            vals = [time_update, rec.id, rec.name, rec.ccode, rec.parent_id.name]
-            if cell:
-                row = cell.row
-            else:
-                row = next_available_row(WS_CATG)
-            cells = []
-            for i in range(len(vals)):
-                cells.append(Cell(row=int(row), col=i + 1, value=vals[i]))
-            WS_CATG.update_cells(cells)
-            time.sleep(2)
+            if rec.wp_ok:
+                cell = WS_CATG.find(query=str(rec.id), in_row=2)
+                vals = [time_update, rec.id, rec.name, rec.ccode, rec.parent_id.name]
+                if cell:
+                    row = cell.row
+                else:
+                    row = next_available_row(WS_CATG)
+                cells = []
+                for i in range(len(vals)):
+                    cells.append(Cell(row=int(row), col=i + 1, value=vals[i]))
+                WS_CATG.update_cells(cells)
+                time.sleep(2)
 
     # Đồng bộ hoá gsheet
     def sync_odoo_catg_gsheet(self):
@@ -489,6 +490,7 @@ class ProductCategory(models.Model):
         data = {
             "name": self.name,
             "parent": self.parent_id.cate_id or 0,
+            "image": self.url_img or "",
             "description": "",
         }
         if self.cate_id:
@@ -504,18 +506,10 @@ class ProductCategory(models.Model):
     #Đồng bộ danh mục
     def sync_categ_product_wp(self):
         wcapi = self.wp_auth()
-        i = 0
         if wcapi:
             for p in self.browse(self.env.context['active_ids']):
-                sync = p.check_categ_wp(wcapi)
-                if sync:
-                    i += 1
-        return {
-                    'warning': {
-                        'title': ('Đã có lỗi'),
-                        'message': (("Đã đồng bộ %s danh mục!") % (i)),
-                    },
-                }
+                if p.wp_ok:
+                    p.check_categ_wp(wcapi)
 
     # đồng bộ tự động
     def auto_sync_category_wp(self):
@@ -663,9 +657,14 @@ class ProductProduct(models.Model):
             if s:
                 images.append({"src": s})
 
+        status = 'private'
+        if self.product_tmpl_id.wp_ok:
+            status = 'publish'
+
         data = {
                     "name": variants['name'],
                     "type": "simple",
+                    "status": status,
                     "regular_price": str(prices['main']),
                     "description": "",
                     "short_description": variants['attrs'],
@@ -781,17 +780,8 @@ class ProductProduct(models.Model):
 
     #batch đồng bộ sản phẩm
     def batch_sync_product_wp(self):
-        i = 0
         for p in self.browse(self.env.context['active_ids']):
-            sync = p.sync_product_wp()
-            if sync:
-                i += 1
-        return {
-                        'warning': {
-                            'title': ('Đã có lỗi'),
-                            'message': (("Đã đồng bộ %s sản phẩm!") % (i)),
-                        },
-                    }
+            p.sync_product_wp()
 
     #đồng bộ tự động
     def auto_sync_product_wp(self):

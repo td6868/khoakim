@@ -146,7 +146,7 @@
             (<t t-out="object.partner_id.parent_id.name or ''">Azure Interior</t>)
         </t>
         <br/><br/>
-        Here is in attachment a request for quotation <strong t-out="object.name or ''">P00015</strong>
+        Here is in attachment a request for quotation <strong t-out="object.vend_name or object.name or ''">P00015</strong>
         <t t-if="object.partner_ref">
             with reference: <t t-out="object.partner_ref or ''">REF_XXX</t>
         </t>
@@ -164,5 +164,6 @@
         </record>
 
     </data>
+
 
 </odoo>
