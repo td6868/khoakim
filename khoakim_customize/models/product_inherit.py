@@ -785,7 +785,7 @@ class ProductProduct(models.Model):
 
     #đồng bộ tự động
     def auto_sync_product_wp(self):
-        prod_ids = self.env['product.product'].search([], order='id asc')
+        prod_ids = self.env['product.product'].search([('detailed_type', '=', 'product')], order='id asc')
         for rec in prod_ids:
             rec.sync_product_wp()
 
@@ -1023,7 +1023,7 @@ class SaleOrder(models.Model):
     def check_price_quotation(self):
         if self.order_line:
             for line in self.order_line:
-                if line.new_price_unit == 0:
+                if (line.new_price_unit == 0 and line.display_type == False):
                     return line.name
         return False
 
