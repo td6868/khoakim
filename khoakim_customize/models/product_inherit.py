@@ -1219,11 +1219,11 @@ class StockLandedCost(models.Model):
 
     @api.depends('picking_ids')
     def total_weight_prod(self):
+        total_weight = 0
         if self.picking_ids:
-            total_weight = 0
             for picking_id in self.picking_ids:
                 total_weight += picking_id.weight
-            self.total_weight = total_weight
+        self.total_weight = total_weight
         if self.cost_lines:
             for line in self.cost_lines:
                 if line.provisional == True:
