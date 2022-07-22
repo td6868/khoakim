@@ -370,10 +370,8 @@
             <xpath expr="//field[@name='parent_id']" position="after">
                 <field name="ccode"/>
                 <field name="cate_code"/>
+                <field name="cate_id" invisible="1"/>
             </xpath>
-<!--            <xpath expr="//field[@name='categ_id']" position="after">-->
-<!--                <field name="wp_ok"/>-->
-<!--            </xpath>-->
         </field>
     </record>
 
@@ -493,6 +491,25 @@
             <button name="preview_invoice" position="replace">
             </button>
 
+        </field>
+    </record>
+
+    <record id="view_stock_landed_cost_form_inherit" model="ir.ui.view">
+        <field name="name">stock.landed.cost.inherit</field>
+        <field name="model">stock.landed.cost</field>
+        <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_ids']" position="after">
+                <field name="total_weight"/>
+            </xpath>
+            <xpath expr="//field[@name='cost_lines']/tree//field[@name='split_method']" position="before">
+                <field name="total_weight" invisible="1"/>
+                <field name="provisional"/>
+            </xpath>
+            <xpath expr="//field[@name='cost_lines']/form//field[@name='split_method']" position="before">
+                <field name="total_weight" invisible="1"/>
+                <field name="provisional"/>
+            </xpath>
         </field>
     </record>
 
