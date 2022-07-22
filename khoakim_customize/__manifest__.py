@@ -2,10 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name' : 'Khoa Kim Customize',
-    'version' : '1.1',
+    'version' : '1.3',
     'summary': 'Invoices & Payments',
     'sequence': 115,
-    "license": "AGPL-3",
     'description': """
             Module tổng hợp các tùy biến Khoa Kim ERP
     """,
@@ -28,6 +27,8 @@
         "sale",
         "base",
         "product",
+        "stock",
+        "stock_landed_costs",
         "report_xlsx",
     ],
     'demo': [

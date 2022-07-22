@@ -417,7 +417,6 @@ class ProductCategory(models.Model):
 
     ccode = fields.Char(string="Mã nhóm sản phẩm", required=True)
     cate_code = fields.Char(string="Mã nhóm", compute='_gene_code_cate', store=True)
-    sku_wp = fields.Char(string="WP ID")
     url_img = fields.Char(string="URL ảnh")
     wp_ok = fields.Char(string="Khả dụng trên website")
     cate_id = fields.Integer(string="ID WP")
@@ -493,7 +492,7 @@ class ProductCategory(models.Model):
             "image": self.url_img or "",
             "description": "",
         }
-        if self.cate_id:
+        if self.sku_wp:
             update = wcapi.put("products/categories/" + str(self.cate_id), data)
         else:
             update = wcapi.post("products/categories", data)
@@ -1211,6 +1210,36 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
 
     prod_image = fields.Binary(string="Ảnh sản phẩm", related="product_id.image_1920")
+
+class StockLandedCost(models.Model):
+    _inherit = 'stock.landed.cost'
+
+    total_weight = fields.Float(string='Tổng trọng lượng', compute="total_weight_prod")
+    total_volume = fields.Float(string='Tổng khối lượng')
+
+    @api.depends('picking_ids')
+    def total_weight_prod(self):
+        if self.picking_ids:
+            total_weight = 0
+            for picking_id in self.picking_ids:
+                total_weight += picking_id.weight
+            self.total_weight = total_weight
+        if self.cost_lines:
+            for line in self.cost_lines:
+                if line.provisional == True:
+                    line.provisional = False
+
+class StockLandedCostLines(models.Model):
+    _inherit = 'stock.landed.cost.lines'
+
+    total_weight = fields.Float(related="cost_id.total_weight")
+    provisional = fields.Boolean(string="Tạm tính")
+
+    @api.onchange('provisional', 'total_weight', 'split_method')
+    def total_weight_compute(self):
+        if self.provisional and self.split_method == 'by_weight':
+            total_price = self.product_id.standard_price * self.total_weight
+            self.price_unit = total_price
 
 # class WPSetting(models.TransientModel):
 #     _inherit = 'res.config.settings'
